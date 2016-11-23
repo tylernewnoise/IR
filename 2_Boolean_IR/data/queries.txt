@@ -1,0 +1,14 @@
+title:"game of thrones" AND type:episode AND plot:shae AND plot:Baelish
+plot:Skywalker AND type:series
+plot:"year 2200"
+plot:Berlin AND plot:wall AND type:television
+plot:Cthulhu
+title:"saber rider" AND plot:april
+plot:"James Bond" AND plot:"Jaws" AND type:movie
+title:"Pimp my Ride" AND episodetitle:mustang
+plot:"matt berninger"
+title:"grand theft auto" AND type:videogame
+plot:"Jim Jefferies"
+plot:Berlin AND type:videogame
+plot:starcraft AND type:movie
+type:video AND title:"from dusk till dawn"
