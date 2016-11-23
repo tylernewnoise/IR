@@ -1,0 +1,58 @@
+[
+  {
+    "gross":"$132,373,442",
+    "year":"2006",
+    "castList":[
+      "Leonardo DiCaprio",
+      "Matt Damon",
+      "Jack Nicholson",
+      "Mark Wahlberg",
+      "Martin Sheen",
+      "Ray Winstone",
+      "Vera Farmiga",
+      "Anthony Anderson",
+      "Alec Baldwin",
+      "Kevin Corrigan",
+      "James Badge Dale",
+      "David O'Hara",
+      "Mark Rolston",
+      "Robert Wahlberg",
+      "Kristen Dalton"
+    ],
+    "genreList":[
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "description":"In South Boston, the state police force is waging war on Irish-American organized crime. Young undercover cop Billy Costigan (",
+    "directorList":[
+      "Martin Scorsese"
+    ],
+    "characterList":[
+      "Billy",
+      "Colin Sullivan",
+      "Frank Costello",
+      "Dignam",
+      "Queenan",
+      "Mr. French",
+      "Madolyn",
+      "Trooper Brown",
+      "Ellerby",
+      "Cousin Sean",
+      "Trooper Barrigan",
+      "Fitzy",
+      "Delahunt",
+      "Gwen"
+    ],
+    "title":"The Departed",
+    "ratingCount":"892,425",
+    "countryList":[
+      "USA",
+      "Hong Kong"
+    ],
+    "url":"http://akas.imdb.com/title/tt0407887/?ref_=fn_ft_tt_1",
+    "duration":"2h 31min",
+    "ratingValue":"8.5",
+    "budget":"$90,000,000"
+  }
+]

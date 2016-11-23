@@ -1,0 +1,77 @@
+[
+  {
+    "gross":"$234,360,014",
+    "year":"2006",
+    "castList":[
+      "Hugh Jackman",
+      "Halle Berry",
+      "Ian McKellen",
+      "Patrick Stewart",
+      "Famke Janssen",
+      "Anna Paquin",
+      "Kelsey Grammer",
+      "James Marsden",
+      "Rebecca Romijn",
+      "Shawn Ashmore",
+      "Aaron Stanford",
+      "Vinnie Jones",
+      "Ellen Page",
+      "Daniel Cudmore",
+      "Ben Foster"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"When a cure is created, which apparently can turn any mutant into a normal human being, there is outrage amongst the mutant community. Whilst some mutants do like the idea of a cure, including Rogue, many mutants find that there shouldn't be a cure. Magneto, who still believes a war is coming, recruits a large team of mutants to take down Warren Worthington II and his cure. Might seem easy for the X-Men to stop, but Magneto has a big advantage, which Wolverine doesn't have. Jean Grey has returned, and joined with Magneto. The Phoenix has woken within her, which has the ability to destroy anything in her way, even if that 'anything' is a X-Men.",
+    "directorList":[
+      "Brett Ratner"
+    ],
+    "characterList":[
+      "Logan",
+      "Wolverine",
+      "Ororo Munroe",
+      "Storm",
+      "Erik Lehnsherr",
+      "Magneto",
+      "Charles Xavier",
+      "Professor X",
+      "Jean Grey",
+      "Phoenix",
+      "Marie",
+      "Rogue",
+      "Dr. Henry 'Hank' McCoy",
+      "Beast",
+      "Scott Summers",
+      "Cyclops",
+      "Raven Darkholme",
+      "Mystique",
+      "Bobby Drake",
+      "Iceman",
+      "John Allerdyce",
+      "Pyro",
+      "Cain Marko",
+      "Juggernaut",
+      "Kitty Pryde",
+      "Shadowcat",
+      "Peter Rasputin",
+      "Colossus",
+      "Warren Worthington III",
+      "Angel"
+    ],
+    "title":"X-Men: The Last Stand",
+    "ratingCount":"389,818",
+    "countryList":[
+      "Canada",
+      "USA",
+      "UK"
+    ],
+    "url":"http://akas.imdb.com/title/tt0376994/?ref_=fn_ft_tt_1",
+    "duration":"1h 44min",
+    "ratingValue":"6.8",
+    "budget":"$210,000,000"
+  }
+]

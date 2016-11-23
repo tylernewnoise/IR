@@ -1,0 +1,68 @@
+[
+  {
+    "gross":"$458,991,599",
+    "year":"2015",
+    "castList":[
+      "Robert Downey Jr.",
+      "Chris Hemsworth",
+      "Mark Ruffalo",
+      "Chris Evans",
+      "Scarlett Johansson",
+      "Jeremy Renner",
+      "James Spader",
+      "Samuel L. Jackson",
+      "Don Cheadle",
+      "Aaron Taylor-Johnson",
+      "Elizabeth Olsen",
+      "Paul Bettany",
+      "Cobie Smulders",
+      "Anthony Mackie",
+      "Hayley Atwell"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "description":"Tony Stark creates the Ultron Program to protect the world, but when the peacekeeping program becomes hostile, The Avengers go into action to try and defeat a virtually impossible enemy together. Earth's mightiest heroes must come together once again to protect the world from global extinction.",
+    "directorList":[
+      "Joss Whedon"
+    ],
+    "characterList":[
+      "Tony Stark",
+      "Iron Man",
+      "Thor",
+      "Bruce Banner",
+      "Hulk",
+      "Steve Rogers",
+      "Captain America",
+      "Natasha Romanoff",
+      "Black Widow",
+      "Clint Barton",
+      "Hawkeye",
+      "Ultron",
+      "Nick Fury",
+      "James Rhodes",
+      "War Machine",
+      "Pietro Maximoff",
+      "Quicksilver",
+      "Wanda Maximoff",
+      "Scarlet Witch",
+      "Jarvis",
+      "Vision",
+      "Maria Hill",
+      "Sam Wilson",
+      "Falcon",
+      "Peggy Carter"
+    ],
+    "title":"Avengers: Age of Ultron",
+    "ratingCount":"480,141",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2395427/?ref_=fn_ft_tt_1",
+    "duration":"2h 21min",
+    "ratingValue":"7.5",
+    "budget":"$250,000,000"
+  }
+]

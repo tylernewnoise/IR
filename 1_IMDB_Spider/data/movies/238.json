@@ -1,0 +1,48 @@
+[
+  {
+    "gross":"$89,021,735",
+    "year":"2013",
+    "castList":[
+      "Tom Cruise",
+      "Morgan Freeman",
+      "Olga Kurylenko",
+      "Andrea Riseborough",
+      "Nikolaj Coster-Waldau",
+      "Melissa Leo",
+      "Zoë Bell",
+      "Abigail Lowe",
+      "Isabelle Lowe",
+      "David Madison"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Mystery",
+      "Sci-Fi"
+    ],
+    "description":"One of the few remaining drone repairmen assigned to Earth, its surface devastated after decades of war with the alien Scavs, discovers a crashed spacecraft with contents that bring into question everything he believed about the war, and may even put the fate of mankind in his hands.",
+    "directorList":[
+      "Joseph Kosinski"
+    ],
+    "characterList":[
+      "Jack",
+      "Beech",
+      "Julia",
+      "Victoria",
+      "Sykes",
+      "Sally",
+      "Kara",
+      "Julia's Child",
+      "Julia's Child"
+    ],
+    "title":"Oblivion",
+    "ratingCount":"394,325",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1483013/?ref_=fn_ft_tt_1",
+    "duration":"2h 4min",
+    "ratingValue":"7.0",
+    "budget":"$120,000,000"
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "gross":"$144,795,350",
+    "year":"2004",
+    "castList":[
+      "Will Smith",
+      "Bridget Moynahan",
+      "Alan Tudyk",
+      "James Cromwell",
+      "Bruce Greenwood",
+      "Adrian Ricard",
+      "Chi McBride",
+      "Jerry Wasserman",
+      "Fiona Hogan",
+      "Peter Shinkoda",
+      "Terry Chen",
+      "David Haysom",
+      "Scott Heindl",
+      "Sharon Wilkins",
+      "Craig March"
+    ],
+    "genreList":[
+      "Action",
+      "Mystery",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"In 2035, technophobic homicide detective Del Spooner of the Chicago PD heads the investigation of the apparent suicide of leading robotics scientist, Dr. Alfred Lanning. Unconvinced of the motive, Spooner's investigation into Lanning's death reveals a trail of secrets and agendas within the USR (United States Robotics) corporation and suspicions of murder. Little does he know that his investigation would lead to uncovering a larger threat to humanity.",
+    "directorList":[
+      "Alex Proyas"
+    ],
+    "characterList":[
+      "Del Spooner",
+      "Susan Calvin",
+      "Sonny",
+      "Dr. Alfred Lanning",
+      "Lawrence Robertson",
+      "Granny",
+      "Lt. John Bergin",
+      "Baldez",
+      "V.I.K.I.",
+      "Chin",
+      "Chin",
+      "NS4 Robot",
+      "NS5 Robot",
+      "NS4 Robot",
+      "NS5 Robot",
+      "Asthmatic Woman"
+    ],
+    "title":"I, Robot",
+    "ratingCount":"395,103",
+    "countryList":[
+      "USA",
+      "Germany"
+    ],
+    "url":"http://akas.imdb.com/title/tt0343818/?ref_=fn_ft_tt_1",
+    "duration":"1h 55min",
+    "ratingValue":"7.1",
+    "budget":"$120,000,000"
+  }
+]

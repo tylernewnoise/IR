@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$100,446,895",
+    "year":"2003",
+    "castList":[
+      "Mike Myers",
+      "Alec Baldwin",
+      "Kelly Preston",
+      "Dakota Fanning",
+      "Spencer Breslin",
+      "Amy Hill",
+      "Sean Hayes",
+      "Danielle Chuchran",
+      "Taylor Rice",
+      "Brittany Oaks",
+      "Talia-Lynn Prairie",
+      "Dan Castellaneta",
+      "Victor Brandt",
+      "Daran Norris",
+      "Bugsy"
+    ],
+    "genreList":[
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Fantasy"
+    ],
+    "description":"Conrad and Sally Walden (",
+    "directorList":[
+      "Bo Welch"
+    ],
+    "characterList":[
+      "The Cat",
+      "Quinn",
+      "Mom",
+      "Sally",
+      "Conrad",
+      "Mrs. Kwan",
+      "Mr. Humberfloob",
+      "Voice of the Fish",
+      "Thing One",
+      "Thing One",
+      "Thing Two",
+      "Thing Two",
+      "Thing One",
+      "Thing Two",
+      "Nevins"
+    ],
+    "title":"The Cat in the Hat",
+    "ratingCount":"36,638",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0312528/?ref_=fn_ft_tt_1",
+    "duration":"1h 22min",
+    "ratingValue":"3.8",
+    "budget":"$109,000,000"
+  }
+]

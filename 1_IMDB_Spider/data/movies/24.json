@@ -1,0 +1,58 @@
+[
+  {
+    "gross":"$652,177,271",
+    "year":"2015",
+    "castList":[
+      "Chris Pratt",
+      "Bryce Dallas Howard",
+      "Irrfan Khan",
+      "Vincent D'Onofrio",
+      "Ty Simpkins",
+      "Nick Robinson",
+      "Jake Johnson",
+      "Omar Sy",
+      "BD Wong",
+      "Judy Greer",
+      "Lauren Lapkus",
+      "Brian Tee",
+      "Katie McGrath",
+      "Andy Buckley",
+      "Eric Edelstein"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "description":"22 years after the original Jurassic Park failed, the new park (also known as Jurassic World) is open for business. After years of studying genetics the scientists on the park genetically engineer a new breed of dinosaur. When everything goes horribly wrong, will our heroes make it off the island?",
+    "directorList":[
+      "Colin Trevorrow"
+    ],
+    "characterList":[
+      "Owen",
+      "Claire",
+      "Masrani",
+      "Hoskins",
+      "Gray",
+      "Zach",
+      "Lowery",
+      "Barry",
+      "Dr. Henry Wu",
+      "Karen",
+      "Vivian",
+      "Hamada",
+      "Zara",
+      "Scott",
+      "Paddock Supervisor"
+    ],
+    "title":"Jurassic World",
+    "ratingCount":"429,894",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0369610/?ref_=fn_ft_tt_1",
+    "duration":"2h 4min",
+    "ratingValue":"7.0",
+    "budget":"$150,000,000"
+  }
+]

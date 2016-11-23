@@ -1,0 +1,53 @@
+[
+  {
+    "gross":"$186,336,103",
+    "year":"2005",
+    "castList":[
+      "Brad Pitt",
+      "Angelina Jolie",
+      "Vince Vaughn",
+      "Adam Brody",
+      "Kerry Washington",
+      "Keith David",
+      "Chris Weitz",
+      "Rachael Huntley",
+      "Michelle Monaghan",
+      "Stephanie March",
+      "Jennifer Morrison",
+      "Theresa Barrera",
+      "Perrey Reeves",
+      "Melanie Tolbert",
+      "Jerry T. Adams"
+    ],
+    "genreList":[
+      "Action",
+      "Comedy",
+      "Crime",
+      "Romance",
+      "Thriller"
+    ],
+    "description":"John and Jane Smith are a normal married couple, living a normal life in a normal suburb, working normal jobs...well, if you can call secretly being assassins \"normal\". But neither Jane nor John knows about their spouse's secret, until they are surprised to find each other as targets! But on their quest to kill each other, they learn a lot more about each other than they ever did in five (or six) years of marriage.",
+    "directorList":[
+      "Doug Liman"
+    ],
+    "characterList":[
+      "John Smith",
+      "Jane Smith",
+      "Eddie",
+      "Benjamin Danz",
+      "Jasmine",
+      "Martin Coleman",
+      "Suzy Coleman",
+      "Gwen"
+    ],
+    "title":"Mr. and Mrs. Smith",
+    "ratingCount":"355,705",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0356910/?ref_=fn_ft_tt_1",
+    "duration":"2h",
+    "ratingValue":"6.5",
+    "budget":"$120,000,000"
+  }
+]

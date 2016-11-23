@@ -1,0 +1,49 @@
+[
+  {
+    "gross":"$50,802,661",
+    "year":"2000",
+    "castList":[
+      "Kevin Kline",
+      "Kenneth Branagh",
+      "Rosie Perez",
+      "Armand Assante",
+      "Edward James Olmos",
+      "Jim Cummings",
+      "Frank Welker",
+      "Tobin Bell",
+      "Duncan Marjoribanks",
+      "Elijah Chiang",
+      "Cyrus Shaki-Khan",
+      "Elton John"
+    ],
+    "genreList":[
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Romance"
+    ],
+    "description":"The story is about two swindlers who get their hands on a map to the fabled city of gold, El Dorado while pulling off some sort of scam. Their plan goes bad and the rogues end up lost at sea after a number of misfortunes. Oddly enough, they end up on the shores of El Dorado and are worshiped by the natives for their foreign appearance.",
+    "directorList":[
+      "Bibo Bergeron",
+      "Don Paul"
+    ],
+    "characterList":[
+      "Tulio",
+      "Miguel",
+      "Chel",
+      "Tzekel-Kan",
+      "Chief",
+      "Cortes"
+    ],
+    "title":"The Road to El Dorado",
+    "ratingCount":"59,875",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0138749/?ref_=fn_ft_tt_1",
+    "duration":"1h 29min",
+    "ratingValue":"6.9",
+    "budget":"$95,000,000"
+  }
+]

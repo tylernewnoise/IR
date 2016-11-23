@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$43,982,842",
+    "year":"2009",
+    "castList":[
+      "Mark Wahlberg",
+      "Rachel Weisz",
+      "Susan Sarandon",
+      "Stanley Tucci",
+      "Michael Imperioli",
+      "Saoirse Ronan",
+      "Rose McIver",
+      "Christian Ashdale",
+      "Reece Ritchie",
+      "Carolyn Dando",
+      "Nikki SooHoo",
+      "Andrew James Allen",
+      "Jake Abel",
+      "AJ Michalka",
+      "Tom McCarthy"
+    ],
+    "genreList":[
+      "Drama",
+      "Fantasy",
+      "Thriller"
+    ],
+    "description":"A 14-year-old girl in suburban 1970's Pennsylvania is murdered by her neighbor. She tells the story from the place between Heaven and Earth, showing the lives of the people around her and how they have changed all while attempting to get someone to find her lost body.",
+    "directorList":[
+      "Peter Jackson"
+    ],
+    "characterList":[
+      "Jack Salmon",
+      "Abigail Salmon",
+      "Grandma Lynn",
+      "George Harvey",
+      "Len Fenerman",
+      "Susie Salmon",
+      "Lindsey Salmon",
+      "Buckley Salmon",
+      "Ray Singh",
+      "Ruth Connors",
+      "Holly",
+      "Samuel Heckler",
+      "Brian Nelson",
+      "Clarissa",
+      "Principal Caden"
+    ],
+    "title":"The Lovely Bones",
+    "ratingCount":"126,799",
+    "countryList":[
+      "USA",
+      "UK",
+      "New Zealand"
+    ],
+    "url":"http://akas.imdb.com/title/tt0380510/?ref_=fn_ft_tt_1",
+    "duration":"2h 15min",
+    "ratingValue":"6.7",
+    "budget":"$65,000,000"
+  }
+]

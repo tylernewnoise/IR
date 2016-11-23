@@ -1,0 +1,61 @@
+[
+  {
+    "gross":"$206,456,431",
+    "year":"2005",
+    "castList":[
+      "Johnny Depp",
+      "Freddie Highmore",
+      "David Kelly",
+      "Helena Bonham Carter",
+      "Noah Taylor",
+      "Missi Pyle",
+      "James Fox",
+      "Deep Roy",
+      "Christopher Lee",
+      "Adam Godley",
+      "Franziska Troegner",
+      "AnnaSophia Robb",
+      "Julia Winter",
+      "Jordan Fry",
+      "Philip Wiegratz"
+    ],
+    "genreList":[
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Fantasy"
+    ],
+    "description":"When Willy Wonka decides to let five children into his chocolate factory, he decides to release five golden tickets in five separate chocolate bars, causing complete mayhem. The tickets start to be found, with the fifth going to a very special boy, called Charlie Bucket. With his Grandpa, Charlie joins the rest of the children to experience the most amazing factory ever. But not everything goes to plan within the factory.",
+    "directorList":[
+      "Tim Burton"
+    ],
+    "characterList":[
+      "Willy Wonka",
+      "Charlie Bucket",
+      "Grandpa Joe",
+      "Mrs. Bucket",
+      "Mr. Bucket",
+      "Mrs. Beauregarde",
+      "Mr. Salt",
+      "Oompa Loompa",
+      "Dr. Wonka",
+      "Mr. Teavee",
+      "Mrs. Gloop",
+      "Violet Beauregarde",
+      "Veruca Salt",
+      "Mike Teavee",
+      "Augustus Gloop"
+    ],
+    "title":"Charlie and the Chocolate Factory",
+    "ratingCount":"327,284",
+    "countryList":[
+      "USA",
+      "UK",
+      "Australia"
+    ],
+    "url":"http://akas.imdb.com/title/tt0367594/?ref_=fn_ft_tt_1",
+    "duration":"1h 55min",
+    "ratingValue":"6.7",
+    "budget":"$150,000,000"
+  }
+]

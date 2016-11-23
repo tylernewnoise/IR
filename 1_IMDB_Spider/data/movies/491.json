@@ -1,0 +1,54 @@
+[
+  {
+    "gross":"$73,215,310",
+    "year":"2002",
+    "castList":[
+      "Matt Damon",
+      "James Cromwell",
+      "Daniel Studi",
+      "Chopper Bernet",
+      "Jeff LeBeau",
+      "John Rubano",
+      "Richard McGonagle",
+      "Matt Levin",
+      "Adam Paul",
+      "Robert Cait",
+      "Charles Napier",
+      "Meredith Wells",
+      "Zahn McClarnon",
+      "Michael Horse",
+      "Donald Fullilove"
+    ],
+    "genreList":[
+      "Animation",
+      "Adventure",
+      "Family",
+      "Western"
+    ],
+    "description":"A wild stallion is captured by humans and slowly loses the will to resist training. Yet throughout his struggles for freedom, the stallion refuses to let go of the hope of one day returning home to his herd.",
+    "directorList":[
+      "Kelly Asbury",
+      "Lorna Cook"
+    ],
+    "characterList":[
+      "Spirit",
+      "The Colonel",
+      "Little Creek",
+      "Sgt. Adams",
+      "Murphy",
+      "Bill",
+      "Joe",
+      "Pete",
+      "Jake"
+    ],
+    "title":"Spirit: Stallion of the Cimarron",
+    "ratingCount":"45,334",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0166813/?ref_=fn_ft_tt_1",
+    "duration":"1h 23min",
+    "ratingValue":"7.0",
+    "budget":"$80,000,000"
+  }
+]

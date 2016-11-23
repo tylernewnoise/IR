@@ -1,0 +1,55 @@
+[
+  {
+    "gross":"$69,102,910",
+    "year":"1998",
+    "castList":[
+      "William Hurt",
+      "Mimi Rogers",
+      "Heather Graham",
+      "Lacey Chabert",
+      "Jack Johnson",
+      "Gary Oldman",
+      "Matt LeBlanc",
+      "Jared Harris",
+      "Mark Goddard",
+      "Lennie James",
+      "Marta Kristen",
+      "June Lockhart",
+      "Edward Fox",
+      "Adam Sims",
+      "Angela Cartwright"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Family",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"In the year 2058, the Earth will soon be uninhabitable after the irreversible effects of pollution and global warming! Professor John Robinson, lead scientist of the Jupiter 2 Mission, will lead his family to the habitable planet Alpha Prime to prep it for colonization. The Jupiter 2 is equipped with a hyperdrive that allows faster-than-light travel, which will eventually be employed to evacuate the citizens of Earth. However hypergates must be constructed on Earth and Alpha Prime to provide stable points of departure and arrival. Dr. Zachary Smith is bribed by a terrorist organization to sabotage the mission, and ends up an unwilling stowaway as the ship blasts off.",
+    "directorList":[
+      "Stephen Hopkins"
+    ],
+    "characterList":[
+      "Prof. John Robinson",
+      "Dr. Maureen Robinson",
+      "Dr. Judy Robinson",
+      "Penny Robinson",
+      "Will Robinson",
+      "Dr. Zachary Smith",
+      "Spider Smith",
+      "Maj. Don West",
+      "Older Will Robinson",
+      "Lab Technician"
+    ],
+    "title":"Lost In Space",
+    "ratingCount":"58,934",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0120738/?ref_=fn_ft_tt_1",
+    "duration":"2h 10min",
+    "ratingValue":"5.1",
+    "budget":"$80,000,000"
+  }
+]

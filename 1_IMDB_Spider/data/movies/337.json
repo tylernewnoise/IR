@@ -1,0 +1,48 @@
+[
+  {
+    "gross":"$10,200,000",
+    "year":"1997",
+    "castList":[
+      "Campbell Scott",
+      "Steve Martin",
+      "Rebecca Pidgeon",
+      "Ben Gazzara",
+      "Ricky Jay",
+      "Felicity Huffman",
+      "Richard L. Friedman",
+      "Jerry Graff",
+      "G. Roy Levin",
+      "Hilary Hinckle",
+      "David Pittu",
+      "Christopher Kaldor",
+      "Mike Robinson",
+      "Olivia Tecosky",
+      "Charlotte Potok"
+    ],
+    "genreList":[
+      "Drama",
+      "Mystery",
+      "Thriller"
+    ],
+    "description":"Joe Ross is a rising star. He's designed a process that will make his company millions. He wants a bonus for this work, but fears his boss will stiff him. He meets a wealthy stranger, Jimmy Dell, and they strike up an off-kilter friendship. When the boss seems to set Ross up to get nothing, he seeks Dell's help. Then he learns Dell is not what he seems, so he contacts an FBI agent through his tightly-wound assistant, Susan Ricci. The FBI asks him to help entrap Dell. He accepts, a sting is arranged, but suddenly it's he who's been conned out of the process and framed for murder. Bewildered and desperate, he enlists Susan's aid to prove his innocence.",
+    "directorList":[
+      "David Mamet"
+    ],
+    "characterList":[
+      "Joseph A. 'Joe' Ross",
+      "Julian 'Jimmy' Dell",
+      "Susan Ricci",
+      "Mr. Klein",
+      "George Lang"
+    ],
+    "title":"The Spanish Prisoner",
+    "ratingCount":"18,859",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0120176/?ref_=fn_ft_tt_1",
+    "duration":"1h 50min",
+    "ratingValue":"7.3",
+    "budget":"$10,000,000"
+  }
+]

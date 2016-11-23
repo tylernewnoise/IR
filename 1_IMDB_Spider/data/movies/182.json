@@ -1,0 +1,47 @@
+[
+  {
+    "gross":"$187,165,546",
+    "year":"2013",
+    "castList":[
+      "Nicolas Cage",
+      "Emma Stone",
+      "Ryan Reynolds",
+      "Catherine Keener",
+      "Cloris Leachman",
+      "Clark Duke",
+      "Chris Sanders",
+      "Randy Thom"
+    ],
+    "genreList":[
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Fantasy"
+    ],
+    "description":"The Croods is a prehistoric comedy adventure that follows the world's first family as they embark on a journey of a lifetime when the cave that has always shielded them from danger is destroyed. Traveling across a spectacular landscape, the Croods discover an incredible new world filled with fantastic creatures -- and their outlook is changed forever.",
+    "directorList":[
+      "Kirk De Micco",
+      "Chris Sanders"
+    ],
+    "characterList":[
+      "Grug",
+      "Eep",
+      "Guy",
+      "Ugga",
+      "Gran",
+      "Thunk",
+      "Belt",
+      "Sandy"
+    ],
+    "title":"The Croods",
+    "ratingCount":"153,430",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0481499/?ref_=fn_ft_tt_1",
+    "duration":"1h 38min",
+    "ratingValue":"7.3",
+    "budget":"$135,000,000"
+  }
+]

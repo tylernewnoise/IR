@@ -1,0 +1,49 @@
+[
+  {
+    "gross":"$142,614,158",
+    "year":"2011",
+    "castList":[
+      "Hank Azaria",
+      "Neil Patrick Harris",
+      "Jayma Mays",
+      "Sofía Vergara",
+      "Tim Gunn",
+      "Madison McKinley",
+      "Meg Phillips",
+      "Julie Chang",
+      "Roger Clark",
+      "Mark Doherty",
+      "Minglie Chen",
+      "Sean Kenin",
+      "Victor Pagan",
+      "Mahadeo Shivraj",
+      "Adria Baratta"
+    ],
+    "genreList":[
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Fantasy"
+    ],
+    "description":"When the evil wizard Gargamel chases the tiny blue Smurfs out of their village, they tumble from their magical world and into ours -- in fact, smack dab in the middle of Central Park. Just three apples high and stuck in the Big Apple, the Smurfs must find a way to get back to their village before Gargamel tracks them down.",
+    "directorList":[
+      "Raja Gosnell"
+    ],
+    "characterList":[
+      "Gargamel",
+      "Patrick Winslow",
+      "Grace Winslow",
+      "Odile Anjelou"
+    ],
+    "title":"The Smurfs",
+    "ratingCount":"67,561",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0472181/?ref_=fn_ft_tt_1",
+    "duration":"1h 43min",
+    "ratingValue":"5.5",
+    "budget":"$110,000,000"
+  }
+]

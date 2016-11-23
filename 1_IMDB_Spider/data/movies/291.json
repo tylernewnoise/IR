@@ -1,0 +1,44 @@
+[
+  {
+    "gross":"$6,712,451",
+    "year":"2001",
+    "castList":[
+      "Warren Beatty",
+      "Nastassja Kinski",
+      "Diane Keaton",
+      "Goldie Hawn",
+      "Garry Shandling",
+      "Vincent Lascoumes",
+      "William Hootkins",
+      "Terri Hoyos",
+      "Josh Hartnett",
+      "Tricia Vessey",
+      "Marc Casabani",
+      "Del Zamora",
+      "Katharine Towne",
+      "Tony Abatemarco",
+      "Eve Crawford"
+    ],
+    "genreList":[
+      "Comedy",
+      "Romance"
+    ],
+    "description":"Porter Stoddard is a well-known New York architect who is at a crossroads... a nexus where twists and turns lead to myriad missteps, some with his wife Ellie, others with longtime friends Mona and her husband Griffin. Deciding which direction to take often leads to unexpected encounters with hilarious consequences.",
+    "directorList":[
+      "Peter Chelsom"
+    ],
+    "characterList":[
+      "Porter",
+      "Griffin"
+    ],
+    "title":"Town & Country",
+    "ratingCount":"4,130",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0141907/?ref_=fn_ft_tt_1",
+    "duration":"1h 44min",
+    "ratingValue":"4.4",
+    "budget":"$90,000,000"
+  }
+]

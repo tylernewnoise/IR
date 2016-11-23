@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$380,262,555",
+    "year":"2005",
+    "castList":[
+      "Ewan McGregor",
+      "Natalie Portman",
+      "Hayden Christensen",
+      "Ian McDiarmid",
+      "Samuel L. Jackson",
+      "Jimmy Smits",
+      "Frank Oz",
+      "Anthony Daniels",
+      "Christopher Lee",
+      "Keisha Castle-Hughes",
+      "Silas Carson",
+      "Jay Laga'aia",
+      "Bruce Spence",
+      "Wayne Pygram",
+      "Temuera Morrison"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Sci-Fi"
+    ],
+    "description":"During the near end of the clone wars, Darth Sidious has revealed himself and is ready to execute the last part of his plan to rule the Galaxy. Sidious is ready for his new apprentice, Lord Vader, to step into action and kill the remaining Jedi. Vader, however, struggles to choose the dark side and save his wife or remain loyal to the Jedi order.",
+    "directorList":[
+      "George Lucas"
+    ],
+    "characterList":[
+      "Obi-Wan Kenobi",
+      "Padmé",
+      "Anakin Skywalker",
+      "Supreme Chancellor Palpatine",
+      "Mace Windu",
+      "Senator Bail Organa",
+      "Yoda",
+      "C-3PO",
+      "Count Dooku",
+      "Queen of Naboo",
+      "Ki-Adi-Mundi",
+      "Nute Gunray",
+      "Captain Typho",
+      "Tion Medon",
+      "Governor Tarkin",
+      "Commander Cody"
+    ],
+    "title":"Star Wars III: Revenge of the Sith",
+    "ratingCount":"529,563",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0121766/?ref_=fn_ft_tt_1",
+    "duration":"2h 20min",
+    "ratingValue":"7.6",
+    "budget":"$113,000,000"
+  }
+]

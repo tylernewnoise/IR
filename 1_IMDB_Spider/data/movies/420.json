@@ -1,0 +1,56 @@
+[
+  {
+    "gross":"$126,149,655",
+    "year":"2012",
+    "castList":[
+      "Denzel Washington",
+      "Ryan Reynolds",
+      "Vera Farmiga",
+      "Brendan Gleeson",
+      "Sam Shepard",
+      "Rubén Blades",
+      "Nora Arnezeder",
+      "Robert Patrick",
+      "Liam Cunningham",
+      "Joel Kinnaman",
+      "Fares Fares",
+      "Jenna Dover",
+      "Stephen Rider",
+      "Daniel Fox",
+      "Tracie Thoms"
+    ],
+    "genreList":[
+      "Action",
+      "Crime",
+      "Mystery",
+      "Thriller"
+    ],
+    "description":"Matt Weston (",
+    "directorList":[
+      "Daniel Espinosa"
+    ],
+    "characterList":[
+      "Tobin Frost",
+      "Matt Weston",
+      "Catherine Linklater",
+      "David Barlow",
+      "Harlan Whitford",
+      "Carlos Villar",
+      "Ana Moreau",
+      "Daniel Kiefer",
+      "Alec Wade",
+      "Keller"
+    ],
+    "title":"Safe House",
+    "ratingCount":"169,170",
+    "countryList":[
+      "USA",
+      "South Africa",
+      "Japan"
+    ],
+    "url":"http://akas.imdb.com/title/tt1599348/?ref_=fn_ft_tt_1",
+    "duration":"1h 55min",
+    "ratingValue":"6.8",
+    "budget":"$85,000,000"
+  }
+]

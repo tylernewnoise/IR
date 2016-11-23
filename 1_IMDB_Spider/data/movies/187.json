@@ -1,0 +1,61 @@
+[
+  {
+    "gross":"$83,024,900",
+    "year":"2013",
+    "castList":[
+      "Ryan Reynolds",
+      "Paul Giamatti",
+      "Michael Peña",
+      "Samuel L. Jackson",
+      "Luis Guzmán",
+      "Bill Hader",
+      "Snoop Dogg",
+      "Maya Rudolph",
+      "Ben Schwartz",
+      "Richard Jenkins",
+      "Ken Jeong",
+      "Michelle Rodriguez",
+      "Mario Andretti",
+      "Mike Bell",
+      "Aidan Andrews"
+    ],
+    "genreList":[
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Sci-Fi",
+      "Sport"
+    ],
+    "description":"After a freak accident infuses him with the power of super-speed, Turbo kicks into overdrive and embarks on an extraordinary journey to achieve the seemingly impossible: competing in the world's fastest race, the Indianapolis 500. With the help of his tricked-out streetwise snail crew, this ultimate underdog puts his heart and shell on the line to prove that no dream is too big, and no dreamer too small.",
+    "directorList":[
+      "David Soren"
+    ],
+    "characterList":[
+      "Turbo",
+      "Chet",
+      "Tito",
+      "Whiplash",
+      "Angelo",
+      "Guy Gagné",
+      "Smoove Move",
+      "Burn",
+      "Skidmark",
+      "Kim Ly",
+      "Paz",
+      "Dos Bros Customer",
+      "Race Official",
+      "White Shadow",
+      "Bike Boy"
+    ],
+    "title":"Turbo",
+    "ratingCount":"63,461",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1860353/?ref_=fn_ft_tt_1",
+    "duration":"1h 36min",
+    "ratingValue":"6.5",
+    "budget":"$135,000,000"
+  }
+]

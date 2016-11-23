@@ -1,0 +1,61 @@
+[
+  {
+    "gross":"$24,985,612",
+    "year":"2015",
+    "castList":[
+      "Chris Hemsworth",
+      "Benjamin Walker",
+      "Cillian Murphy",
+      "Brendan Gleeson",
+      "Ben Whishaw",
+      "Michelle Fairley",
+      "Tom Holland",
+      "Paul Anderson",
+      "Frank Dillane",
+      "Joseph Mawle",
+      "Edward Ashley",
+      "Sam Keeley",
+      "Osy Ikhile",
+      "Gary Beadle",
+      "Jamie Sives"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Biography",
+      "Drama",
+      "History",
+      "Thriller"
+    ],
+    "description":"In the winter of 1820, the New England whaling ship Essex was assaulted by something no one could believe: a whale of mammoth size and will, and an almost human sense of vengeance. The real-life maritime disaster would inspire Herman Melville's Moby-Dick. But that told only half the story. \"In the Heart of the Sea\" reveals the encounter's harrowing aftermath, as the ship's surviving crew is pushed to their limits and forced to do the unthinkable to stay alive. Braving storms, starvation, panic and despair, the men will call into question their deepest beliefs, from the value of their lives to the morality of their trade, as their captain searches for direction on the open sea and his first mate still seeks to bring the great whale down.",
+    "directorList":[
+      "Ron Howard"
+    ],
+    "characterList":[
+      "Owen Chase",
+      "George Pollard",
+      "Matthew Joy",
+      "Tom Nickerson",
+      "Herman Melville",
+      "Mrs. Nickerson",
+      "Thomas Nickerson",
+      "Henry Coffin",
+      "Benjamin Lawrence",
+      "Richard Peterson",
+      "William Bond"
+    ],
+    "title":"In the Heart of the Sea",
+    "ratingCount":"79,873",
+    "countryList":[
+      "USA",
+      "Australia",
+      "Spain",
+      "UK",
+      "Canada"
+    ],
+    "url":"http://akas.imdb.com/title/tt1390411/?ref_=fn_ft_tt_1",
+    "duration":"2h 2min",
+    "ratingValue":"6.9",
+    "budget":"$100,000,000"
+  }
+]

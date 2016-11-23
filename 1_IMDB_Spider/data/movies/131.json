@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$181,015,141",
+    "year":"2011",
+    "castList":[
+      "Chris Hemsworth",
+      "Natalie Portman",
+      "Tom Hiddleston",
+      "Anthony Hopkins",
+      "Stellan Skarsgård",
+      "Kat Dennings",
+      "Clark Gregg",
+      "Colm Feore",
+      "Idris Elba",
+      "Ray Stevenson",
+      "Tadanobu Asano",
+      "Josh Dallas",
+      "Jaimie Alexander",
+      "Rene Russo",
+      "Adriana Barraza"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Sci-Fi"
+    ],
+    "description":"The warrior Thor (Hemsworth) is cast out of the fantastic realm of Asgard by his father Odin (Hopkins) for his arrogance and sent to Earth to live among humans. Falling in love with scientist Jane Foster (Portman) teaches Thor much-needed lessons, and his new-found strength comes into play as a villain from his homeland sends dark forces toward Earth.",
+    "directorList":[
+      "Kenneth Branagh"
+    ],
+    "characterList":[
+      "Thor",
+      "Jane Foster",
+      "Loki",
+      "Odin",
+      "Erik Selvig",
+      "Darcy Lewis",
+      "Agent Coulson",
+      "King Laufey",
+      "Heimdall",
+      "Volstagg",
+      "Hogun",
+      "Fandral",
+      "Sif",
+      "Frigga",
+      "Isabela Alvarez"
+    ],
+    "title":"Thor",
+    "ratingCount":"546,769",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0800369/?ref_=fn_ft_tt_1",
+    "duration":"1h 55min",
+    "ratingValue":"7.0",
+    "budget":"$150,000,000"
+  }
+]

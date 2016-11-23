@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$281,666,058",
+    "year":"2015",
+    "castList":[
+      "Jennifer Lawrence",
+      "Josh Hutcherson",
+      "Liam Hemsworth",
+      "Woody Harrelson",
+      "Donald Sutherland",
+      "Philip Seymour Hoffman",
+      "Julianne Moore",
+      "Willow Shields",
+      "Sam Claflin",
+      "Elizabeth Banks",
+      "Mahershala Ali",
+      "Jena Malone",
+      "Jeffrey Wright",
+      "Paula Malcomson",
+      "Stanley Tucci"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"After young Katniss Everdeen agrees to be the symbol of rebellion, the Mockingjay, she tries to return Peeta to his normal state, tries to get to the Capitol, and tries to deal with the battles coming her way...but all for her main goal: assassinating President Snow and returning peace to the Districts of Panem. As her squad starts to get smaller and smaller, will she make it to the Capitol? Will she get revenge on Snow or will her target change? Will she be with her \"Star-Crossed Lover,\" Peeta, or her long-time friend, Gale? Deaths, bombs, bow and arrows, a love triangle, hope... What will happen?",
+    "directorList":[
+      "Francis Lawrence"
+    ],
+    "characterList":[
+      "Katniss Everdeen",
+      "Peeta Mellark",
+      "Gale Hawthorne",
+      "Haymitch Abernathy",
+      "President Snow",
+      "Plutarch Heavensbee",
+      "President Alma Coin",
+      "Primrose Everdeen",
+      "Finnick Odair",
+      "Effie Trinket",
+      "Boggs",
+      "Johanna Mason",
+      "Beetee",
+      "Katniss' Mother",
+      "Caesar Flickerman"
+    ],
+    "title":"The Hunger Games: Mockingjay - Part 2",
+    "ratingCount":"179,401",
+    "countryList":[
+      "USA",
+      "Germany"
+    ],
+    "url":"http://akas.imdb.com/title/tt1951266/?ref_=fn_ft_tt_1",
+    "duration":"2h 17min",
+    "ratingValue":"6.6",
+    "budget":"$160,000,000"
+  }
+]

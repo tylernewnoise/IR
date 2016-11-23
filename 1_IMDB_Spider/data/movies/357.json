@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$340,478,898",
+    "year":"2002",
+    "castList":[
+      "Bruce Allpress",
+      "Sean Astin",
+      "John Bach",
+      "Sala Baker",
+      "Cate Blanchett",
+      "Orlando Bloom",
+      "Billy Boyd",
+      "Jed Brophy",
+      "Sam Comery",
+      "Brad Dourif",
+      "Calum Gittins",
+      "Bernard Hill",
+      "Bruce Hopkins",
+      "Paris Howe Strewe",
+      "Christopher Lee"
+    ],
+    "genreList":[
+      "Adventure",
+      "Drama",
+      "Fantasy"
+    ],
+    "description":"While Frodo and Sam, now accompanied by a new guide, continue their hopeless journey towards the land of shadow to destroy the One Ring, each member of the broken fellowship plays their part in the battle against the evil wizard Saruman and his armies of Isengard.",
+    "directorList":[
+      "Peter Jackson"
+    ],
+    "characterList":[
+      "Aldor",
+      "Sam",
+      "Madril",
+      "Man Flesh Uruk",
+      "Galadriel",
+      "Legolas",
+      "Pippin",
+      "Sharku",
+      "Snaga",
+      "Eothain",
+      "Wormtongue",
+      "Haleth",
+      "Theoden",
+      "Gamling",
+      "Theodred",
+      "Saruman"
+    ],
+    "title":"The Lord of the Rings: The Two Towers",
+    "ratingCount":"1,122,588",
+    "countryList":[
+      "USA",
+      "New Zealand"
+    ],
+    "url":"http://akas.imdb.com/title/tt0167261/?ref_=fn_ft_tt_1",
+    "duration":"2h 59min",
+    "ratingValue":"8.7",
+    "budget":"$94,000,000"
+  }
+]

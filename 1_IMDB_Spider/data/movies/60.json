@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$533,316,061",
+    "year":"2008",
+    "castList":[
+      "Christian Bale",
+      "Heath Ledger",
+      "Aaron Eckhart",
+      "Michael Caine",
+      "Maggie Gyllenhaal",
+      "Gary Oldman",
+      "Morgan Freeman",
+      "Monique Gabriela Curnen",
+      "Ron Dean",
+      "Cillian Murphy",
+      "Chin Han",
+      "Nestor Carbonell",
+      "Eric Roberts",
+      "Ritchie Coster",
+      "Anthony Michael Hall"
+    ],
+    "genreList":[
+      "Action",
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "description":"Set within a year after the events of Batman Begins, Batman, Lieutenant James Gordon, and new district attorney Harvey Dent successfully begin to round up the criminals that plague Gotham City until a mysterious and sadistic criminal mastermind known only as the Joker appears in Gotham, creating a new wave of chaos. Batman's struggle against the Joker becomes deeply personal, forcing him to \"confront everything he believes\" and improve his technology to stop him. A love triangle develops between Bruce Wayne, Dent and Rachel Dawes.",
+    "directorList":[
+      "Christopher Nolan"
+    ],
+    "characterList":[
+      "Bruce Wayne",
+      "Joker",
+      "Harvey Dent",
+      "Alfred",
+      "Rachel",
+      "Gordon",
+      "Lucius Fox",
+      "Ramirez",
+      "Wuertz",
+      "Scarecrow",
+      "Lau",
+      "Mayor",
+      "Maroni",
+      "Chechen",
+      "Mike Engel"
+    ],
+    "title":"The Dark Knight",
+    "ratingCount":"1,710,852",
+    "countryList":[
+      "USA",
+      "UK"
+    ],
+    "url":"http://akas.imdb.com/title/tt0468569/?ref_=fn_ft_tt_1",
+    "duration":"2h 32min",
+    "ratingValue":"9.0",
+    "budget":"$185,000,000"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "gross":"$47,952,020",
+    "year":"2016",
+    "castList":[
+      "Chris Hemsworth",
+      "Charlize Theron",
+      "Jessica Chastain",
+      "Emily Blunt",
+      "Nick Frost",
+      "Rob Brydon",
+      "Sheridan Smith",
+      "Alexandra Roach",
+      "Sope Dirisu",
+      "Sam Hazeldine",
+      "Sam Claflin",
+      "Sophie Cookson",
+      "Conrad Khan",
+      "Niamh Walter",
+      "Nana Agyeman-Bediako"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Drama",
+      "Fantasy"
+    ],
+    "description":"Eric and fellow warrior Sara, raised as members of ice Queen Freya's army, try to conceal their forbidden love as they fight to survive the wicked intentions of both Freya and her sister Ravenna.",
+    "directorList":[
+      "Cedric Nicolas-Troyan"
+    ],
+    "characterList":[
+      "The Huntsman",
+      "Eric",
+      "Ravenna",
+      "Sara",
+      "Queen Freya",
+      "Nion",
+      "Gryff",
+      "Tull",
+      "William",
+      "Pippa",
+      "Young Eric",
+      "Young Sara",
+      "Young Tull"
+    ],
+    "title":"The Huntsman: Winter's War",
+    "ratingCount":"52,293",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2381991/?ref_=fn_ft_tt_1",
+    "duration":"1h 54min",
+    "ratingValue":"6.1",
+    "budget":"$115,000,000"
+  }
+]

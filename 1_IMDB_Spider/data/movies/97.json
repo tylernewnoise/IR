@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$222,487,711",
+    "year":"2014",
+    "castList":[
+      "Scott Adsit",
+      "Ryan Potter",
+      "Daniel Henney",
+      "T.J. Miller",
+      "Jamie Chung",
+      "Damon Wayans Jr.",
+      "Genesis Rodriguez",
+      "James Cromwell",
+      "Alan Tudyk",
+      "Maya Rudolph",
+      "Abraham Benrubi",
+      "Katie Lowes",
+      "Billy Bush",
+      "Daniel Gerson",
+      "Paul Briggs"
+    ],
+    "genreList":[
+      "Animation",
+      "Action",
+      "Adventure",
+      "Comedy",
+      "Drama",
+      "Family",
+      "Sci-Fi"
+    ],
+    "description":"When a devastating event befalls the city of San Fransokyo and catapults Hiro into the midst of danger, he turns to Baymax and his close friends adrenaline junkie Go Go Tomago, neatnik Wasabi, chemistry whiz Honey Lemon and fanboy Fred. Determined to uncover the mystery, Hiro transforms his friends into a band of high-tech heroes called \"Big Hero 6.\"",
+    "directorList":[
+      "Don Hall",
+      "Chris Williams"
+    ],
+    "characterList":[
+      "Baymax",
+      "Hiro",
+      "Tadashi",
+      "Fred",
+      "Go Go",
+      "Wasabi",
+      "Honey Lemon",
+      "Robert Callaghan",
+      "Alistair Krei",
+      "Cass",
+      "Yama"
+    ],
+    "title":"Big Hero 6",
+    "ratingCount":"288,425",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2245084/?ref_=fn_ft_tt_1",
+    "duration":"1h 42min",
+    "ratingValue":"7.9",
+    "budget":"$165,000,000"
+  }
+]

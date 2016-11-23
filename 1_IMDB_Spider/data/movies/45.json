@@ -1,0 +1,56 @@
+[
+  {
+    "gross":"$172,051,787",
+    "year":"2010",
+    "castList":[
+      "Jeff Bridges",
+      "Garrett Hedlund",
+      "Olivia Wilde",
+      "Bruce Boxleitner",
+      "James Frain",
+      "Beau Garrett",
+      "Michael Sheen",
+      "Anis Cheurfa",
+      "Serinda Swan",
+      "Yaya DaCosta",
+      "Elizabeth Mathis",
+      "Kis Yurij",
+      "Conrad Coates",
+      "Daft Punk",
+      "Ron Selmour"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "description":"Sam Flynn, the tech-savvy 27-year-old son of Kevin Flynn, looks into his father's disappearance and finds himself pulled into the same world of fierce programs and gladiatorial games where his father has been living for 20 years. Along with Kevin's loyal confidant Quorra, father and son embark on a life-and-death journey across a visually-stunning cyber universe that has become far more advanced and exceedingly dangerous. Meanwhile, the malevolent program CLU, who dominates the digital world, plans to invade the real world and will stop at nothing to prevent their escape.",
+    "directorList":[
+      "Joseph Kosinski"
+    ],
+    "characterList":[
+      "Kevin Flynn",
+      "Clu",
+      "Sam Flynn",
+      "Quorra",
+      "Alan Bradley",
+      "Tron",
+      "Jarvis",
+      "Gem",
+      "Castor",
+      "Zuse",
+      "Rinzler",
+      "Bartik",
+      "Masked DJ's"
+    ],
+    "title":"Tron: Legacy",
+    "ratingCount":"267,119",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1104001/?ref_=fn_ft_tt_1",
+    "duration":"2h 5min",
+    "ratingValue":"6.8",
+    "budget":"$170,000,000"
+  }
+]

@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$936,627,416",
+    "year":"2015",
+    "castList":[
+      "Harrison Ford",
+      "Mark Hamill",
+      "Carrie Fisher",
+      "Adam Driver",
+      "Daisy Ridley",
+      "John Boyega",
+      "Oscar Isaac",
+      "Lupita Nyong'o",
+      "Andy Serkis",
+      "Domhnall Gleeson",
+      "Anthony Daniels",
+      "Max von Sydow",
+      "Peter Mayhew",
+      "Gwendoline Christie",
+      "Joonas Suotamo"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Sci-Fi"
+    ],
+    "description":"30 years after the defeat of Darth Vader and the Empire, Rey, a scavenger from the planet Jakku, finds a BB-8 droid that knows the whereabouts of the long lost Luke Skywalker. Rey, as well as a rogue stormtrooper and two smugglers, are thrown into the middle of a battle between the Resistance and the daunting legions of the First Order.",
+    "directorList":[
+      "J.J. Abrams"
+    ],
+    "characterList":[
+      "Han Solo",
+      "Luke Skywalker",
+      "Princess Leia",
+      "Kylo Ren",
+      "Rey",
+      "Finn",
+      "Poe Dameron",
+      "Maz Kanata",
+      "Supreme Leader Snoke",
+      "General Hux",
+      "C-3PO",
+      "Lor San Tekka",
+      "Chewbacca",
+      "Captain Phasma",
+      "Chewbacca Double"
+    ],
+    "title":"Star Wars VII: The Force Awakens",
+    "ratingCount":"599,034",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2488496/?ref_=fn_ft_tt_1",
+    "duration":"2h 18min",
+    "ratingValue":"8.2",
+    "budget":"$245,000,000"
+  }
+]

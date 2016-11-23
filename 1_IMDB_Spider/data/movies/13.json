@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$301,956,980",
+    "year":"2009",
+    "castList":[
+      "Daniel Radcliffe",
+      "Michael Gambon",
+      "Dave Legeno",
+      "Elarica Johnson",
+      "Jim Broadbent",
+      "Geraldine Somerville",
+      "Bonnie Wright",
+      "Julie Walters",
+      "Rupert Grint",
+      "Emma Watson",
+      "Helena Bonham Carter",
+      "Helen McCrory",
+      "Timothy Spall",
+      "Alan Rickman",
+      "Oliver Phelps"
+    ],
+    "genreList":[
+      "Adventure",
+      "Family",
+      "Fantasy",
+      "Mystery"
+    ],
+    "description":"In the sixth year at Hogwarts School of Witchcraft, and in both wizard and muggle worlds Lord Voldemort and his henchmen are increasingly active. With vacancies to fill at Hogwarts, Professor Dumbledore persuades Horace Slughorn, back from retirement to become the potions teacher, while Professor Snape receives long awaited news. Harry Potter, together with Dumbledore, must face treacherous tasks to defeat his evil nemesis.",
+    "directorList":[
+      "David Yates"
+    ],
+    "characterList":[
+      "Harry Potter",
+      "Professor Albus Dumbledore",
+      "Fenrir Greyback",
+      "Waitress",
+      "Professor Horace Slughorn",
+      "Lily Potter",
+      "Ginny Weasley",
+      "Molly Weasley",
+      "Ron Weasley",
+      "Hermione Granger",
+      "Bellatrix Lestrange",
+      "Narcissa Malfoy",
+      "Wormtail",
+      "Professor Severus Snape",
+      "George Weasley"
+    ],
+    "title":"Harry Potter and the Half-Blood Prince",
+    "ratingCount":"329,524",
+    "countryList":[
+      "UK",
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0417741/?ref_=fn_ft_tt_1",
+    "duration":"2h 33min",
+    "ratingValue":"7.5",
+    "budget":"$250,000,000"
+  }
+]

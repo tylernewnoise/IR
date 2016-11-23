@@ -1,0 +1,53 @@
+[
+  {
+    "gross":"$113,165,635",
+    "year":"2012",
+    "castList":[
+      "Jeremy Renner",
+      "Scott Glenn",
+      "Stacy Keach",
+      "Edward Norton",
+      "Donna Murphy",
+      "Michael Chernus",
+      "Corey Stoll",
+      "Alice Gainer",
+      "Prue Lewarne",
+      "Howard Leader",
+      "James Joseph O'Neil",
+      "Rachel Weisz",
+      "Tony Guida",
+      "Sonnie Brown",
+      "Neil Brooks Cunningham"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Mystery",
+      "Romance",
+      "Thriller"
+    ],
+    "description":"The events in this movie take place around the same time as the events in",
+    "directorList":[
+      "Tony Gilroy"
+    ],
+    "characterList":[
+      "Aaron Cross",
+      "Ezra Kramer",
+      "Adm Mark Turso USN Ret.",
+      "Col Eric Byer, USAF, Ret.",
+      "Dita Mandy",
+      "Arthur Ingram",
+      "Zev Vendel",
+      "Dr. Marta Shearing"
+    ],
+    "title":"The Bourne Legacy",
+    "ratingCount":"235,140",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1194173/?ref_=fn_ft_tt_1",
+    "duration":"2h 15min",
+    "ratingValue":"6.7",
+    "budget":"$125,000,000"
+  }
+]

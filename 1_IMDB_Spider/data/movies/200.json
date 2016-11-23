@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$148,337,537",
+    "year":"2010",
+    "castList":[
+      "Will Ferrell",
+      "Brad Pitt",
+      "Tina Fey",
+      "Jonah Hill",
+      "David Cross",
+      "Ben Stiller",
+      "Justin Theroux",
+      "Jessica Schulte",
+      "Tom McGrath",
+      "Emily Nordwind",
+      "J.K. Simmons",
+      "Ella Olivia Stiller",
+      "Quinn Dempsey Stiller",
+      "Brian Hopkins",
+      "Christopher Knights"
+    ],
+    "genreList":[
+      "Animation",
+      "Action",
+      "Comedy",
+      "Family",
+      "Sci-Fi"
+    ],
+    "description":"After super-villain Megamind (Ferrell) kills his good-guy nemesis, Metro Man (Pitt), he becomes bored since there is no one left to fight. He creates a new foe, Titan (Hill), who, instead of using his powers for good, sets out to destroy the world, positioning Megamind to save the day for the first time in his life.",
+    "directorList":[
+      "Tom McGrath"
+    ],
+    "characterList":[
+      "Megamind",
+      "Metro Man",
+      "Roxanne Ritchie",
+      "Tighten",
+      "Minion",
+      "Bernard",
+      "Megamind's Father",
+      "Megamind's Mother",
+      "Lord Scott",
+      "Prison Guard",
+      "Lady Scott",
+      "Warden",
+      "Schoolchild",
+      "Schoolchild",
+      "Prison Guard"
+    ],
+    "title":"Megamind",
+    "ratingCount":"176,257",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1001526/?ref_=fn_ft_tt_1",
+    "duration":"1h 35min",
+    "ratingValue":"7.3",
+    "budget":"$130,000,000"
+  }
+]

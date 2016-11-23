@@ -1,0 +1,53 @@
+[
+  {
+    "gross":"$31,141,074",
+    "year":"2016",
+    "castList":[
+      "Brenton Thwaites",
+      "John Samaha",
+      "Courtney Eaton",
+      "Nikolaj Coster-Waldau",
+      "Paula Arundell",
+      "Alia Seror-O'Neill",
+      "Emily Wheaton",
+      "Elodie Yung",
+      "Rachael Blake",
+      "Bryan Brown",
+      "Michael-Anthony Taylor",
+      "Emma Booth",
+      "Felix Williamson",
+      "Chadwick Boseman",
+      "Gerard Butler"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "description":"Set, the merciless god of darkness, has taken over the throne of Egypt and plunged the once peaceful and prosperous empire into chaos and conflict. Few dare to rebel against him. A young thief, whose love was taken captive by the god, seeks to dethrone and defeat Set with the aid of the powerful god Horus.",
+    "directorList":[
+      "Alex Proyas"
+    ],
+    "characterList":[
+      "Bek",
+      "Zaya",
+      "Horus",
+      "Hathor",
+      "Isis",
+      "Osiris",
+      "Nephthys",
+      "Thoth",
+      "Set"
+    ],
+    "title":"Gods of Egypt",
+    "ratingCount":"60,767",
+    "countryList":[
+      "USA",
+      "Australia"
+    ],
+    "url":"http://akas.imdb.com/title/tt2404233/?ref_=fn_ft_tt_1",
+    "duration":"2h 6min",
+    "ratingValue":"5.5",
+    "budget":"$140,000,000"
+  }
+]

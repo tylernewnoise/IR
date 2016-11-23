@@ -1,0 +1,58 @@
+[
+  {
+    "gross":"$100,012,500",
+    "year":"1995",
+    "castList":[
+      "Bruce Willis",
+      "Jeremy Irons",
+      "Samuel L. Jackson",
+      "Graham Greene",
+      "Colleen Camp",
+      "Larry Bryggman",
+      "Anthony Peck",
+      "Nicholas Wyman",
+      "Sam Phillips",
+      "Kevin Chamberlin",
+      "Sharon Washington",
+      "Stephen Pearlman",
+      "Michael Alexander Jackson",
+      "Aldis Hodge",
+      "Mischa Hausserman"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Thriller"
+    ],
+    "description":"John McClane is now almost a full-blown alcoholic and is suspended from the NYPD. But when a bomb goes off in the Bonwit Teller Department Store the police go insane trying to figure out what's going on. Soon, a man named Simon calls and asks for McClane. Simon tells Inspector Walter Cobb that McClane is going to play a game called \"Simon Says\". He says that McClane is going to do the tasks he assigns him. If not, he'll blow off another bomb. With the help of a Harlem electrician, John McClane must race all over New York trying to figure out the frustrating puzzles that the crafty terrorist gives him. But when a bomb goes off in a subway station right by the Federal Reserve (the biggest gold storage in the world) things start to get heated up.",
+    "directorList":[
+      "John McTiernan"
+    ],
+    "characterList":[
+      "John McClane",
+      "Simon Gruber",
+      "Zeus Carver",
+      "Joe Lambert",
+      "Connie Kowalski",
+      "Insp. Walter Cobb",
+      "Ricky Walsh",
+      "Mathias Targo",
+      "Katya",
+      "Charles Weiss",
+      "Officer Jane",
+      "Dr. Fred Schiller",
+      "Dexter",
+      "Raymond",
+      "Mischa"
+    ],
+    "title":"Die Hard: With a Vengeance",
+    "ratingCount":"303,210",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0112864/?ref_=fn_ft_tt_1",
+    "duration":"2h 8min",
+    "ratingValue":"7.6",
+    "budget":"$90,000,000"
+  }
+]

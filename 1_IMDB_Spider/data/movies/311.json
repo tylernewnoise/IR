@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$116,866,727",
+    "year":"2013",
+    "castList":[
+      "Leonardo DiCaprio",
+      "Jonah Hill",
+      "Margot Robbie",
+      "Matthew McConaughey",
+      "Kyle Chandler",
+      "Rob Reiner",
+      "Jon Bernthal",
+      "Jon Favreau",
+      "Jean Dujardin",
+      "Joanna Lumley",
+      "Cristin Milioti",
+      "Christine Ebersole",
+      "Shea Whigham",
+      "Katarina Cas",
+      "P.J. Byrne"
+    ],
+    "genreList":[
+      "Biography",
+      "Comedy",
+      "Crime",
+      "Drama"
+    ],
+    "description":"Jordan Belfort is a Long Island penny stockbroker who served 22 months in prison for defrauding investors in a massive 1990s securities scam that involved widespread corruption on Wall Street and in the corporate banking world, including shoe designer Steve Madden.",
+    "directorList":[
+      "Martin Scorsese"
+    ],
+    "characterList":[
+      "Jordan Belfort",
+      "Donnie Azoff",
+      "Naomi Lapaglia",
+      "Mark Hanna",
+      "Agent Patrick Denham",
+      "Max Belfort",
+      "Brad",
+      "Manny Riskin",
+      "Jean Jacques Saurel",
+      "Aunt Emma",
+      "Teresa Petrillo",
+      "Leah Belfort",
+      "Captain Ted Beecham",
+      "Chantalle",
+      "Nicky Koskoff ('Rugrat')"
+    ],
+    "title":"The Wolf of Wall Street",
+    "ratingCount":"806,351",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0993846/?ref_=fn_ft_tt_1",
+    "duration":"3h",
+    "ratingValue":"8.2",
+    "budget":"$100,000,000"
+  }
+]

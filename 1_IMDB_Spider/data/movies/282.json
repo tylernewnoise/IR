@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$313,837,577",
+    "year":"2001",
+    "castList":[
+      "Alan Howard",
+      "Noel Appleby",
+      "Sean Astin",
+      "Sala Baker",
+      "Sean Bean",
+      "Cate Blanchett",
+      "Orlando Bloom",
+      "Billy Boyd",
+      "Marton Csokas",
+      "Megan Edwards",
+      "Michael Elsworth",
+      "Mark Ferguson",
+      "Ian Holm",
+      "Christopher Lee",
+      "Lawrence Makoare"
+    ],
+    "genreList":[
+      "Adventure",
+      "Drama",
+      "Fantasy"
+    ],
+    "description":"An ancient Ring thought lost for centuries has been found, and through a strange twist in fate has been given to a small Hobbit named Frodo. When Gandalf discovers the Ring is in fact the One Ring of the Dark Lord Sauron, Frodo must make an epic quest to the Cracks of Doom in order to destroy it! However he does not go alone. He is joined by Gandalf, Legolas the elf, Gimli the Dwarf, Aragorn, Boromir and his three Hobbit friends Merry, Pippin and Samwise. Through mountains, snow, darkness, forests, rivers and plains, facing evil and danger at every corner the Fellowship of the Ring must go. Their quest to destroy the One Ring is the only hope for the end of the Dark Lords reign!",
+    "directorList":[
+      "Peter Jackson"
+    ],
+    "characterList":[
+      "Voice of the Ring",
+      "Everard Proudfoot",
+      "Sam",
+      "Sauron",
+      "Boromir",
+      "Galadriel",
+      "Legolas",
+      "Pippin",
+      "Celeborn",
+      "Mrs. Proudfoot",
+      "Gondorian Archivist",
+      "Gil-galad",
+      "Bilbo",
+      "Saruman",
+      "Lurtz"
+    ],
+    "title":"The Lord of the Rings: The Fellowship of the Ring",
+    "ratingCount":"1,262,056",
+    "countryList":[
+      "New Zealand",
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0120737/?ref_=fn_ft_tt_1",
+    "duration":"2h 58min",
+    "ratingValue":"8.8",
+    "budget":"$93,000,000"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "gross":"$35,168,677",
+    "year":"2002",
+    "castList":[
+      "Sam Spruell",
+      "Peter Stebbings",
+      "Christian Camargo",
+      "Roman Podhora",
+      "Sam Redford",
+      "Steve Nicolson",
+      "Liam Neeson",
+      "Ravil Isyanov",
+      "Tim Woodward",
+      "Lex Shrapnel",
+      "Shaun Benson",
+      "Kris Holden-Ried",
+      "Dmitry Chepovetsky",
+      "Christopher Redman",
+      "Tygh Runyan"
+    ],
+    "genreList":[
+      "Drama",
+      "History",
+      "Thriller",
+      "War"
+    ],
+    "description":"The story of USSR's first nuclear ballistic submarine, which suffered a malfunction in its nuclear reactor on its maiden voyage in the North Atlantic in 1961. The submarine's crew, led by the unyielding Captain Alexi Vostrikov, races against time to prevent a Chernobyl-like nuclear disaster which threatens not only the lives of his crew, but has the potential to ignite a world war between the super powers.",
+    "directorList":[
+      "Kathryn Bigelow"
+    ],
+    "characterList":[
+      "Dmitri",
+      "Kuryshev",
+      "Pavel",
+      "Lapinsh",
+      "Vasily",
+      "Demichev",
+      "Capt. Mikhail Polenin",
+      "Suslov",
+      "Partonov",
+      "Kornilov",
+      "Leonid",
+      "Anton",
+      "Sergei",
+      "Kiklidze",
+      "Maxim"
+    ],
+    "title":"K-19: The Widowmaker",
+    "ratingCount":"49,932",
+    "countryList":[
+      "UK",
+      "Germany",
+      "USA",
+      "Canada"
+    ],
+    "url":"http://akas.imdb.com/title/tt0267626/?ref_=fn_ft_tt_1",
+    "duration":"2h 18min",
+    "ratingValue":"6.7",
+    "budget":"$100,000,000"
+  }
+]

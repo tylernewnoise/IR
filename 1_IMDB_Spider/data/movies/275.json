@@ -1,0 +1,58 @@
+[
+  {
+    "gross":"$66,002,193",
+    "year":"2016",
+    "castList":[
+      "Shailene Woodley",
+      "Theo James",
+      "Naomi Watts",
+      "Octavia Spencer",
+      "Jeff Daniels",
+      "Zoë Kravitz",
+      "Ansel Elgort",
+      "Miles Teller",
+      "Keiynan Lonsdale",
+      "Daniel Dae Kim",
+      "Maggie Q",
+      "Bill Skarsgård",
+      "Jonny Weston",
+      "Nadia Hilker",
+      "Andy Bean"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Mystery",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"After the earth-shattering revelations of INSURGENT, Tris must escape with Four and go beyond the wall enclosing Chicago. For the first time ever, they will leave the only city and family they have ever known. Once outside, old discoveries are quickly rendered meaningless with the revelation of shocking new truths. Tris and Four must quickly decide who they can trust as a ruthless battle ignites beyond the walls of Chicago which threatens all of humanity. In order to survive, Tris will be forced to make impossible choices about courage, allegiance, sacrifice and love.",
+    "directorList":[
+      "Robert Schwentke"
+    ],
+    "characterList":[
+      "Tris",
+      "Four",
+      "Evelyn",
+      "Johanna",
+      "David",
+      "Christina",
+      "Caleb",
+      "Peter",
+      "Uriah",
+      "Tori",
+      "Matthew",
+      "Edgar",
+      "Nita"
+    ],
+    "title":"The Divergent Series: Allegiant",
+    "ratingCount":"55,627",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt3410834/?ref_=fn_ft_tt_1",
+    "duration":"2h",
+    "ratingValue":"5.8",
+    "budget":"$110,000,000"
+  }
+]

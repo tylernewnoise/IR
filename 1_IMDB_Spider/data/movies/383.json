@@ -1,0 +1,50 @@
+[
+  {
+    "gross":"$92,238,549",
+    "year":"2016",
+    "castList":[
+      "Denzel Washington",
+      "Chris Pratt",
+      "Ethan Hawke",
+      "Vincent D'Onofrio",
+      "Byung-hun Lee",
+      "Manuel Garcia-Rulfo",
+      "Martin Sensmeier",
+      "Haley Bennett",
+      "Peter Sarsgaard",
+      "Luke Grimes",
+      "Matt Bomer",
+      "Jonathan Joss",
+      "Cam Gigandet",
+      "Emil Beheshti",
+      "Mark Ashworth"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Western"
+    ],
+    "description":"Director Antoine Fuqua brings his modern vision to a classic story in The Magnificent Seven. With the town of Rose Creek under the deadly control of industrialist Bartholomew Bogue, the desperate townspeople employ protection from seven outlaws, bounty hunters, gamblers and hired guns. As they prepare the town for the violent showdown that they know is coming, these seven mercenaries find themselves fighting for more than money.",
+    "directorList":[
+      "Antoine Fuqua"
+    ],
+    "characterList":[
+      "Chisolm",
+      "Josh Faraday",
+      "Goodnight Robicheaux",
+      "Jack Horne",
+      "Billy Rocks",
+      "Vasquez",
+      "Red Harvest"
+    ],
+    "title":"The Magnificent Seven",
+    "ratingCount":"35,861",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2404435/?ref_=fn_ft_tt_1",
+    "duration":"2h 13min",
+    "ratingValue":"7.1",
+    "budget":"$90,000,000"
+  }
+]

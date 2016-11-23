@@ -1,0 +1,52 @@
+[
+  {
+    "gross":"$162,162,120",
+    "year":"2016",
+    "castList":[
+      "Matt Damon",
+      "Tommy Lee Jones",
+      "Alicia Vikander",
+      "Vincent Cassel",
+      "Julia Stiles",
+      "Riz Ahmed",
+      "Ato Essandoh",
+      "Scott Shepherd",
+      "Bill Camp",
+      "Vinzenz Kiefer",
+      "Stephen Kunken",
+      "Ben Stylianou",
+      "Kaya Yuzuki",
+      "Matthew O'Neill",
+      "Lizzie Phillips"
+    ],
+    "genreList":[
+      "Action",
+      "Thriller"
+    ],
+    "description":"Jason Bourne is again being hunted by the CIA. It begins when Nicky Parson a former CIA operative who helped Bourne who then went under and now works with a man who's a whistle blower and is out to expose the CIA's black ops. So Nicky hacks into the CIA and downloads everything on all their Black Ops including Treadstone which Bourne was a part of. And Heather Lee, a CIA agent discovers the hack and brings it to the attention of CIA Director Dewey, the man behind the Black Ops. He then orders Parsons be found and hopefully Bourne too.",
+    "directorList":[
+      "Paul Greengrass"
+    ],
+    "characterList":[
+      "Jason Bourne",
+      "CIA Director Robert Dewey",
+      "Heather Lee",
+      "Asset",
+      "Nicky Parsons",
+      "Aaron Kalloor",
+      "Craig Jeffers",
+      "Director NI Edwin Russell"
+    ],
+    "title":"Jason Bourne",
+    "ratingCount":"88,707",
+    "countryList":[
+      "UK",
+      "China",
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt4196776/?ref_=fn_ft_tt_1",
+    "duration":"2h 3min",
+    "ratingValue":"6.8",
+    "budget":"$120,000,000"
+  }
+]

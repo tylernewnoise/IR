@@ -1,0 +1,57 @@
+[
+  {
+    "gross":"$448,130,642",
+    "year":"2012",
+    "castList":[
+      "Christian Bale",
+      "Gary Oldman",
+      "Tom Hardy",
+      "Joseph Gordon-Levitt",
+      "Anne Hathaway",
+      "Marion Cotillard",
+      "Morgan Freeman",
+      "Michael Caine",
+      "Matthew Modine",
+      "Alon Aboutboul",
+      "Ben Mendelsohn",
+      "Burn Gorman",
+      "Daniel Sunjata",
+      "Aidan Gillen",
+      "Sam Kennard"
+    ],
+    "genreList":[
+      "Action",
+      "Thriller"
+    ],
+    "description":"Despite his tarnished reputation after the events of The Dark Knight, in which he took the rap for Dent's crimes, Batman feels compelled to intervene to assist the city and its police force which is struggling to cope with Bane's plans to destroy the city.",
+    "directorList":[
+      "Christopher Nolan"
+    ],
+    "characterList":[
+      "Bruce Wayne",
+      "Commissioner Gordon",
+      "Bane",
+      "Blake",
+      "Selina",
+      "Miranda",
+      "Fox",
+      "Alfred",
+      "Foley",
+      "Dr. Pavel",
+      "Daggett",
+      "Stryver",
+      "Captain Jones",
+      "CIA Op"
+    ],
+    "title":"The Dark Knight Rises",
+    "ratingCount":"1,171,405",
+    "countryList":[
+      "USA",
+      "UK"
+    ],
+    "url":"http://akas.imdb.com/title/tt1345836/?ref_=fn_ft_tt_1",
+    "duration":"2h 44min",
+    "ratingValue":"8.5",
+    "budget":"$250,000,000"
+  }
+]

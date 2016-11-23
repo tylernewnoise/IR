@@ -1,0 +1,49 @@
+[
+  {
+    "gross":"$11,000,000",
+    "year":"1995",
+    "castList":[
+      "Geena Davis",
+      "Matthew Modine",
+      "Frank Langella",
+      "Maury Chaykin",
+      "Patrick Malahide",
+      "Stan Shaw",
+      "Rex Linn",
+      "Paul Dillon",
+      "Christopher Masterson",
+      "Jimmie F. Skaggs",
+      "Harris Yulin",
+      "Carl Chase",
+      "Peter Geeves",
+      "Angus Wright",
+      "Ken Bones"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Comedy"
+    ],
+    "description":"Morgan Adams and her slave, William Shaw, are on a quest to recover the three portions of a treasure map. Unfortunately, the final portion is held by her murderous uncle, Dawg. Her crew is skeptical of her leadership abilities, so she must complete her quest before they mutiny against her. This is made yet more difficult by the efforts of the British crown to end her piratical raids.",
+    "directorList":[
+      "Renny Harlin"
+    ],
+    "characterList":[
+      "Morgan",
+      "Shaw",
+      "Fiddler Pirate"
+    ],
+    "title":"Cutthroat Island",
+    "ratingCount":"21,405",
+    "countryList":[
+      "USA",
+      "France",
+      "Italy",
+      "Germany"
+    ],
+    "url":"http://akas.imdb.com/title/tt0112760/?ref_=fn_ft_tt_1",
+    "duration":"2h 4min",
+    "ratingValue":"5.6",
+    "budget":"$98,000,000"
+  }
+]

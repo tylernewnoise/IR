@@ -1,0 +1,62 @@
+[
+  {
+    "gross":"$179,982,968",
+    "year":"2008",
+    "castList":[
+      "Ben Stiller",
+      "Chris Rock",
+      "David Schwimmer",
+      "Jada Pinkett Smith",
+      "Sacha Baron Cohen",
+      "Cedric the Entertainer",
+      "Andy Richter",
+      "Bernie Mac",
+      "Alec Baldwin",
+      "Sherri Shepherd",
+      "Will.i.am",
+      "Elisa Gabrielli",
+      "Tom McGrath",
+      "Chris Miller",
+      "Christopher Knights"
+    ],
+    "genreList":[
+      "Animation",
+      "Action",
+      "Adventure",
+      "Comedy",
+      "Family"
+    ],
+    "description":"The sequel to 2005's \"Madagascar\", in which New York Zoo animals, Alex the Lion, Marty the Zebra, Melman the Giraffe and Gloria the Hippo, still stranded on Madagascar, start to leave the island. All of a sudden, they land in the wilderness of Africa, where Alex meets the rest of his family, but has trouble communicating with them after spending so much time at the Central Park Zoo.",
+    "directorList":[
+      "Eric Darnell",
+      "Tom McGrath"
+    ],
+    "characterList":[
+      "Alex",
+      "Marty",
+      "Melman",
+      "Gloria",
+      "Julien",
+      "Maurice",
+      "Mort",
+      "Zuba",
+      "Makunga",
+      "Mom",
+      "Moto Moto",
+      "Nana",
+      "Skipper",
+      "Lemur",
+      "Kowalski",
+      "Private"
+    ],
+    "title":"Madagascar: Escape 2 Africa",
+    "ratingCount":"149,287",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0479952/?ref_=fn_ft_tt_1",
+    "duration":"1h 29min",
+    "ratingValue":"6.7",
+    "budget":"$150,000,000"
+  }
+]

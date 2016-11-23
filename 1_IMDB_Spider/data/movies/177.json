@@ -1,0 +1,48 @@
+[
+  {
+    "gross":"$31,704,416",
+    "year":"2005",
+    "castList":[
+      "Josh Lucas",
+      "Jessica Biel",
+      "Jamie Foxx",
+      "Sam Shepard",
+      "Richard Roxburgh",
+      "Joe Morton",
+      "Ian Bliss",
+      "Ebon Moss-Bachrach",
+      "Michael Denkha",
+      "Rocky Helton",
+      "Clayton Adams",
+      "Maurice Morgan",
+      "Woody Naismith",
+      "Charles Ndibe",
+      "Nicholas Hammond"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"In the near future, the Navy develops a fighter jet piloted by an artificial intelligence computer. The jet is placed on an aircraft carrier in the Pacific to learn combat manuevers from the human pilots aboard. But when the computer develops a mind of its own, it's the humans who are charged with stopping it before it incites a war...",
+    "directorList":[
+      "Rob Cohen"
+    ],
+    "characterList":[
+      "Lt. Ben Gannon",
+      "Lt. Kara Wade",
+      "Lt. Henry Purcell",
+      "Capt. George Cummings"
+    ],
+    "title":"Stealth",
+    "ratingCount":"45,826",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0382992/?ref_=fn_ft_tt_1",
+    "duration":"2h 1min",
+    "ratingValue":"5.0",
+    "budget":"$135,000,000"
+  }
+]

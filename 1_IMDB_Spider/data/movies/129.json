@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$205,343,774",
+    "year":"2005",
+    "castList":[
+      "Christian Bale",
+      "Michael Caine",
+      "Liam Neeson",
+      "Katie Holmes",
+      "Gary Oldman",
+      "Cillian Murphy",
+      "Tom Wilkinson",
+      "Rutger Hauer",
+      "Ken Watanabe",
+      "Mark Boone Junior",
+      "Linus Roache",
+      "Morgan Freeman",
+      "Larry Holden",
+      "Gerard Murphy",
+      "Colin McFarlane"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure"
+    ],
+    "description":"When his parents are killed, billionaire playboy Bruce Wayne relocates to Asia where he is mentored by Henri Ducard and Ra's Al Ghul in how to fight evil. When learning about the plan to wipe out evil in Gotham City by Ducard, Bruce prevents this plan from getting any further and heads back to his home. Back in his original surroundings, Bruce adopts the image of a bat to strike fear into the criminals and the corrupt as the icon known as 'Batman'. But it doesn't stay quiet for long.",
+    "directorList":[
+      "Christopher Nolan"
+    ],
+    "characterList":[
+      "Bruce Wayne",
+      "Batman",
+      "Alfred",
+      "Ducard",
+      "Rachel Dawes",
+      "Jim Gordon",
+      "Dr. Jonathan Crane",
+      "Carmine Falcone",
+      "Earle",
+      "Ra's Al Ghul",
+      "Flass",
+      "Thomas Wayne",
+      "Lucius Fox",
+      "Finch",
+      "Judge Faden",
+      "Loeb"
+    ],
+    "title":"Batman Begins",
+    "ratingCount":"1,001,860",
+    "countryList":[
+      "USA",
+      "UK"
+    ],
+    "url":"http://akas.imdb.com/title/tt0372784/?ref_=fn_ft_tt_1",
+    "duration":"2h 20min",
+    "ratingValue":"8.3",
+    "budget":"$150,000,000"
+  }
+]

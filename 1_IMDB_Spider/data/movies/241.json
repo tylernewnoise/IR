@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$57,637,485",
+    "year":"2004",
+    "castList":[
+      "Vin Diesel",
+      "Colm Feore",
+      "Thandie Newton",
+      "Judi Dench",
+      "Karl Urban",
+      "Alexa Davalos",
+      "Linus Roache",
+      "Yorick van Wageningen",
+      "Nick Chinlund",
+      "Keith David",
+      "Mark Gibbon",
+      "Roger Cross",
+      "Terry Chen",
+      "Christina Cox",
+      "Nigel Vonas"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"Riddick, now a hunted man, finds himself in the middle of two opposing forces in a major crusade.",
+    "directorList":[
+      "David Twohy"
+    ],
+    "characterList":[
+      "Riddick",
+      "Lord Marshal",
+      "Dame Vaako",
+      "Aereon",
+      "Vaako",
+      "Kyra",
+      "Purifier",
+      "The Guv",
+      "Toombs",
+      "Imam",
+      "Irgun",
+      "Toal",
+      "Merc Pilot",
+      "Eve Logan",
+      "Merc"
+    ],
+    "title":"The Chronicles of Riddick",
+    "ratingCount":"185,970",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0296572/?ref_=fn_ft_tt_1",
+    "duration":"1h 59min",
+    "ratingValue":"6.7",
+    "budget":"$105,000,000"
+  }
+]

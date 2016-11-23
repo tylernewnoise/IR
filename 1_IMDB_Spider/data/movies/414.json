@@ -1,0 +1,61 @@
+[
+  {
+    "gross":"$172,620,724",
+    "year":"1997",
+    "castList":[
+      "Harrison Ford",
+      "Gary Oldman",
+      "Glenn Close",
+      "Wendy Crewson",
+      "Liesel Matthews",
+      "Paul Guilfoyle",
+      "Xander Berkeley",
+      "William H. Macy",
+      "Dean Stockwell",
+      "Tom Everett",
+      "Jürgen Prochnow",
+      "Donna Bullock",
+      "Michael Ray Miller",
+      "Carl Weintraub",
+      "Elester Latham"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Drama",
+      "Romance",
+      "Thriller"
+    ],
+    "description":"The President of the USA goes to Moscow and gives a stirring speech outlining the USA's new \"Zero-tolerance\" policy with respect to terrorism. On the flight home, terrorists take over Air Force One (the President's official plane) and take the passengers (including his wife and daughter) hostage. The terrorists plan to execute one hostage every half-hour unless/until their demands are met. However, the President is a former Medal of Honor winner, so the terrorists may be in for a surprise...",
+    "directorList":[
+      "Wolfgang Petersen"
+    ],
+    "characterList":[
+      "President James Marshall",
+      "Ivan Korshunov",
+      "Vice President Kathryn Bennett",
+      "Grace Marshall",
+      "Alice Marshall",
+      "Chief of Staff Lloyd Shepherd",
+      "Agent Gibbs",
+      "Major Caldwell",
+      "Defense Secretary Walter Dean",
+      "NSA Advisor Jack Doherty",
+      "General Alexander Radek",
+      "Press Secretary Melanie Mitchell",
+      "AFO Pilot Colonel Axelrod",
+      "AFO Co-Pilot Lt. Col. Ingrahams",
+      "AFO Navigator"
+    ],
+    "title":"Air Force One",
+    "ratingCount":"148,379",
+    "countryList":[
+      "USA",
+      "Germany"
+    ],
+    "url":"http://akas.imdb.com/title/tt0118571/?ref_=fn_ft_tt_1",
+    "duration":"2h 4min",
+    "ratingValue":"6.4",
+    "budget":"$85,000,000"
+  }
+]

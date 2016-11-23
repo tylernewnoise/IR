@@ -1,0 +1,60 @@
+[
+  {
+    "gross":"$153,629,485",
+    "year":"2015",
+    "castList":[
+      "Tom Hardy",
+      "Charlize Theron",
+      "Nicholas Hoult",
+      "Hugh Keays-Byrne",
+      "Josh Helman",
+      "Nathan Jones",
+      "Zoë Kravitz",
+      "Rosie Huntington-Whiteley",
+      "Riley Keough",
+      "Abbey Lee",
+      "Courtney Eaton",
+      "John Howard",
+      "Richard Carter",
+      "Iota",
+      "Angus Sampson"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi",
+      "Thriller"
+    ],
+    "description":"An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and almost everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland.",
+    "directorList":[
+      "George Miller"
+    ],
+    "characterList":[
+      "Max Rockatansky",
+      "Imperator Furiosa",
+      "Nux",
+      "Immortan Joe",
+      "Slit",
+      "Rictus Erectus",
+      "Toast the Knowing",
+      "The Splendid Angharad",
+      "Capable",
+      "The Dag",
+      "Cheedo the Fragile",
+      "The People Eater",
+      "The Bullet Farmer",
+      "The Doof Warrior",
+      "The Organic Mechanic"
+    ],
+    "title":"Mad Max: Fury Road",
+    "ratingCount":"578,826",
+    "countryList":[
+      "Australia",
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1392190/?ref_=fn_ft_tt_1",
+    "duration":"2h",
+    "ratingValue":"8.1",
+    "budget":"$150,000,000"
+  }
+]

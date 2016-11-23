@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$75,754,670",
+    "year":"2008",
+    "castList":[
+      "Ron Perlman",
+      "Selma Blair",
+      "Doug Jones",
+      "John Alexander",
+      "James Dodd",
+      "Seth MacFarlane",
+      "Luke Goss",
+      "Anna Walton",
+      "Jeffrey Tambor",
+      "John Hurt",
+      "Brian Steele",
+      "Andrew Hefler",
+      "Iván Kamarás",
+      "Mike Kelly",
+      "Jeremy Zimmermann"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Horror",
+      "Sci-Fi"
+    ],
+    "description":"In this continuation to the adventure of the demon superhero, an evil elf breaks an ancient pact between humans and creatures, as he declares war against humanity. He is on a mission to release The Golden Army, a deadly group of fighting machines that can destroy the human race. As Hell on Earth is ready to erupt, Hellboy and his crew set out to defeat the evil prince before The Golden Army can destroy humanity's existence.",
+    "directorList":[
+      "Guillermo del Toro"
+    ],
+    "characterList":[
+      "Hellboy",
+      "Liz Sherman",
+      "Abe Sapien",
+      "Chamberlain",
+      "Johann Krauss",
+      "Johann Krauss",
+      "Johann",
+      "Prince Nuada",
+      "Princess Nuala",
+      "Tom Manning",
+      "Professor Broom",
+      "Wink",
+      "Fragglewump"
+    ],
+    "title":"Hellboy II: The Golden Army",
+    "ratingCount":"210,930",
+    "countryList":[
+      "USA",
+      "Germany"
+    ],
+    "url":"http://akas.imdb.com/title/tt0411477/?ref_=fn_ft_tt_1",
+    "duration":"2h",
+    "ratingValue":"7.0",
+    "budget":"$85,000,000"
+  }
+]

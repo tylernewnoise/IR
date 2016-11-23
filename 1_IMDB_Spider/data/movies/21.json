@@ -1,0 +1,62 @@
+[
+  {
+    "gross":"$291,021,565",
+    "year":"2013",
+    "castList":[
+      "Henry Cavill",
+      "Amy Adams",
+      "Michael Shannon",
+      "Diane Lane",
+      "Russell Crowe",
+      "Antje Traue",
+      "Harry Lennix",
+      "Richard Schiff",
+      "Christopher Meloni",
+      "Kevin Costner",
+      "Ayelet Zurer",
+      "Laurence Fishburne",
+      "Dylan Sprayberry",
+      "Cooper Timberline",
+      "Richard Cetrone"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Sci-Fi"
+    ],
+    "description":"A young boy learns that he has extraordinary powers and is not of this Earth. As a young man, he journeys to discover where he came from and what he was sent here to do. But the hero in him must emerge if he is to save the world from annihilation and become the symbol of hope for all mankind.",
+    "directorList":[
+      "Zack Snyder"
+    ],
+    "characterList":[
+      "Clark Kent",
+      "Kal-El",
+      "Lois Lane",
+      "General Zod",
+      "Martha Kent",
+      "Jor-El",
+      "Faora-Ul",
+      "General Swanwick",
+      "Dr. Emil Hamilton",
+      "Colonel Nathan Hardy",
+      "Jonathan Kent",
+      "Lara Lor-Van",
+      "Perry White",
+      "Clark Kent (13 Years)",
+      "Clark Kent (9 Years)",
+      "Tor-An"
+    ],
+    "title":"Man of Steel",
+    "ratingCount":"559,494",
+    "countryList":[
+      "USA",
+      "Canada",
+      "UK"
+    ],
+    "url":"http://akas.imdb.com/title/tt0770828/?ref_=fn_ft_tt_1",
+    "duration":"2h 23min",
+    "ratingValue":"7.1",
+    "budget":"$225,000,000"
+  }
+]

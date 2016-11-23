@@ -1,0 +1,55 @@
+[
+  {
+    "gross":"$208,543,795",
+    "year":"2014",
+    "castList":[
+      "Andy Serkis",
+      "Jason Clarke",
+      "Gary Oldman",
+      "Keri Russell",
+      "Toby Kebbell",
+      "Kodi Smit-McPhee",
+      "Kirk Acevedo",
+      "Nick Thurston",
+      "Terry Notary",
+      "Karin Konoval",
+      "Judy Greer",
+      "Jon Eyez",
+      "Enrique Murciano",
+      "Larramie Doc Shaw",
+      "Lee Ross"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Drama",
+      "Sci-Fi"
+    ],
+    "description":"A growing nation of genetically evolved apes led by Caesar is threatened by a band of human survivors of the devastating virus unleashed a decade earlier. They reach a fragile peace, but it proves short-lived, as both sides are brought to the brink of a war that will determine who will emerge as Earth's dominant species.",
+    "directorList":[
+      "Matt Reeves"
+    ],
+    "characterList":[
+      "Caesar",
+      "Malcolm",
+      "Dreyfus",
+      "Ellie",
+      "Koba",
+      "Alexander",
+      "Carver",
+      "Blue Eyes",
+      "Rocket",
+      "Maurice",
+      "Cornelia"
+    ],
+    "title":"Dawn of the Planet of the Apes",
+    "ratingCount":"323,845",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2103281/?ref_=fn_ft_tt_1",
+    "duration":"2h 10min",
+    "ratingValue":"7.6",
+    "budget":"$170,000,000"
+  }
+]

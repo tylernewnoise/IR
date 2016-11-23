@@ -1,0 +1,51 @@
+[
+  {
+    "gross":"$28,772,222",
+    "year":"2015",
+    "castList":[
+      "Edgar Ramírez",
+      "Luke Bracey",
+      "Ray Winstone",
+      "Teresa Palmer",
+      "Matias Varela",
+      "Clemens Schick",
+      "Tobias Santelmann",
+      "Max Thieriot",
+      "Delroy Lindo",
+      "Nikolai Kinski",
+      "Glynis Barber",
+      "Steve Toussaint",
+      "James Le Gros",
+      "Bojesse Christopher",
+      "Ronak Patani"
+    ],
+    "genreList":[
+      "Action",
+      "Crime",
+      "Sport",
+      "Thriller"
+    ],
+    "description":"A young FBI agent infiltrates an extraordinary team of extreme sports athletes he suspects of masterminding a string of unprecedented, sophisticated corporate heists. Deep undercover, and with his life in danger, he strives to prove these athletes are the architects of the mind-boggling crimes that are devastating the world's financial markets.",
+    "directorList":[
+      "Ericson Core"
+    ],
+    "characterList":[
+      "Bodhi",
+      "Utah",
+      "Pappas",
+      "Grommet",
+      "Roach"
+    ],
+    "title":"Point Break",
+    "ratingCount":"38,616",
+    "countryList":[
+      "USA",
+      "Germany",
+      "China"
+    ],
+    "url":"http://akas.imdb.com/title/tt2058673/?ref_=fn_ft_tt_1",
+    "duration":"1h 54min",
+    "ratingValue":"5.3",
+    "budget":"$105,000,000"
+  }
+]

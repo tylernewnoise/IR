@@ -1,0 +1,59 @@
+[
+  {
+    "gross":"$257,704,099",
+    "year":"2009",
+    "castList":[
+      "Chris Pine",
+      "Zachary Quinto",
+      "Leonard Nimoy",
+      "Eric Bana",
+      "Bruce Greenwood",
+      "Karl Urban",
+      "Zoe Saldana",
+      "Simon Pegg",
+      "John Cho",
+      "Anton Yelchin",
+      "Ben Cross",
+      "Winona Ryder",
+      "Chris Hemsworth",
+      "Jennifer Morrison",
+      "Rachel Nichols"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "description":"On the day of James Kirk's birth, his father dies on his damaged starship in a last stand against a Romulan time-traveling mining vessel looking for Ambassador Spock, who is also a child on Vulcan, in this time, disdained by his neighbors for his half-human heritage. 25 years later, Kirk has grown into a young troublemaker. Challenged by Captain Christopher Pike to realize his potential in Starfleet, he comes to annoy instructors like young Commander Spock. Suddenly, there is an emergency on Vulcan and the newly-commissioned USS Enterprise is crewed with promising cadets like Nyota Uhura, Hikaru Sulu, Pavel Chekov and even Kirk himself, thanks to Leonard McCoy's medical trickery. Together, this crew will have an adventure in the final frontier where the old legend is altered forever as a new version of the legend begins.",
+    "directorList":[
+      "J.J. Abrams"
+    ],
+    "characterList":[
+      "Kirk",
+      "Spock",
+      "Spock Prime",
+      "Nero",
+      "Pike",
+      "Bones",
+      "Uhura",
+      "Scotty",
+      "Sulu",
+      "Chekov",
+      "Sarek",
+      "Amanda Grayson",
+      "George Kirk",
+      "Winona Kirk",
+      "Gaila"
+    ],
+    "title":"Star Trek",
+    "ratingCount":"512,915",
+    "countryList":[
+      "USA",
+      "Germany"
+    ],
+    "url":"http://akas.imdb.com/title/tt0796366/?ref_=fn_ft_tt_1",
+    "duration":"2h 7min",
+    "ratingValue":"8.0",
+    "budget":"$150,000,000"
+  }
+]

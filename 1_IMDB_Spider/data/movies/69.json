@@ -1,0 +1,57 @@
+[
+  {
+    "gross":"$73,820,094",
+    "year":"2011",
+    "castList":[
+      "Ben Kingsley",
+      "Sacha Baron Cohen",
+      "Asa Butterfield",
+      "Chloë Grace Moretz",
+      "Ray Winstone",
+      "Emily Mortimer",
+      "Christopher Lee",
+      "Helen McCrory",
+      "Michael Stuhlbarg",
+      "Frances de la Tour",
+      "Richard Griffiths",
+      "Jude Law",
+      "Kevin Eldon",
+      "Gulliver McGrath",
+      "Shaun Aylward"
+    ],
+    "genreList":[
+      "Adventure",
+      "Drama",
+      "Family",
+      "Fantasy",
+      "Mystery",
+      "Romance"
+    ],
+    "description":"Hugo is an orphan boy living in the walls of a train station in 1930s Paris. He learned to fix clocks and other gadgets from his father and uncle which he puts to use keeping the train station clocks running. The only thing that he has left that connects him to his dead father is an automaton (mechanical man) that doesn't work without a special key. Hugo needs to find the key to unlock the secret he believes it contains. On his adventures, he meets George Melies, a shopkeeper, who works in the train station, and his adventure-seeking god-daughter. Hugo finds that they have a surprising connection to his father and the automaton, and he discovers it unlocks some memories the old man has buried inside regarding his past.",
+    "directorList":[
+      "Martin Scorsese"
+    ],
+    "characterList":[
+      "Georges Méliès",
+      "Station Inspector",
+      "Hugo Cabret",
+      "Isabelle",
+      "Uncle Claude",
+      "Lisette",
+      "Mama Jeanne",
+      "Rene Tabard",
+      "Madame Emilie",
+      "Monsieur Frick",
+      "Hugo's Father"
+    ],
+    "title":"Hugo",
+    "ratingCount":"249,091",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt0970179/?ref_=fn_ft_tt_1",
+    "duration":"2h 6min",
+    "ratingValue":"7.5",
+    "budget":"$150,000,000"
+  }
+]

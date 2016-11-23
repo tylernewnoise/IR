@@ -1,0 +1,47 @@
+[
+  {
+    "gross":"0",
+    "year":"2017",
+    "castList":[
+      "Sofia Boutella",
+      "Tom Cruise",
+      "Annabelle Wallis",
+      "Russell Crowe",
+      "Jake Johnson",
+      "Javier Botet",
+      "Courtney B. Vance",
+      "Marwan Kenzari",
+      "Shina Shihoko Nagai",
+      "Dylan Smith",
+      "Michael Haydon",
+      "Selva Rasalingam",
+      "Jason Matthewson",
+      "Solomon Taiwo Justified",
+      "Bella Ava Georgiou"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Horror"
+    ],
+    "description":"Though safely entombed in a crypt deep beneath the unforgiving desert, an ancient queen whose destiny was unjustly taken from her is awakened in our current day, bringing with her malevolence grown over millennia, and terrors that defy human comprehension.",
+    "directorList":[
+      "Alex Kurtzman"
+    ],
+    "characterList":[
+      "Mummy",
+      "Tyler Colt",
+      "Dr. Henry Jekyll"
+    ],
+    "title":"The Mummy",
+    "ratingCount":"0",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt2345759/?ref_=fn_ft_tt_1",
+    "duration":"",
+    "ratingValue":"0",
+    "budget":"0"
+  }
+]

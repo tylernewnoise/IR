@@ -1,0 +1,45 @@
+[
+  {
+    "gross":"0",
+    "year":"2017",
+    "castList":[
+      "Charlie Hunnam",
+      "Katie McGrath",
+      "Jude Law",
+      "Annabelle Wallis",
+      "Eric Bana",
+      "Aidan Gillen",
+      "Djimon Hounsou",
+      "Astrid Bergès-Frisbey",
+      "Hermione Corfield",
+      "Millie Brady",
+      "Daniel Stisen",
+      "Mikael Persbrandt",
+      "Michael McElhatton",
+      "Freddie Fox",
+      "Tom Wu"
+    ],
+    "genreList":[
+      "Action",
+      "Adventure",
+      "Drama",
+      "Fantasy"
+    ],
+    "description":"The young Arthur runs the back passages of Londonium with his crew, not knowing his royal lineage until he grabs Excalibur. Instantly confronted by the sword's influence, Arthur is forced to make up his mind. He joins the rebellion and a shadowy young woman named Guinevere, he must learn to understand the magic weapon, deal with his demons and unite the people to defeat the dictator Vortigern, the man who murdered his parents and stole his crown to become king.",
+    "directorList":[
+      "Guy Ritchie"
+    ],
+    "characterList":[],
+    "title":"King Arthur",
+    "ratingCount":"0",
+    "countryList":[
+      "USA",
+      "UK",
+      "Australia"
+    ],
+    "url":"http://akas.imdb.com/title/tt1972591/?ref_=fn_ft_tt_1",
+    "duration":"",
+    "ratingValue":"0",
+    "budget":"$102,000,000"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "gross":"$237,282,182",
+    "year":"2012",
+    "castList":[
+      "Kelly Macdonald",
+      "Billy Connolly",
+      "Emma Thompson",
+      "Julie Walters",
+      "Robbie Coltrane",
+      "Kevin McKidd",
+      "Craig Ferguson",
+      "Sally Kinghorn",
+      "Eilidh Fraser",
+      "Peigi Barker",
+      "Steven Cree",
+      "Steve Purcell",
+      "Callum O'Neill",
+      "Patrick Doyle",
+      "John Ratzenberger"
+    ],
+    "genreList":[
+      "Animation",
+      "Adventure",
+      "Comedy",
+      "Family",
+      "Fantasy",
+      "History"
+    ],
+    "description":"Set in Scotland in a rugged and mythical time, \"Brave\" features Merida, an aspiring archer and impetuous daughter of royalty. Merida makes a reckless choice that unleashes unintended peril and forces her to spring into action to set things right.",
+    "directorList":[
+      "Mark Andrews",
+      "Brenda Chapman"
+    ],
+    "characterList":[
+      "Merida",
+      "Fergus",
+      "Elinor",
+      "The Witch",
+      "Lord Dingwall",
+      "Lord MacGuffin",
+      "Young MacGuffin",
+      "Lord Macintosh",
+      "Maudie",
+      "Maudie",
+      "Young Merida",
+      "Young Macintosh",
+      "The Crow",
+      "Wee Dingwall",
+      "Gordon"
+    ],
+    "title":"Brave",
+    "ratingCount":"279,637",
+    "countryList":[
+      "USA"
+    ],
+    "url":"http://akas.imdb.com/title/tt1217209/?ref_=fn_ft_tt_1",
+    "duration":"1h 33min",
+    "ratingValue":"7.2",
+    "budget":"$185,000,000"
+  }
+]
