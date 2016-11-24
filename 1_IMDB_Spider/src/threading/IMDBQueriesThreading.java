@@ -405,10 +405,6 @@ public class IMDBQueriesThreading {
                 // sort for year
                 Collections.sort(results, (o1, o2) -> o1.getYear().compareTo(o2.getYear()));
 
-                // get rid of the rest
-                if (results.size() > 10) {
-                        results.subList(0, 10);
-                }
                 return results;
         }
 
@@ -513,10 +509,6 @@ public class IMDBQueriesThreading {
                 // do sorting
                 Collections.sort(results, (o1, o2) -> o1.getRatingValue().compareTo(o2.getRatingValue()));
 
-                // get rid of the rest
-                if (results.size() > 10) {
-                        results.subList(0, 10);
-                }
                 return results;
         }
 
