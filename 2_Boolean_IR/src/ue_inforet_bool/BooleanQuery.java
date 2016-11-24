@@ -6,19 +6,23 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Comparator;
+import java.util.regex.Pattern;
 
 public class BooleanQuery {
 
-        public static ArrayList<String> allMovies = new ArrayList(); //later convert to array via allMovies.toArray? otherwise the allMovies[i] notation does not work but the uglier allMovies.get(i)
-        public static HashMap<String, HashSet<Integer>> hashAllYears=new HashMap<String, HashSet<Integer>>();
-        public static HashMap<String, HashSet<Integer>> hashPlot=new HashMap<String, HashSet<Integer>>();
-        public static HashMap<String, HashSet<Integer>> hashType=new HashMap<String, HashSet<Integer>>();
-        public static HashMap<String, HashSet<Integer>> hashTitle=new HashMap<String, HashSet<Integer>>();
-        public static HashMap<String, HashSet<Integer>> hashEpisodeTitle=new HashMap<String, HashSet<Integer>>();
-
-
-
+        private ArrayList<String> allMovies = new ArrayList<>(); //later convert to array via allMovies.toArray? otherwise the allMovies[i] notation does not work but the uglier allMovies.get(i)
+        private HashMap<String, HashSet<Integer>> hashAllYears = new HashMap<>();
+        public HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
+        private HashMap<String, HashSet<Integer>> hashType = new HashMap<>();
+        private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>();
+        private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>();
 
         /**
          * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
@@ -26,10 +30,6 @@ public class BooleanQuery {
         public BooleanQuery() {
         }
 
-        /***Parse the file and call the methods below
-         *
-         *
-         */
         /**
          * A method for reading the textual movie plot file and building indices. The
          * purpose of these indices is to speed up subsequent boolean searches using
@@ -44,7 +44,174 @@ public class BooleanQuery {
          */
         //Christoph
         public void buildIndices(String plotFile) {
+                int nextMovieID = 0;  // int eventuell zu klein ;)
+                int movieID = 0;
 
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+
+                                // is it an MV: line?
+                                if (Pattern.compile("^MV:").matcher(line).find()) {
+                                        // add an entry and increase movieID
+                                        movieID = nextMovieID;
+                                        nextMovieID++;
+                                        // add Film to ID/Film List
+                                        allMovies.add(movieID, line);
+
+                                        List<String> termList = tokenizeRowToTerms(line);
+
+                                        // run MV line methods
+                                        insertYearToHashMap(movieID, termList);
+                                        insertTitleToHashMap(movieID, termList);
+                                        insertTypeToHashMap(movieID, termList, line);
+                                }
+                                // is it an PL: line?
+                                if (Pattern.compile("^PL:").matcher(line).find()) {
+                                        // getting List<String> from tokenizeRowToTerms (line);
+                                        // insertPlotRowToHashMap(movieID, plotrow);
+
+                                        insertPlotRowToHashMap(movieID, line);
+                                }
+                        }
+                } catch (IOException e) {
+                        e.printStackTrace();
+                        System.exit(-1);
+                }
+        }
+
+        private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
+                if (hashMap.containsKey(value)) {
+                        hashMap.get(value).add(movieID);
+                } else {
+                        // value has no entry yet, create a list for the value and store film in it
+                        HashSet<Integer> movieList = new HashSet<>();
+                        movieList.add(movieID);
+                        hashMap.put(value, movieList);
+                }
+        }
+
+        private List<String> tokenizeRowToTerms(String row) {
+                List<String> wordList = new ArrayList<>();
+                for (String retval : row.split(" |,|\\.|:|!|\\?")) {
+                        if (!retval.isEmpty()) {
+                                wordList.add(retval.toLowerCase());
+                        }
+                }
+                return wordList;
+        }
+
+        //Jonas
+        private void insertPlotRowToHashMap(int movieID, String plotrow) {
+        }
+
+        private void insertYearToHashMap(int movieID, List<String> termList) {
+                //TODO: handle:
+                // MV: Displaced (2014/II)
+                // MV: Displaced (2014/III)
+                // MV: The Ambassador (????/IV)
+                // MV: The Ambassador (1984)
+                //get the year out of string
+                String year = null;
+                boolean openBracket = false;
+                for (String term : termList) {
+                        if (term.equals("(")) {
+                                openBracket = true;
+                                continue;
+                        }
+                        if (openBracket && term.equals(")")) {
+                                year = "????";
+                                break;
+                        }
+                        if (term.contains("(") && term.contains(")") && term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
+                                year = term.substring(term.indexOf("(") + 1, term.indexOf(")"));
+                                break;
+                        }
+                }
+
+                //store year and movie in hashset
+                addToHashMap(hashAllYears, year, movieID);
+        }
+
+        //Benni
+        private void insertTitleToHashMap(int movieID, List<String> termList) {
+                boolean MV = false;
+                boolean openBracket = false;
+                for (String term : termList) {
+                        if (term.equals("mv")) {
+                                MV = true;
+                                continue;
+                        }
+                        if (term.equals("(")) {
+                                openBracket = true;
+                                continue;
+                        }
+                        if (openBracket && term.equals(")")) {
+                                break;
+                        }
+                        if (term.contains("(") && term.contains(")") &&
+                                term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
+                                break;
+                        }
+                        //we add a term of the title (after MV and before the year)
+                        if (MV) {
+                                //store
+                                addToHashMap(hashTitle, term, movieID);
+                        }
+                }
+        }
+
+        //Falko
+        private void insertTypeToHashMap(int movieID, List<String> termList, String titleRow) {
+                // get the year out of string
+                String type = null;
+                String lastTerm = termList.get(termList.size() - 1);
+                String betweenBrackets = lastTerm.substring(lastTerm.indexOf("(") + 1, lastTerm.indexOf(")"));
+
+                //find a term starting with " and ending with "
+                for (String term : termList) {
+                        //make sure the term inqoutes is before the year
+                        if (term.contains("(") && term.contains(")") &&
+                                term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
+                                break;
+                        }
+                        if (term.contains("\"") && term.startsWith("\"") && term.endsWith("\"")) {
+                                //qoute = true;
+                                type = "series";
+                        }
+                }
+
+                // videogame
+                if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("vg")) {
+                        type = "videogame";
+                // television
+                } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("tv")) {
+                        type = "television";
+                // video
+                } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("v")) {
+                        type = "video";
+                //episode
+                } else if (lastTerm.endsWith("}")) {
+                        //handle "MV: Disparity (2013) {{SUSPENDED}}"
+                        if (!lastTerm.contains("}}")) {
+                                type = "episode";
+                                insertEpisodeTitleToHashMap(movieID, titleRow);
+                        }
+                } else {
+                //type is nothing of the above so it has to be a movie
+                        type = "movie";
+                }
+
+                //store
+                addToHashMap(hashType, type, movieID);
+        }
+
+        //Falko
+        private void insertEpisodeTitleToHashMap(int movieID, String titleRow) {
+                String betweenBrackets = titleRow.substring(titleRow.indexOf("{") + 1, titleRow.indexOf("}"));
+                for (String term : tokenizeRowToTerms(betweenBrackets)) {
+                        addToHashMap(hashEpisodeTitle, term, movieID);
+                }
         }
 
         /**
@@ -93,47 +260,6 @@ public class BooleanQuery {
                 return new HashSet<>();
         }
 
-        //Jonas
-        public void insertPlotRowToHashmap(int movieID, String plotrow) {
-                return;
-        }
-
-        /***Reads year from titleRow and and stores movieID (which represents a movie) in hashset
-         *
-         * @param movieID
-         * @param titleRow
-         */
-        public static void insertYeartoHashmap(int movieID, String titleRow) {
-                //ugly as hell and need to be improved (e.g.(????)) ToDo
-                String year = (String) titleRow.subSequence(titleRow.indexOf('(')+1, titleRow.indexOf(')'));
-
-                if (hashAllYears.containsKey(year)){
-                        hashAllYears.get(year).add(movieID);
-                } else {
-                        // year has no entry yet, create a list for the year and store film in it
-                        HashSet<Integer> movieList=new HashSet<Integer>();
-                        movieList.add(movieID);
-                        hashAllYears.put(year, movieList);
-                }
-        }
-
-        //Benni
-        public void insertTitletoHashmap(int movieID, String titleRow) {
-                titleRow = "MV: \"#BlackLove\" (2015) {Crash the Party (#1.9)}";
-
-
-                return;
-        }
-
-        //Falko
-        public void insertTypeToHashmap(int movieID, String titleRow) {
-                return;
-        }
-
-        //Falko
-        public void insertEpisodeTitleToHasmap(int movieID, String titleRow) {
-                return;
-        }
 
         public static void main(String[] args) {
                 BooleanQuery bq = new BooleanQuery();
