@@ -63,7 +63,8 @@ public class BooleanQuery {
                                         // run MV line methods
                                         insertYearToHashMap(movieID, termList);
                                         insertTitleToHashMap(movieID, termList);
-                                        insertTypeToHashMap(movieID, termList, line);
+                                       insertTypeToHashMap(movieID, line.toLowerCase());
+                                       // insertTypeToHashMap(movieID, termList, line);
                                 }
                                 // is it an PL: line?
                                 if (org.apache.commons.lang3.StringUtils.substring(line, 0, 3).contains("PL:")){
@@ -156,60 +157,42 @@ public class BooleanQuery {
                 }
         }
 
-        private void insertTypeToHashMap(int movieID, List<String> termList, String titleRow) {
-        /*        String type = null;
-                // get the year out of string
-                //System.out.println("lastTerm " + lastTerm);
+        private void insertTypeToHashMap(int movieID, String mvLine) {
+                String type = "movie";
                 // remove {{SUSPENDED}}
-                String betweenBrackets = "";
-                String lastTerm = "";
-                //System.out.println("termlist: "+ termList.get(termList.size() - 1));
-                //System.out.println("termlist: "+ termList.get(termList.size() - 2));
-                if (termList.get(termList.size() - 1).contains("{{suspended}}")) {
-                        lastTerm = termList.get(termList.size() - 2);
-                        //System.out.println("blubb");
-                } else {
-                        lastTerm = termList.get(termList.size() - 1);
-                }
-                System.out.println("last term: " + lastTerm);
-                betweenBrackets = lastTerm.substring(lastTerm.indexOf("(") + 1, lastTerm.indexOf(")"));
-                //System.out.println("betweenBrackets: " + betweenBrackets);
-
-                // find a term starting with " and ending with "
-                for (String term : termList) {
-                        // make sure the term inqoutes is before the year
-                        if (term.contains("(") && term.contains(")") &&
-                                term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
-                                break;
-                        }
-                        if (term.contains("\"") && term.startsWith("\"") && term.endsWith("\"")) {
-                                type = "series";
-                        }
+                if (mvLine.contains("{{suspended}}")){
+                        mvLine = mvLine.replace(" {{suspended}}", "");
+                        //System.out.println("lastTerm: " + mvLine);
                 }
 
-                // videogame
-                if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("vg")) {
-                        type = "videogame";
-                // television
-                } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("tv")) {
+                if (mvLine.contains("MV: \"") && !mvLine.contains("}")){
+                        type = "series";
+                        addToHashMap(hashType, type, movieID);
+                        return;
+                }
+
+                if (mvLine.contains("MV: \"") && mvLine.contains("}")){
+                        type = "episode";
+                        addToHashMap(hashType, type, movieID);
+                        return;
+                }
+                if (mvLine.contains(") (TV)")) {
                         type = "television";
-                // video
-                } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("v")) {
+                        addToHashMap(hashType, type, movieID);
+                        return;
+                }
+                if (mvLine.contains(") (V)")) {
                         type = "video";
-                // episode
-                } else if (lastTerm.endsWith("}")) {
-                        // handle "MV: Disparity (2013) {{SUSPENDED}}"
-                        if (!lastTerm.contains("}}")) {
-                                type = "episode";
-                                insertEpisodeTitleToHashMap(movieID, titleRow);
-                        }
-                } else {
-                // type is nothing of the above so it has to be a movie
-                        type = "movie";
-                }*/
+                        addToHashMap(hashType, type, movieID);
+                        return;
+                }
+                if (mvLine.contains(") (VG)")) {
+                        type = "videogame";
+                        addToHashMap(hashType, type, movieID);
+                        return;
+                }
 
-                //store
-              //  addToHashMap(hashType, type, movieID);
+                addToHashMap(hashType, type, movieID);
         }
 
         private void insertEpisodeTitleToHashMap(int movieID, String titleRow) {
@@ -345,3 +328,61 @@ public class BooleanQuery {
                 }*/
         }
 }
+
+
+
+/*        private void insertTypeToHashMap(int movieID, List<String> termList, String titleRow) {
+                String type = null;
+                // get the year out of string
+                //System.out.println("lastTerm " + lastTerm);
+                // remove {{SUSPENDED}}
+                String betweenBrackets = "";
+                String lastTerm = "";
+                System.out.println("termlist -1: "+ termList.get(termList.size() - 1));
+                System.out.println("termlist -2: "+ termList.get(termList.size() - 2));
+                if (termList.get(termList.size() - 1).equals("{{suspended}}")) {
+                        lastTerm = termList.get(termList.size() - 2);
+                        //System.out.println("blubb");
+                } else {
+                        lastTerm = termList.get(termList.size() - 1);
+                }
+                System.out.println("last term: " + lastTerm);
+                betweenBrackets = lastTerm.substring(lastTerm.indexOf("(") + 1, lastTerm.indexOf(")"));
+                //System.out.println("betweenBrackets: " + betweenBrackets);
+
+                // find a term starting with " and ending with "
+                for (String term : termList) {
+                        // make sure the term inqoutes is before the year
+                        if (term.contains("(") && term.contains(")") &&
+                                term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
+                                break;
+                        }
+                        if (term.contains("\"") && term.startsWith("\"") && term.endsWith("\"")) {
+                                type = "series";
+                        }
+                }
+
+                // videogame
+                if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("vg")) {
+                        type = "videogame";
+                        // television
+                } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("tv")) {
+                        type = "television";
+                        // video
+                } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("v")) {
+                        type = "video";
+                        // episode
+                } else if (lastTerm.endsWith("}")) {
+                        // handle "MV: Disparity (2013) {{SUSPENDED}}"
+                        if (!lastTerm.contains("}}")) {
+                                type = "episode";
+                                insertEpisodeTitleToHashMap(movieID, titleRow);
+                        }
+                } else {
+                        // type is nothing of the above so it has to be a movie
+                        type = "movie";
+                }
+
+                //store
+                addToHashMap(hashType, type, movieID);
+        }*/
