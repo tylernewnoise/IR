@@ -1,23 +1,24 @@
 // DO NOT CHANGE THIS PACKAGE NAME.
 package ue_inforet_bool;
 
+import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
+
 import java.nio.charset.StandardCharsets;
 
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.regex.Pattern;
 
 public class BooleanQuery {
-
-        private ArrayList<String> allMovies = new ArrayList<>(); //later convert to array via allMovies.toArray? otherwise the allMovies[i] notation does not work but the uglier allMovies.get(i)
+	//later convert to array via allMovies.toArray? otherwise the allMovies[i] notation does not work but the uglier allMovies.get(i)
+        private ArrayList<String> allMovies = new ArrayList<>();
         private HashMap<String, HashSet<Integer>> hashAllYears = new HashMap<>();
         public HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
         private HashMap<String, HashSet<Integer>> hashType = new HashMap<>();
@@ -42,9 +43,8 @@ public class BooleanQuery {
          *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
          *                 use.
          */
-        //Christoph
         public void buildIndices(String plotFile) {
-                int nextMovieID = 0;  // int eventuell zu klein ;)
+                int nextMovieID = 0;
                 int movieID = 0;
 
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
@@ -52,10 +52,9 @@ public class BooleanQuery {
                         while ((line = reader.readLine()) != null) {
 
                                 // is it an MV: line?
-                                if (Pattern.compile("^MV:").matcher(line).find()) {
+                                if (org.apache.commons.lang3.StringUtils.substring(line, 0, 3).contains("MV:")){
                                         // add an entry and increase movieID
-                                        movieID = nextMovieID;
-                                        nextMovieID++;
+                                        movieID = nextMovieID++;
                                         // add Film to ID/Film List
                                         allMovies.add(movieID, line);
 
@@ -67,10 +66,8 @@ public class BooleanQuery {
                                         insertTypeToHashMap(movieID, termList, line);
                                 }
                                 // is it an PL: line?
-                                if (Pattern.compile("^PL:").matcher(line).find()) {
+                                if (org.apache.commons.lang3.StringUtils.substring(line, 0, 3).contains("PL:")){
                                         // getting List<String> from tokenizeRowToTerms (line);
-                                        // insertPlotRowToHashMap(movieID, plotrow);
-
                                         insertPlotRowToHashMap(movieID, line);
                                 }
                         }
@@ -93,20 +90,19 @@ public class BooleanQuery {
 
         private List<String> tokenizeRowToTerms(String row) {
                 List<String> wordList = new ArrayList<>();
-                for (String retval : row.split(" |,|\\.|:|!|\\?")) {
-                        if (!retval.isEmpty()) {
-                                wordList.add(retval.toLowerCase());
+                for (String retVal : row.split(" |,|\\.|:|!|\\?")) {
+                        if (!retVal.isEmpty()) {
+                                wordList.add(retVal.toLowerCase());
                         }
                 }
                 return wordList;
         }
 
-        //Jonas
         private void insertPlotRowToHashMap(int movieID, String plotrow) {
         }
 
         private void insertYearToHashMap(int movieID, List<String> termList) {
-                //TODO: handle:
+                // TODO: handle:
                 // MV: Displaced (2014/II)
                 // MV: Displaced (2014/III)
                 // MV: The Ambassador (????/IV)
@@ -129,11 +125,10 @@ public class BooleanQuery {
                         }
                 }
 
-                //store year and movie in hashset
+                // store year and movie in hashset
                 addToHashMap(hashAllYears, year, movieID);
         }
 
-        //Benni
         private void insertTitleToHashMap(int movieID, List<String> termList) {
                 boolean MV = false;
                 boolean openBracket = false;
@@ -153,30 +148,41 @@ public class BooleanQuery {
                                 term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
                                 break;
                         }
-                        //we add a term of the title (after MV and before the year)
+                        // we add a term of the title (after MV and before the year)
                         if (MV) {
-                                //store
+                                // store
                                 addToHashMap(hashTitle, term, movieID);
                         }
                 }
         }
 
-        //Falko
         private void insertTypeToHashMap(int movieID, List<String> termList, String titleRow) {
+        /*        String type = null;
                 // get the year out of string
-                String type = null;
-                String lastTerm = termList.get(termList.size() - 1);
-                String betweenBrackets = lastTerm.substring(lastTerm.indexOf("(") + 1, lastTerm.indexOf(")"));
+                //System.out.println("lastTerm " + lastTerm);
+                // remove {{SUSPENDED}}
+                String betweenBrackets = "";
+                String lastTerm = "";
+                //System.out.println("termlist: "+ termList.get(termList.size() - 1));
+                //System.out.println("termlist: "+ termList.get(termList.size() - 2));
+                if (termList.get(termList.size() - 1).contains("{{suspended}}")) {
+                        lastTerm = termList.get(termList.size() - 2);
+                        //System.out.println("blubb");
+                } else {
+                        lastTerm = termList.get(termList.size() - 1);
+                }
+                System.out.println("last term: " + lastTerm);
+                betweenBrackets = lastTerm.substring(lastTerm.indexOf("(") + 1, lastTerm.indexOf(")"));
+                //System.out.println("betweenBrackets: " + betweenBrackets);
 
-                //find a term starting with " and ending with "
+                // find a term starting with " and ending with "
                 for (String term : termList) {
-                        //make sure the term inqoutes is before the year
+                        // make sure the term inqoutes is before the year
                         if (term.contains("(") && term.contains(")") &&
                                 term.substring(term.indexOf("(") + 1, term.indexOf(")")).matches("\\d+")) {
                                 break;
                         }
                         if (term.contains("\"") && term.startsWith("\"") && term.endsWith("\"")) {
-                                //qoute = true;
                                 type = "series";
                         }
                 }
@@ -190,23 +196,22 @@ public class BooleanQuery {
                 // video
                 } else if (lastTerm.contains("(") && lastTerm.contains(")") && betweenBrackets.equals("v")) {
                         type = "video";
-                //episode
+                // episode
                 } else if (lastTerm.endsWith("}")) {
-                        //handle "MV: Disparity (2013) {{SUSPENDED}}"
+                        // handle "MV: Disparity (2013) {{SUSPENDED}}"
                         if (!lastTerm.contains("}}")) {
                                 type = "episode";
                                 insertEpisodeTitleToHashMap(movieID, titleRow);
                         }
                 } else {
-                //type is nothing of the above so it has to be a movie
+                // type is nothing of the above so it has to be a movie
                         type = "movie";
-                }
+                }*/
 
                 //store
-                addToHashMap(hashType, type, movieID);
+              //  addToHashMap(hashType, type, movieID);
         }
 
-        //Falko
         private void insertEpisodeTitleToHashMap(int movieID, String titleRow) {
                 String betweenBrackets = titleRow.substring(titleRow.indexOf("{") + 1, titleRow.indexOf("}"));
                 for (String term : tokenizeRowToTerms(betweenBrackets)) {
@@ -260,7 +265,6 @@ public class BooleanQuery {
                 return new HashSet<>();
         }
 
-
         public static void main(String[] args) {
                 BooleanQuery bq = new BooleanQuery();
                 if (args.length < 3) {
@@ -281,7 +285,7 @@ public class BooleanQuery {
                         .println("memory: " + ((runtime.totalMemory() - mem) / (1048576l))
                                 + " MB (rough estimate)");
 
-                // parsing the queries that are to be run from the queries file
+/*                // parsing the queries that are to be run from the queries file
                 List<String> queries = new ArrayList<>();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                         new FileInputStream(args[1]), StandardCharsets.ISO_8859_1))) {
@@ -338,6 +342,6 @@ public class BooleanQuery {
                         System.out.println("actual result:   " + actualResultSorted.toString());
                         System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
                                 : "FAILURE");
-                }
+                }*/
         }
 }
