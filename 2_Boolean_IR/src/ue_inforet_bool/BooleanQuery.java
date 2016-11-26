@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.ArrayList;
 
 public class BooleanQuery {
-        //later convert to array via allMovies.toArray? otherwise the allMovies[i] notation does not work but the uglier allMovies.get(i)
         private ArrayList<String> allMovies = new ArrayList<>();
         private HashMap<String, HashSet<Integer>> hashType = new HashMap<>();
         private HashMap<String, HashSet<Integer>> hashAllYears = new HashMap<>();
@@ -59,7 +58,7 @@ public class BooleanQuery {
                                 }
                                 // is it an PL: line?
                                 if (org.apache.commons.lang3.StringUtils.substring(line, 0, 3).contains("PL:")) {
-                                       //remove 'PL: ' first
+                                        //remove 'PL: ' first
                                         line = org.apache.commons.lang3.StringUtils.substring(line, 4, line.length()).toLowerCase();
                                         // getting List<String> from tokenizePlotLine (line);
                                         insertPlotRowToHashMap(movieID, line);
@@ -93,20 +92,21 @@ public class BooleanQuery {
         }
 
         private void insertPlotRowToHashMap(int movieID, String plotLine) {
-               List <String> plotTokens;
-               plotTokens = tokenizePlotLine(plotLine);
-               for (String token : plotTokens) {
-                       addToHashMap(hashPlot, token, movieID);
-               }
+                List<String> plotTokens;
+                plotTokens = tokenizePlotLine(plotLine);
+                for (String token : plotTokens) {
+                        addToHashMap(hashPlot, token, movieID);
+                }
         }
 
-        /** In this code-pile-of-junk we add title, type and year to the hash maps.
+        /**
+         * In this code-pile-of-junk we add title, type and year to the hash maps.
          * Since series and episodes are a bit tricky/different they are handled
          * in separate way. For info on how the code works have look at episodes or
          * call Batman.
          *
          * @param movieID Gives each entry in our indices a unique number
-         * @param mvLine Contains all information for the different entries.
+         * @param mvLine  Contains all information for the different entries.
          */
         private void insertTitleTypeYear(int movieID, String mvLine) {
                 mvLine = mvLine.toLowerCase();
@@ -134,7 +134,7 @@ public class BooleanQuery {
                         }
 
                         if (year.length() == 4) {
-				addToHashMap(hashAllYears, year, movieID);
+                                addToHashMap(hashAllYears, year, movieID);
                         }
                         return;
                 }
@@ -355,7 +355,7 @@ public class BooleanQuery {
         }
 }
 
-
+/* ++++++++++++++++++ OLD STUFF +++++++++++++++++++++++++++ */
 
 /*        private void insertTypeToHashMap(int movieID, List<String> termList, String titleRow) {
                 String type = null;
