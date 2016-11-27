@@ -9,10 +9,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Set;
-import java.util.List;
+//import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ArrayList;
+//import java.util.Comparator;
 
 public class BooleanQuery {
         private ArrayList<String> allMovies = new ArrayList<>();
@@ -21,6 +22,7 @@ public class BooleanQuery {
         private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
         private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>();
         private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>();
+	private String token = "";
 
         /**
          * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
@@ -66,7 +68,8 @@ public class BooleanQuery {
                         e.printStackTrace();
                         System.exit(-1);
                 }
-        }
+		//print();
+	}
 
         private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
                 if (hashMap.containsKey(value)) {
@@ -80,7 +83,7 @@ public class BooleanQuery {
         }
 
         private void addTokenFromPlotLineToHashMap(Integer movieID, String line) {
-                String tokenString = "";
+		token = "";
 
                 // iterate through the line and check for delimiters
                 for (int i = 0; i < line.length(); i++) {
@@ -89,20 +92,21 @@ public class BooleanQuery {
                         if (line.charAt(i) == ' ' || line.charAt(i) == '.' || line.charAt(i) == ':' ||
                                 line.charAt(i) == '?' || line.charAt(i) == '!' || line.charAt(i) == ',') {
 
-                                if (!tokenString.isEmpty()) {
-                                        addToHashMap(hashPlot, tokenString, movieID);
-                                }
-                                tokenString = "";
-                                continue;
+				if (!token.isEmpty()) {
+					addToHashMap(hashPlot, token, movieID);
+				}
+
+				token = "";
+				continue;
                         }
                         // add chars to the token
-                        tokenString += line.charAt(i);
-                }
+			token += line.charAt(i);
+		}
 
                 // when we reached the end of the line, we want to add the last token as well
-                if (!tokenString.isEmpty()) {
-                        addToHashMap(hashPlot, tokenString, movieID);
-                }
+		if (!token.isEmpty()) {
+			addToHashMap(hashPlot, token, movieID);
+		}
         }
 
         /**
@@ -125,23 +129,35 @@ public class BooleanQuery {
                 // +++ series +++
                 if (mvLine.contains("mv: \"") && !mvLine.contains("}")) {
                         addToHashMap(hashType, "series", movieID);
+
                         int bracketStart = 8;
-                        String title = "";
-                        String year = "";
+			token = "";
 
                         for (int i = 5; mvLine.charAt(i) != '\"'; i++) {
-                                title += mvLine.charAt(i);
-                                bracketStart++;
-                        }
-                        addToHashMap(hashTitle, title, movieID);
+				if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
+					mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
 
-                        for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
-                                year += mvLine.charAt(i);
-                        }
+					if (!token.isEmpty()) {
+						addToHashMap(hashTitle, token, movieID);
+					}
+					token = "";
+					bracketStart++;
+					continue;
+				}
+				token += mvLine.charAt(i);
+				bracketStart++;
+			}
+			if (!token.isEmpty()) {
+				addToHashMap(hashTitle, token, movieID);
+			}
 
-                        if (year.length() == 4) {
-                                addToHashMap(hashAllYears, year, movieID);
-                        }
+			token = "";
+			for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
+				token += mvLine.charAt(i);
+			}
+			if (token.length() == 4) {
+				addToHashMap(hashAllYears, token, movieID);
+			}
                         return;
                 }
                 // +++ episode +++
@@ -149,32 +165,48 @@ public class BooleanQuery {
                         // add type to HashMap
                         addToHashMap(hashType, "episode", movieID);
 
-                        String year = "";
-                        String title = "";
-                        String episodeTitle = "";
-                        int bracketStart = 8;
+			token = ""; // reset the token to 0
+			int bracketStart = 8; // set the index for the year (yes, I know it's actually a parenthesis)
 
-                        // get and add title to HashMap, start at the first '"' and add every char to the titleString
-                        // until the end is reached.
-                        for (int i = 5; mvLine.charAt(i) != '\"'; i++) {
-                                title += mvLine.charAt(i);
-                                bracketStart++;
-                        }
-                        addToHashMap(hashTitle, title, movieID);
+			// get and add title to hash map, start at the first quotation mark which ich always on
+			// index 5 in the string and add every char to the token. add the token to the hash map.
+			// repeat until the second quotation mark is reached.
+			for (int i = 5; mvLine.charAt(i) != '\"'; i++) {
 
-                        // since wie already got the end of the title and know where to start, we can move on to
-                        // the year directly
-                        for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
-                                year += mvLine.charAt(i);
-                                bracketStart++;
-                        }
-                        if (year.length() == 4) {
-                                addToHashMap(hashAllYears, year, movieID);
-                        }
+				// tokenize the title - see addTokenFromPlotLineToHashMap for description
+				if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
+					mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
 
-                        // we don't know exactly, if the year was a 4-digit number or some special shit
-                        // so let's see and if no, we have to iterate a bit to get to the episode title.
-                        if (mvLine.charAt(bracketStart) == ')') {
+					if (!token.isEmpty()) {
+						addToHashMap(hashTitle, token, movieID);
+					}
+					token = "";
+					bracketStart++;
+					continue;
+				}
+				// add chars to the token
+				token += mvLine.charAt(i);
+				bracketStart++;
+			}
+			if (!token.isEmpty()) {
+				addToHashMap(hashTitle, token, movieID);
+			}
+			token = "";
+
+			// since wie already got the end of the title (thanks to bracketStart) and know where to start,
+			// we can move on to the year directly. we only add digits to the token. if there are no
+			// digits in the year field (????) the token is not added.
+			for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
+				token += mvLine.charAt(i);
+				bracketStart++;
+                        }
+			if (token.length() == 4) {
+				addToHashMap(hashAllYears, token, movieID);
+			}
+
+			// we don't know exactly, if the year was a 4-digit number or some special shit. so let's see
+			// see and if no, we have to iterate a bit to get to the start of the episode title.
+			if (mvLine.charAt(bracketStart) == ')') {
                                 bracketStart += 3;
                         } else {
                                 while (mvLine.charAt(bracketStart - 1) != '{') {
@@ -182,12 +214,24 @@ public class BooleanQuery {
                                 }
                         }
 
-                        // yay, we found the start of the episodeTitle...
-                        for (int i = bracketStart; mvLine.charAt(i) != '}'; i++) {
-                                episodeTitle += mvLine.charAt(i);
-
-                        }
-                        addToHashMap(hashEpisodeTitle, episodeTitle, movieID);
+			token = "";
+			// yay, we found the start of the episode title, so let's tokenize this as well.
+			for (int i = bracketStart; mvLine.charAt(i) != '}'; i++) {
+				if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
+					mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
+					if (!token.isEmpty()) {
+						addToHashMap(hashEpisodeTitle, token, movieID);
+					}
+					token = "";
+					bracketStart++;
+					continue;
+				}
+				token += mvLine.charAt(i);
+				bracketStart++;
+			}
+			if (!token.isEmpty()) {
+				addToHashMap(hashEpisodeTitle, token, movieID);
+			}
 
                         // and we're done, no need to check the other if-statements.
                         return;
@@ -195,44 +239,56 @@ public class BooleanQuery {
                 // +++ television +++
                 if (mvLine.contains(") (tv)")) {
                         addToHashMap(hashType, "television", movieID);
-                        addYearAndTitle(movieID, mvLine);
-                        return;
+			addTitleAndYear(movieID, mvLine);
+			return;
                 }
                 // +++ video +++
                 if (mvLine.contains(") (v)")) {
                         addToHashMap(hashType, "video", movieID);
-                        addYearAndTitle(movieID, mvLine);
-                        return;
+			addTitleAndYear(movieID, mvLine);
+			return;
                 }
                 // +++ video game +++
                 if (mvLine.contains(") (vg)")) {
                         addToHashMap(hashType, "videogame", movieID);
-                        addYearAndTitle(movieID, mvLine);
-                        return;
+			addTitleAndYear(movieID, mvLine);
+			return;
                 }
                 // +++ movie +++
                 addToHashMap(hashType, "movie", movieID);
-                addYearAndTitle(movieID, mvLine);
-        }
+		addTitleAndYear(movieID, mvLine);
+	}
 
-        /* Just a helper method to not blow the code. */
-        private void addYearAndTitle(int movieID, String mvLine) {
-                String title = "";
-                String year = "";
-                int bracketStart = 6;
+	/* Just a helper method to not blow the code even more. */
+	private void addTitleAndYear(int movieID, String mvLine) {
+		token = "";
+		int bracketStart = 6;
 
                 for (int i = 4; mvLine.charAt(i + 1) != '('; i++) {
-                        title += mvLine.charAt(i);
-                        bracketStart++;
-                }
-                addToHashMap(hashTitle, title, movieID);
+			if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
+				mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
 
-                for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
-                        year += mvLine.charAt(i);
-                }
-                if (year.length() == 4) {
-                        addToHashMap(hashAllYears, year, movieID);
-                }
+				if (!token.isEmpty()) {
+					addToHashMap(hashTitle, token, movieID);
+				}
+				token = "";
+				bracketStart++;
+				continue;
+			}
+			token += mvLine.charAt(i);
+			bracketStart++;
+		}
+		if (!token.isEmpty()) {
+			addToHashMap(hashTitle, token, movieID);
+		}
+
+		token = "";
+		for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
+			token += mvLine.charAt(i);
+		}
+		if (token.length() == 4) {
+			addToHashMap(hashAllYears, token, movieID);
+		}
         }
 
         /**
@@ -277,9 +333,53 @@ public class BooleanQuery {
          * lines (starting with "MV: ") of the documents matching the query
          */
         public Set<String> booleanQuery(String queryString) {
-                // TODO: insert code here
+
+		if (queryString.contains(" AND ")) {
+			//call AND - Verknüpfung
+		}
+		if (queryString.contains("\"")) {
+			// call phrase-search
+		}
+
+		// token-search
+		//check if it's a title
+		if (queryString.indexOf(1) == 'i') {
+			// goto title hashmap
+
+
+		}
+
+		//check if it's a plot
+		if (queryString.startsWith("p")) {
+			// goto plot hashmap
+		}
+
+		//check if it's a type
+		if (queryString.indexOf(1) == 'y') {
+			// goto type hashmap
+		}
+
+		//check if it's a year
+		if (queryString.startsWith("y")) {
+			// goto  year hashmap
+		}
+
+		//check if it's a episodetitle
+		if (queryString.startsWith("e")) {
+			// goto episodetitle hashmap
+		}
+
                 return new HashSet<>();
         }
+
+	/* for testing */
+	private void print() {
+/*                System.out.println(hashEpisodeTitle);
+		System.out.println(hashAllYears);
+                 System.out.println(hashType);
+                System.out.println(hashPlot);
+                System.out.println(hashTitle);*/
+	}
 
         public static void main(String[] args) {
                 BooleanQuery bq = new BooleanQuery();
@@ -301,8 +401,8 @@ public class BooleanQuery {
                         .println("memory: " + ((runtime.totalMemory() - mem) / (1048576l))
                                 + " MB (rough estimate)");
 
-/*                // parsing the queries that are to be run from the queries file
-                List<String> queries = new ArrayList<>();
+/*              // parsing the queries that are to be run from the queries file
+		List<String> queries = new ArrayList<>();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                         new FileInputStream(args[1]), StandardCharsets.ISO_8859_1))) {
                         String line;
