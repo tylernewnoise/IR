@@ -1,6 +1,8 @@
 // DO NOT CHANGE THIS PACKAGE NAME.
 package ue_inforet_bool;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -18,8 +20,8 @@ import java.util.ArrayList;
 public class BooleanQuery {
         private ArrayList<String> allMovies = new ArrayList<>();
         private HashMap<String, HashSet<Integer>> hashType = new HashMap<>();
-        private HashMap<String, HashSet<Integer>> hashAllYears = new HashMap<>();
-        private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
         private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>();
         private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>();
 	private String token = "";
@@ -51,24 +53,24 @@ public class BooleanQuery {
 
                         while ((line = reader.readLine()) != null) {
                                 // is it an MV: line?
-                                if (org.apache.commons.lang3.StringUtils.substring(line, 0, 3).contains("MV:")) {
-                                        // add an entry and increase movieID
-                                        allMovies.add(movieID, line);
+				if (line.startsWith("M")) {
+					// add an entry and increase movieID
                                         movieID = nextMovieID++;
-                                        // add movie to list and add title, type and year to the hash maps
+					allMovies.add(movieID, line);
+					// add movie to list and add title, type and year to the hash maps
                                         insertTitleTypeYearToHashMap(movieID, line);
                                 }
                                 // is it an PL: line?
-                                if (org.apache.commons.lang3.StringUtils.substring(line, 0, 3).contains("PL:")) {
-                                        // tokenize the line and add the tokens to the hash map.
-                                        addTokenFromPlotLineToHashMap(movieID, org.apache.commons.lang3.StringUtils.substring(line, 4, line.length()).toLowerCase());
-                                }
+				if (StringUtils.substring(line, 0, 3).contains("PL:")) {
+					// tokenize the line and add the tokens to the hash map.
+					addTokenFromPlotLineToHashMap(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
+				}
                         }
                 } catch (IOException e) {
                         e.printStackTrace();
                         System.exit(-1);
                 }
-		//print();
+		//print(); // TODO: remove
 	}
 
         private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
@@ -98,7 +100,7 @@ public class BooleanQuery {
 
 				token = "";
 				continue;
-                        }
+			}
                         // add chars to the token
 			token += line.charAt(i);
 		}
@@ -107,7 +109,7 @@ public class BooleanQuery {
 		if (!token.isEmpty()) {
 			addToHashMap(hashPlot, token, movieID);
 		}
-        }
+	}
 
         /**
          * In this code-pile-of-junk we add title, type and year to the hash maps.
@@ -156,9 +158,9 @@ public class BooleanQuery {
 				token += mvLine.charAt(i);
 			}
 			if (token.length() == 4) {
-				addToHashMap(hashAllYears, token, movieID);
+				addToHashMap(hashYear, token, movieID);
 			}
-                        return;
+			return;
                 }
                 // +++ episode +++
                 if (mvLine.contains("mv: \"") && mvLine.contains("}")) {
@@ -199,15 +201,15 @@ public class BooleanQuery {
 			for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
 				token += mvLine.charAt(i);
 				bracketStart++;
-                        }
+			}
 			if (token.length() == 4) {
-				addToHashMap(hashAllYears, token, movieID);
+				addToHashMap(hashYear, token, movieID);
 			}
 
 			// we don't know exactly, if the year was a 4-digit number or some special shit. so let's see
 			// see and if no, we have to iterate a bit to get to the start of the episode title.
 			if (mvLine.charAt(bracketStart) == ')') {
-                                bracketStart += 3;
+				bracketStart += 3;
                         } else {
                                 while (mvLine.charAt(bracketStart - 1) != '{') {
                                         bracketStart++;
@@ -241,19 +243,19 @@ public class BooleanQuery {
                         addToHashMap(hashType, "television", movieID);
 			addTitleAndYear(movieID, mvLine);
 			return;
-                }
+		}
                 // +++ video +++
                 if (mvLine.contains(") (v)")) {
                         addToHashMap(hashType, "video", movieID);
 			addTitleAndYear(movieID, mvLine);
 			return;
-                }
+		}
                 // +++ video game +++
                 if (mvLine.contains(") (vg)")) {
                         addToHashMap(hashType, "videogame", movieID);
 			addTitleAndYear(movieID, mvLine);
 			return;
-                }
+		}
                 // +++ movie +++
                 addToHashMap(hashType, "movie", movieID);
 		addTitleAndYear(movieID, mvLine);
@@ -287,9 +289,9 @@ public class BooleanQuery {
 			token += mvLine.charAt(i);
 		}
 		if (token.length() == 4) {
-			addToHashMap(hashAllYears, token, movieID);
+			addToHashMap(hashYear, token, movieID);
 		}
-        }
+	}
 
         /**
          * A method for performing a boolean search on a textual movie plot file after
@@ -333,53 +335,89 @@ public class BooleanQuery {
          * lines (starting with "MV: ") of the documents matching the query
          */
         public Set<String> booleanQuery(String queryString) {
-
-		if (queryString.contains(" AND ")) {
+		System.out.println("");
+		HashSet<String> results = new HashSet<>();
+		// TODO: AND, phrase queries
+/*                if (queryString.contains(" AND ")) {
 			//call AND - Verknüpfung
+                }
+                if (queryString.contains("\"")) {
+                        // call phrase-search
+                }*/
+
+		// +++++ token-search +++++
+		// +++ title +++
+		if (queryString.indexOf("i") == 1) {
+			if (hashTitle.containsKey(StringUtils.substring(queryString, 6, queryString.length()).toLowerCase())) {
+				for (int i : hashTitle.get(StringUtils.substring(queryString, 6, queryString.length()).toLowerCase())) {
+					System.out.println(allMovies.get(i)); // TODO: remove!
+					results.add(allMovies.get(i));
+				}
+				return results;
+			}
+			return null;
 		}
-		if (queryString.contains("\"")) {
-			// call phrase-search
-		}
-
-		// token-search
-		//check if it's a title
-		if (queryString.indexOf(1) == 'i') {
-			// goto title hashmap
-
-
-		}
-
-		//check if it's a plot
+		// +++ plot +++
 		if (queryString.startsWith("p")) {
+			if (hashPlot.containsKey(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase())) {
+				for (int i : hashPlot.get(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase())) {
+					System.out.println(allMovies.get(i)); // TODO: remove!
+					results.add(allMovies.get(i));
+				}
+				return results;
+			}
+			return null;
 			// goto plot hashmap
 		}
-
-		//check if it's a type
-		if (queryString.indexOf(1) == 'y') {
-			// goto type hashmap
+		// +++ type +++
+		if (queryString.indexOf("y") == 1) {
+			if (hashType.containsKey(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase())) {
+				for (int i : hashType.get(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase())) {
+					System.out.println(allMovies.get(i)); // TODO: remove!
+					results.add(allMovies.get(i));
+				}
+				return results;
+			}
+			return null;
 		}
-
-		//check if it's a year
+		// +++ year +++
 		if (queryString.startsWith("y")) {
-			// goto  year hashmap
+			if (hashYear.containsKey(StringUtils.substring(queryString, 5, queryString.length()))) {
+				for (int i : hashYear.get(StringUtils.substring(queryString, 5, queryString.length()))) {
+					System.out.println(allMovies.get(i)); // TODO: remove!
+					results.add(allMovies.get(i));
+				}
+				return results;
+			}
+			return null;
 		}
-
-		//check if it's a episodetitle
+		// +++ episode title +++
 		if (queryString.startsWith("e")) {
-			// goto episodetitle hashmap
+			if (hashEpisodeTitle.containsKey(StringUtils.substring(queryString, 8, queryString.length()).toLowerCase())) {
+				for (int i : hashEpisodeTitle.get(StringUtils.substring(queryString, 8, queryString.length()).toLowerCase())) {
+					System.out.println(allMovies.get(i)); // TODO: remove!
+					results.add(allMovies.get(i));
+				}
+				return results;
+			}
+			return null;
 		}
-
-                return new HashSet<>();
-        }
-
-	/* for testing */
-	private void print() {
-/*                System.out.println(hashEpisodeTitle);
-		System.out.println(hashAllYears);
-                 System.out.println(hashType);
-                System.out.println(hashPlot);
-                System.out.println(hashTitle);*/
+		return null;
 	}
+
+        /* for testing */
+	/*private void print() {
+		System.out.println(hashEpisodeTitle);
+                System.out.println(hashYear);
+                System.out.println(hashType);
+                System.out.println(hashPlot);
+                System.out.println(hashTitle);
+                int i = 0;
+                while (i < allMovies.size()) {
+                        System.out.println(allMovies.get(i));
+                        i++;
+                }
+        }*/
 
         public static void main(String[] args) {
                 BooleanQuery bq = new BooleanQuery();
@@ -400,6 +438,14 @@ public class BooleanQuery {
                 System.out
                         .println("memory: " + ((runtime.totalMemory() - mem) / (1048576l))
                                 + " MB (rough estimate)");
+
+		String query = "title:Terminator";
+		//String query = "title:Genisys";
+		//String query = "plot:Skynet";
+		//String query = "type:movie";
+		//String query = "year:2004";
+		//String query = "episode:party";
+		Set<String> result = bq.booleanQuery(query);
 
 /*              // parsing the queries that are to be run from the queries file
 		List<String> queries = new ArrayList<>();
