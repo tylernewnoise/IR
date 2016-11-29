@@ -1,4 +1,5 @@
 // DO NOT CHANGE THIS PACKAGE NAME.
+// TODO: remove global token as it is bad practice and maybe we can save some time, too.
 package ue_inforet_bool;
 
 import org.apache.commons.lang3.StringUtils;
@@ -16,331 +17,268 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ArrayList;
 //import java.util.Comparator;
+import java.util.StringTokenizer;
 
 public class BooleanQuery {
-        private ArrayList<String> allMovies = new ArrayList<>();
-        private HashMap<String, HashSet<Integer>> hashType = new HashMap<>();
-	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>();
-	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
-        private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>();
-        private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>();
+	private ArrayList<String> allMovies = new ArrayList<>(530000);
+	private HashMap<Integer, String> allPlotPhrases = new HashMap<>(530000);
+	private HashMap<Integer, String> allTitlePhrases = new HashMap<>(530000);
+	private HashMap<Integer, String> allEpisodeTitlePhrases = new HashMap<>(220000);
+	private HashMap<String, HashSet<Integer>> hashType = new HashMap<>(6);
+	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>(140);
+	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>(700000);
+	private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>(150000);
+	private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>(100000);
+	private String tokenPhrase = "";
 	private String token = "";
 
-        /**
-         * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
-         */
-        public BooleanQuery() {
-        }
+	/**
+	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
+	 */
+	public BooleanQuery() {
+	}
 
-        /**
-         * A method for reading the textual movie plot file and building indices. The
-         * purpose of these indices is to speed up subsequent boolean searches using
-         * the {@link #booleanQuery(String) booleanQuery} method.
-         * <p>
-         * DO NOT CHANGE THIS METHOD'S INTERFACE.
-         *
-         * @param plotFile the textual movie plot file 'plot.list', obtainable from <a
-         *                 href="http://www.imdb.com/interfaces"
-         *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
-         *                 use.
-         */
-        public void buildIndices(String plotFile) {
-                int nextMovieID = 0;
-                int movieID = 0;
+	/**
+	 * A method for reading the textual movie plot file and building indices. The
+	 * purpose of these indices is to speed up subsequent boolean searches using
+	 * the {@link #booleanQuery(String) booleanQuery} method.
+	 * <p>
+	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
+	 *
+	 * @param plotFile the textual movie plot file 'plot.list', obtainable from <a
+	 *                 href="http://www.imdb.com/interfaces"
+	 *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
+	 *                 use.
+	 */
+	public void buildIndices(String plotFile) {
+		int nextMovieID = 0;
+		int movieID = 0;
 
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
-                        String line;
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
+			String line;
 
-                        while ((line = reader.readLine()) != null) {
-                                // is it an MV: line?
+			while ((line = reader.readLine()) != null) {
+				// is it an MV: line?
 				if (line.startsWith("M")) {
+					// this check is necessary due to the fact that the first time we run through
+					// this tokenPhrase is empty. we add here the tokenized phrase for
+					// phrase search
+					if (!tokenPhrase.isEmpty()) {
+						allPlotPhrases.put(movieID, tokenPhrase);
+						tokenPhrase = "";
+					}
 					// add an entry and increase movieID
-                                        movieID = nextMovieID++;
+					movieID = nextMovieID++;
 					allMovies.add(movieID, line);
 					// add movie to list and add title, type and year to the hash maps
-                                        insertTitleTypeYearToHashMap(movieID, line);
-                                }
-                                // is it an PL: line?
+					// remove 'MV: ' first and convert everything toLowerCase()
+					addTitleTypeYearToHashMap(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
+				}
+				// is it an PL: line?
 				if (StringUtils.substring(line, 0, 3).contains("PL:")) {
 					// tokenize the line and add the tokens to the hash map.
-					addTokenFromPlotLineToHashMap(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
+					addPlotLineToHashMap(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
 				}
-                        }
-                } catch (IOException e) {
-                        e.printStackTrace();
-                        System.exit(-1);
-                }
-		//print(); // TODO: remove
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		// add the last plot phrase
+		if (!tokenPhrase.isEmpty()) {
+			allPlotPhrases.put(movieID, tokenPhrase);
+		}
+		print(); // TODO: remove
 	}
 
-        private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
-                if (hashMap.containsKey(value)) {
-                        hashMap.get(value).add(movieID);
-                } else {
-                        // value has no entry yet, create a list for the value and store film in it
-                        HashSet<Integer> movieList = new HashSet<>();
-                        movieList.add(movieID);
-                        hashMap.put(value, movieList);
-                }
-        }
+	private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
+		if (hashMap.containsKey(value)) {
+			hashMap.get(value).add(movieID);
+		} else {
+			// value has no entry yet, create a list for the value and store film in it
+			HashSet<Integer> movieList = new HashSet<>();
+			movieList.add(movieID);
+			hashMap.put(value, movieList);
+		}
+	}
 
-        private void addTokenFromPlotLineToHashMap(Integer movieID, String line) {
+	private void addPlotLineToHashMap(Integer movieID, String mvLine) {
 		token = "";
 
-                // iterate through the line and check for delimiters
-                for (int i = 0; i < line.length(); i++) {
+		StringTokenizer st = new StringTokenizer(mvLine, " .,:!)", false);
 
-                        // if a delimiter is found, add the token to the hash map and continue with the next word.
-                        if (line.charAt(i) == ' ' || line.charAt(i) == '.' || line.charAt(i) == ':' ||
-                                line.charAt(i) == '?' || line.charAt(i) == '!' || line.charAt(i) == ',') {
-
-				if (!token.isEmpty()) {
-					addToHashMap(hashPlot, token, movieID);
-				}
-
-				token = "";
+		while (st.hasMoreTokens()) {
+			token = st.nextToken();
+			if (token.contains("\"")) {
+				tokenPhrase += token + " ";
 				continue;
 			}
-                        // add chars to the token
-			token += line.charAt(i);
-		}
-
-                // when we reached the end of the line, we want to add the last token as well
-		if (!token.isEmpty()) {
 			addToHashMap(hashPlot, token, movieID);
+			tokenPhrase += token + " ";
 		}
 	}
 
-        /**
-         * In this code-pile-of-junk we add title, type and year to the hash maps.
-         * Since series and episodes are a bit tricky/different they are handled
-         * in a separate way. For info on how the code works have a look at episodes or
-         * call Batman.
-         *
-         * @param movieID Gives each entry in our indices a unique number.
-         * @param mvLine  Contains all information for the different entries.
-         */
-        private void insertTitleTypeYearToHashMap(int movieID, String mvLine) {
-                mvLine = mvLine.toLowerCase();
+	/**
+	 * TODO: Add better explanation
+	 * @param movieID Gives each entry in our indices a unique number.
+	 * @param mvLine  Contains all information for the different entries.
+	 */
+	private void addTitleTypeYearToHashMap(int movieID, String mvLine) {
 
-                // remove {{SUSPENDED}}
-                if (mvLine.contains("{{suspended}}")) {
-                        mvLine = mvLine.replace(" {{suspended}}", "");
-                }
+		// remove {{SUSPENDED}}
+		if (mvLine.contains("{{suspended}}")) {
+			mvLine = mvLine.replace(" {{suspended}}", "");
+		}
 
-                // +++ series +++
-                if (mvLine.contains("mv: \"") && !mvLine.contains("}")) {
-                        addToHashMap(hashType, "series", movieID);
-
-                        int bracketStart = 8;
-			token = "";
-
-                        for (int i = 5; mvLine.charAt(i) != '\"'; i++) {
-				if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
-					mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
-
-					if (!token.isEmpty()) {
-						addToHashMap(hashTitle, token, movieID);
-					}
-					token = "";
-					bracketStart++;
-					continue;
-				}
-				token += mvLine.charAt(i);
-				bracketStart++;
-			}
-			if (!token.isEmpty()) {
-				addToHashMap(hashTitle, token, movieID);
-			}
-
-			token = "";
-			for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
-				token += mvLine.charAt(i);
-			}
-			if (token.length() == 4) {
-				addToHashMap(hashYear, token, movieID);
-			}
+		// +++ series +++
+		if (mvLine.startsWith("\"") && !mvLine.endsWith("}")) {
+			// add the type to the hash map
+			addToHashMap(hashType, "series", movieID);
+			parseTitleAndYear(movieID, mvLine, true);
+			// and we're done, no need to check the other if-statements
 			return;
-                }
-                // +++ episode +++
-                if (mvLine.contains("mv: \"") && mvLine.contains("}")) {
-                        // add type to HashMap
-                        addToHashMap(hashType, "episode", movieID);
+		}
+		// +++ episode +++
+		if (mvLine.contains("\"") && mvLine.endsWith("}")) {
+			addToHashMap(hashType, "episode", movieID);
 
-			token = ""; // reset the token to 0
-			int bracketStart = 8; // set the index for the year (yes, I know it's actually a parenthesis)
-
-			// get and add title to hash map, start at the first quotation mark which ich always on
-			// index 5 in the string and add every char to the token. add the token to the hash map.
-			// repeat until the second quotation mark is reached.
-			for (int i = 5; mvLine.charAt(i) != '\"'; i++) {
-
-				// tokenize the title - see addTokenFromPlotLineToHashMap for description
-				if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
-					mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
-
-					if (!token.isEmpty()) {
-						addToHashMap(hashTitle, token, movieID);
-					}
-					token = "";
-					bracketStart++;
-					continue;
-				}
-				// add chars to the token
-				token += mvLine.charAt(i);
-				bracketStart++;
-			}
-			if (!token.isEmpty()) {
-				addToHashMap(hashTitle, token, movieID);
-			}
+			// first get the episode title and add it to the list. we know form grep that { is never
+			// in a title/year, so we can start there. parsing is basically the same as in
+			// addTokenFromPlotLine
+			StringTokenizer st = new StringTokenizer(mvLine.substring(mvLine.indexOf('{') + 1, mvLine.length() - 1), " .,:!?", false);
 			token = "";
 
-			// since wie already got the end of the title (thanks to bracketStart) and know where to start,
-			// we can move on to the year directly. we only add digits to the token. if there are no
-			// digits in the year field (????) the token is not added.
-			for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
-				token += mvLine.charAt(i);
-				bracketStart++;
-			}
-			if (token.length() == 4) {
-				addToHashMap(hashYear, token, movieID);
-			}
-
-			// we don't know exactly, if the year was a 4-digit number or some special shit. so let's see
-			// see and if no, we have to iterate a bit to get to the start of the episode title.
-			if (mvLine.charAt(bracketStart) == ')') {
-				bracketStart += 3;
-                        } else {
-                                while (mvLine.charAt(bracketStart - 1) != '{') {
-                                        bracketStart++;
-                                }
-                        }
-
-			token = "";
-			// yay, we found the start of the episode title, so let's tokenize this as well.
-			for (int i = bracketStart; mvLine.charAt(i) != '}'; i++) {
-				if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
-					mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
-					if (!token.isEmpty()) {
-						addToHashMap(hashEpisodeTitle, token, movieID);
-					}
-					token = "";
-					bracketStart++;
+			while (st.hasMoreTokens()) {
+				token = st.nextToken();
+				if (token.contains("\"")) {
+					tokenPhrase += token + " ";
 					continue;
 				}
-				token += mvLine.charAt(i);
-				bracketStart++;
-			}
-			if (!token.isEmpty()) {
 				addToHashMap(hashEpisodeTitle, token, movieID);
+				tokenPhrase += token + " ";
 			}
 
-                        // and we're done, no need to check the other if-statements.
-                        return;
-                }
-                // +++ television +++
-                if (mvLine.contains(") (tv)")) {
-                        addToHashMap(hashType, "television", movieID);
-			addTitleAndYear(movieID, mvLine);
+			// add the token for the phrase search to the array list
+			allEpisodeTitlePhrases.put(movieID, tokenPhrase);
+			tokenPhrase = "";
+
+			// get rid of the episode title. and proceed like it is an episode
+			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.indexOf('{')), true);
 			return;
 		}
-                // +++ video +++
-                if (mvLine.contains(") (v)")) {
-                        addToHashMap(hashType, "video", movieID);
-			addTitleAndYear(movieID, mvLine);
+		// +++ television +++
+		if (mvLine.contains(") (tv)")) {
+			addToHashMap(hashType, "television", movieID);
+			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 6), false);
 			return;
 		}
-                // +++ video game +++
-                if (mvLine.contains(") (vg)")) {
-                        addToHashMap(hashType, "videogame", movieID);
-			addTitleAndYear(movieID, mvLine);
+		// +++ video +++
+		if (mvLine.contains(") (v)")) {
+			addToHashMap(hashType, "video", movieID);
+			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 5), false);
 			return;
 		}
-                // +++ movie +++
-                addToHashMap(hashType, "movie", movieID);
-		addTitleAndYear(movieID, mvLine);
+		// +++ video game +++
+		if (mvLine.contains(") (vg)")) {
+			addToHashMap(hashType, "videogame", movieID);
+			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 6), false);
+			return;
+		}
+		// +++ movie +++
+		addToHashMap(hashType, "movie", movieID);
+		parseTitleAndYear(movieID, mvLine, false);
 	}
 
-	/* Just a helper method to not blow the code even more. */
-	private void addTitleAndYear(int movieID, String mvLine) {
+	/* this method parses the year and the title */
+	private void parseTitleAndYear(int movieID, String mvLine, boolean isSeries) {
 		token = "";
-		int bracketStart = 6;
+		int end = 3;
 
-                for (int i = 4; mvLine.charAt(i + 1) != '('; i++) {
-			if (mvLine.charAt(i) == ' ' || mvLine.charAt(i) == '.' || mvLine.charAt(i) == ':' ||
-				mvLine.charAt(i) == '?' || mvLine.charAt(i) == '!' || mvLine.charAt(i) == ',') {
+		// first, get the year right from behind
+		// we start behind the last parenthesis and add only digits to the token
+		// with end we compute the end for the tokenizer
+		for (int i = mvLine.length() - 1; mvLine.charAt(i) != '('; i--) {
+			if (mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9') {
+				token += mvLine.charAt(i);
+			}
+			end++;
+		}
+		// if the token contains exact 4 digits, we reverse it and add it to the hash map
+		if (token.length() == 4) {
+			addToHashMap(hashYear, new StringBuilder(token).reverse().toString(), movieID);
+		}
+		StringTokenizer st;
+		// then parse the title and add the token to hash map similar to addTokenFromPlotList
+		if (isSeries) {
+			st = new StringTokenizer(mvLine.substring(1, mvLine.length() - end), " .,:!?", false);
+		} else {
 
-				if (!token.isEmpty()) {
-					addToHashMap(hashTitle, token, movieID);
-				}
-				token = "";
-				bracketStart++;
+			st = new StringTokenizer(mvLine.substring(0, mvLine.length() - end), " .,:!?", false);
+		}
+
+		token = "";
+		while (st.hasMoreTokens()) {
+			token = st.nextToken();
+			if (token.contains("\"")) {
+				tokenPhrase += token + " ";
 				continue;
 			}
-			token += mvLine.charAt(i);
-			bracketStart++;
-		}
-		if (!token.isEmpty()) {
 			addToHashMap(hashTitle, token, movieID);
+			tokenPhrase += token + " ";
 		}
-
-		token = "";
-		for (int i = bracketStart; mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9'; i++) {
-			token += mvLine.charAt(i);
-		}
-		if (token.length() == 4) {
-			addToHashMap(hashYear, token, movieID);
-		}
+		allTitlePhrases.put(movieID, tokenPhrase);
+		tokenPhrase = "";
 	}
 
-        /**
-         * A method for performing a boolean search on a textual movie plot file after
-         * indices were built using the {@link #buildIndices(String) buildIndices}
-         * method. The movie plot file contains entries of the <b>types</b> movie,
-         * series, episode, television, video, and videogame. This method allows term
-         * and phrase searches (the latter being enclosed in double quotes) on any of
-         * the <b>fields</b> title, plot, year, episode, and type. Multiple term and
-         * phrase searches can be combined by using the character sequence " AND ".
-         * Note that queries are case-insensitive.<br>
-         * <br>
-         * Examples of queries include the following:
-         * <p>
-         * <pre>
-         * title:"game of thrones" AND type:episode AND plot:shae AND plot:Baelish
-         * plot:Skywalker AND type:series
-         * plot:"year 2200"
-         * plot:Berlin AND plot:wall AND type:television
-         * plot:Cthulhu
-         * title:"saber rider" AND plot:april
-         * plot:"James Bond" AND plot:"Jaws" AND type:movie
-         * title:"Pimp my Ride" AND episodetitle:mustang
-         * plot:"matt berninger"
-         * title:"grand theft auto" AND type:videogame
-         * plot:"Jim Jefferies"
-         * plot:Berlin AND type:videogame
-         * plot:starcraft AND type:movie
-         * type:video AND title:"from dusk till dawn"
-         * </pre>
-         * <p>
-         * More details on (a superset of) the query syntax can be found at <a
-         * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
-         * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
-         * <p>
-         * DO NOT CHANGE THIS METHOD'S INTERFACE.
-         *
-         * @param queryString the query string, formatted according to the Lucene query syntax,
-         *                    but only supporting term search, phrase search, and the AND
-         *                    operator
-         * @return the exact content (in the textual movie plot file) of the title
-         * lines (starting with "MV: ") of the documents matching the query
-         */
-        public Set<String> booleanQuery(String queryString) {
-		System.out.println("");
+
+	/**
+	 * A method for performing a boolean search on a textual movie plot file after
+	 * indices were built using the {@link #buildIndices(String) buildIndices}
+	 * method. The movie plot file contains entries of the <b>types</b> movie,
+	 * series, episode, television, video, and videogame. This method allows term
+	 * and phrase searches (the latter being enclosed in double quotes) on any of
+	 * the <b>fields</b> title, plot, year, episode, and type. Multiple term and
+	 * phrase searches can be combined by using the character sequence " AND ".
+	 * Note that queries are case-insensitive.<br>
+	 * <br>
+	 * Examples of queries include the following:
+	 * <p>
+	 * <pre>
+	 * title:"game of thrones" AND type:episode AND plot:shae AND plot:Baelish
+	 * plot:Skywalker AND type:series
+	 * plot:"year 2200"
+	 * plot:Berlin AND plot:wall AND type:television
+	 * plot:Cthulhu
+	 * title:"saber rider" AND plot:april
+	 * plot:"James Bond" AND plot:"Jaws" AND type:movie
+	 * title:"Pimp my Ride" AND episodetitle:mustang
+	 * plot:"matt berninger"
+	 * title:"grand theft auto" AND type:videogame
+	 * plot:"Jim Jefferies"
+	 * plot:Berlin AND type:videogame
+	 * plot:starcraft AND type:movie
+	 * type:video AND title:"from dusk till dawn"
+	 * </pre>
+	 * <p>
+	 * More details on (a superset of) the query syntax can be found at <a
+	 * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
+	 * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
+	 * <p>
+	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
+	 *
+	 * @param queryString the query string, formatted according to the Lucene query syntax,
+	 *                    but only supporting term search, phrase search, and the AND
+	 *                    operator
+	 * @return the exact content (in the textual movie plot file) of the title
+	 * lines (starting with "MV: ") of the documents matching the query
+	 */
+	public Set<String> booleanQuery(String queryString) {
+/*		System.out.println("");
 		HashSet<String> results = new HashSet<>();
 		// TODO: AND, phrase queries
-		/*if (queryString.contains(" AND ")) {
+		*//*if (queryString.contains(" AND ")) {
 			//call AND - Verknüpfung
-                }*/
+                }*//*
 		if (queryString.contains("\"")) {
 			HashMap<Integer, Integer> phrases;
 			// if phrase is for title
@@ -428,14 +366,14 @@ public class BooleanQuery {
 				return results;
 			}
 			return null;
-		}
+		}*/
 		return null;
 	}
 
-        /* for testing */
-	/*private void print() {
-		System.out.println(hashEpisodeTitle);
-                System.out.println(hashYear);
+	/* for testing */
+	private void print() {
+		/*System.out.println(hashEpisodeTitle);
+		System.out.println(hashYear);
                 System.out.println(hashType);
                 System.out.println(hashPlot);
                 System.out.println(hashTitle);
@@ -444,36 +382,46 @@ public class BooleanQuery {
                         System.out.println(allMovies.get(i));
                         i++;
                 }
-        }*/
+		System.out.println("sizes: ");
+		System.out.println("allMovies: " + allMovies.size());
+		System.out.println("allPlotPhrases: " + allPlotPhrases.size());
+		System.out.println("allTitlePhrases: " + allTitlePhrases.size());
+		System.out.println("allEpisodeTitlePhrases: " + allEpisodeTitlePhrases.size());
+		System.out.println("hashType: " + hashType.size());
+		System.out.println("hashYear: " + hashYear.size());
+		System.out.println("hashPlot: " + hashPlot.size());
+		System.out.println("hashTitle: " + hashTitle.size());
+		System.out.println("hashEpisodeTitle: " + hashEpisodeTitle.size()); */
+	}
 
-        public static void main(String[] args) {
-                BooleanQuery bq = new BooleanQuery();
-                if (args.length < 3) {
-                        System.err
-                                .println("usage: java -jar BooleanQuery.jar <plot list file> <queries file> <results file>");
-                        System.exit(-1);
-                }
+	public static void main(String[] args) {
+		BooleanQuery bq = new BooleanQuery();
+		if (args.length < 3) {
+			System.err
+				.println("usage: java -jar BooleanQuery.jar <plot list file> <queries file> <results file>");
+			System.exit(-1);
+		}
 
-                // build indices
-                System.out.println("building indices...");
-                long tic = System.nanoTime();
-                Runtime runtime = Runtime.getRuntime();
-                long mem = runtime.totalMemory();
-                bq.buildIndices(args[0]);
-                System.out
-                        .println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
-                System.out
-                        .println("memory: " + ((runtime.totalMemory() - mem) / (1048576l))
-                                + " MB (rough estimate)");
+		// build indices
+		System.out.println("building indices...");
+		long tic = System.nanoTime();
+		Runtime runtime = Runtime.getRuntime();
+		long mem = runtime.totalMemory();
+		bq.buildIndices(args[0]);
+		System.out
+			.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
+		System.out
+			.println("memory: " + ((runtime.totalMemory() - mem) / (1048576l))
+				+ " MB (rough estimate)");
 
 		//String query = "title:Terminator";
-		String query = "title:\"Redemption Rise\"";
+		//String query = "title:\"Redemption Rise\"";
 		//String query = "title:Genisys";
 		//String query = "plot:Skynet";
 		//String query = "type:movie";
 		//String query = "year:2004";
 		//String query = "episode:party";
-		Set<String> result = bq.booleanQuery(query);
+		//Set<String> result = bq.booleanQuery(query);
 
 /*              // parsing the queries that are to be run from the queries file
 		List<String> queries = new ArrayList<>();
@@ -533,5 +481,5 @@ public class BooleanQuery {
                         System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
                                 : "FAILURE");
                 }*/
-        }
+	}
 }
