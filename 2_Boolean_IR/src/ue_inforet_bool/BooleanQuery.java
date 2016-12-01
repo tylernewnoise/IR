@@ -4,6 +4,7 @@
 // TODO: check if it is faster to build the index with one char array or a list of char arrays and concatenate the
 // TODO: the different char arrays only if needed for searching
 // TODO: maybe add the line and replaceAll(delimiters)
+// TODO: check toLowercase()
 package ue_inforet_bool;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import java.io.InputStreamReader;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +30,7 @@ public class BooleanQuery {
 		private HashMap<Integer, String> allTitlePhrases = new HashMap<>(530000);
 		private HashMap<Integer, String> allEpisodeTitlePhrases = new HashMap<>(220000);
 		private HashMap<String, HashSet<Integer>> hashType = new HashMap<>(6);
-		private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>(140);
+		private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>(150);
 		private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>(700000);
 		private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>(150000);
 		private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>(100000);
@@ -41,9 +43,8 @@ public class BooleanQuery {
 		public BooleanQuery() {
 		}
 
-	/* ******** Boyer Moore ******** */
-	/* thx to en.wikipedia.org */
-
+		/* ******** Boyer Moore ******** */
+		/* thx to en.wikipedia.org */
 		/**
 		 * Returns the index within this string of the first occurrence of the
 		 * specified substring. If it is not a substring, return -1.
@@ -127,7 +128,7 @@ public class BooleanQuery {
 				}
 				return len;
 		}
-	/* ******** Boyer Moore ******** */
+		/* ******** Boyer Moore ******** */
 
 		/**
 		 * A method for reading the textual movie plot file and building indices. The
@@ -179,7 +180,6 @@ public class BooleanQuery {
 				if (!tokenPhrase.isEmpty()) {
 						allPlotPhrases.put(movieID, tokenPhrase);
 				}
-				// print(); // TODO: remove
 		}
 
 		private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
@@ -196,7 +196,7 @@ public class BooleanQuery {
 		private void addPlotLineToHashMap(Integer movieID, String mvLine) {
 				token = "";
 
-				StringTokenizer st = new StringTokenizer(mvLine, " .,:!)", false);
+				StringTokenizer st = new StringTokenizer(mvLine, " .,:!", false);
 
 				while (st.hasMoreTokens()) {
 						token = st.nextToken();
@@ -365,56 +365,94 @@ public class BooleanQuery {
 		 */
 		public Set<String> booleanQuery(String queryString) {
 				HashSet<String> results = new HashSet<>();
-				// TODO: AND
 				// first, check for ANDS (string.contains(" AND ") should be fine)
 				// if there are ANDS, split the queries, put them in a list and execute them
 				// then "AND" the results and return the movies from the arraylist.
 				// than check for phrases (string.contains("\"") sould be fine)
 				if (queryString.contains(" AND ")) {
-						// make a list for each query and call the methods for them
-						// bilde dann teilmenge aus den retunierten ergebnissen und hole diese aus der allmovies-arraylist
-						// gib die dann zurück
-						return null;
+						ArrayList<Integer> matchingMovies = new ArrayList<>();
+						String singleQuery[] = queryString.split(" AND ");
+						int howManyAnds = 0;
+
+						for (String tmp : singleQuery){
+								if (tmp.contains("\"")) {
+										for (int i : phraseSearch(tmp)) {
+											matchingMovies.add(i);
+										}
+								} else {
+										for (int i : simpleTokenSearch(tmp)) {
+												matchingMovies.add(i);
+										}
+								}
+								howManyAnds++;
+						}
+
+						HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(128);
+						for (int i : matchingMovies) {
+								Integer cnt = countMatchingMovies.get(i);
+								countMatchingMovies.put(i, (cnt == null) ? 1 : cnt +1 );
+						}
+
+						// sort the list for the count, the copyAndSort list is just a helper list so we can sort the hash map
+						ArrayList<Map.Entry<Integer, Integer>> copyAndSort = new ArrayList<>();
+						copyAndSort.addAll(countMatchingMovies.entrySet());
+						copyAndSort.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+
+						for (Map.Entry<Integer, Integer> entry : copyAndSort){
+								if (entry.getValue() != howManyAnds) {
+										break;
+								}
+								results.add(allMovies.get(entry.getKey()));
+
+						}
+						return results;
 				}
-		/* QUERY IS A PHRASE SEARCH */
+				/* QUERY IS A PHRASE SEARCH */
 				if (queryString.contains("\"")) {
 						// call method for query search
 						// we get a list with the matching movies
-						for (int i : phraseSearach(queryString)) {
+						for (int i : phraseSearch(queryString)) {
 								results.add(allMovies.get(i));
 						}
-						return results;
 				} else {
-		/* QUERY IS ONLY TOKEN SEARCH */
-						// if it is not AND not a phrase search, it must be a simple token search
-						// so first we want to know the field type we have to search in
-						// depending on the field type, we cut off the field and call tokenSearch
-						if (getFieldType(queryString) == 'i') { // title
-								for (int i : tokenSearch(StringUtils.substring(queryString, 6, queryString.length()).toLowerCase(), 'i')) {
-										results.add(allMovies.get(i));
-								}
-						} else if (getFieldType(queryString) == 'p') { // plot
-								for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 'p')) {
-										results.add(allMovies.get(i));
-								}
-						} else if (getFieldType(queryString) == 't') { // type
-								for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 't')) {
-										results.add(allMovies.get(i));
-								}
-						} else if (getFieldType(queryString) == 'y') { // year
-								for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 'y')) {
-										results.add(allMovies.get(i));
-								}
-						} else if (getFieldType(queryString) == 'e') { // episode title
-								for (int i : tokenSearch(StringUtils.substring(queryString, 8, queryString.length()).toLowerCase(), 'e')) {
-										results.add(allMovies.get(i));
-								}
+				/* QUERY IS ONLY TOKEN SEARCH */
+						for (int i : simpleTokenSearch(queryString)) {
+								results.add(allMovies.get(i));
 						}
 				}
 				return results;
 		}
 
-		private List<Integer> phraseSearach(String phraseString) {
+		private List<Integer> simpleTokenSearch(String queryString) {
+				ArrayList<Integer> machtingMovies = new ArrayList<>(128);
+				// so first we want to know the field type we have to search in
+				// depending on the field type, we cut off the field and call tokenSearch
+				if (getFieldType(queryString) == 'i') { // title
+						for (int i : tokenSearch(StringUtils.substring(queryString, 6, queryString.length()).toLowerCase(), 'i')) {
+								machtingMovies.add(i);
+								//results.add(allMovies.get(i));
+						}
+				} else if (getFieldType(queryString) == 'p') { // plot
+						for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 'p')) {
+								machtingMovies.add(i);
+						}
+				} else if (getFieldType(queryString) == 't') { // type
+						for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 't')) {
+								machtingMovies.add(i);
+						}
+				} else if (getFieldType(queryString) == 'y') { // year
+						for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 'y')) {
+								machtingMovies.add(i);
+						}
+				} else if (getFieldType(queryString) == 'e') { // episode title
+						for (int i : tokenSearch(StringUtils.substring(queryString, 13, queryString.length()).toLowerCase(), 'e')) {
+								machtingMovies.add(i);
+						}
+				}
+				return machtingMovies;
+		}
+
+		private List<Integer> phraseSearch(String phraseString) {
 				ArrayList<Integer> matchingMovies = new ArrayList<>();
 
 				// get the field
@@ -472,21 +510,17 @@ public class BooleanQuery {
 								// search in title
 								if (boyerMoore(allTitlePhrases.get(entry.getKey()).toCharArray(), phraseString.toCharArray()) > -1) {
 										matchingMovies.add(entry.getKey());
-										//TODO remove
-										//System.out.println(allMovies.get(entry.getKey()));
 								}
 						} else if (fieldTypePhraseQuery == 'p') {
 								// search in plot
 								if (boyerMoore(allPlotPhrases.get(entry.getKey()).toCharArray(), phraseString.toCharArray()) > -1) {
-										// TODO add to results list remove
 										matchingMovies.add(entry.getKey());
-										//System.out.println(allMovies.get(entry.getKey()));
 								}
 						} else {
 								// search in episode title
 								if (boyerMoore(allEpisodeTitlePhrases.get(entry.getKey()).toCharArray(), phraseString.toCharArray()) > -1) {
-										// TODO add to results list remove
 										matchingMovies.add(entry.getKey());
+										// TODO remove
 										//System.out.println(allMovies.get(entry.getKey()));
 								}
 						}
@@ -518,10 +552,6 @@ public class BooleanQuery {
 				return ' ';
 		}
 
-		/**
-		 * @param tokenString The token to be searched.
-		 * @return A list which only contains the movieIDs in the array allMovies.
-		 */
 		private List<Integer> tokenSearch(String tokenString, char searchField) {
 				ArrayList<Integer> matchingMovies = new ArrayList<>(32);
 
@@ -603,9 +633,12 @@ public class BooleanQuery {
 						.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L))
 								+ " MB (rough estimate)");
 
-				//String query = "title:salvation";
+/*				//String query = "title:salvation";
 				//String query = "title:focus";
-				String query = "title:\"Rise of the Machines\"";
+//				String query = "title:\"Rise of the Machines\"";
+				//String query = "title:\"Pimp my Ride\" AND episodetitle:mustang";
+				String query = "plot:\"Jim Jefferies\"";
+				//String query = "title:pimp";
 				//String query = "title:Genisys";
 				//String query = "plot:Skynet";
 				//String query = "type:series";
@@ -618,9 +651,10 @@ public class BooleanQuery {
 				for (String tmp : result) {
 						System.out.println(tmp);
 				}
-				//System.out.println(result);
+				//System.out.println(result);*/
 
-/*              // parsing the queries that are to be run from the queries file
+
+              // parsing the queries that are to be run from the queries file
         List<String> queries = new ArrayList<>();
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                         new FileInputStream(args[1]), StandardCharsets.ISO_8859_1))) {
@@ -677,6 +711,6 @@ public class BooleanQuery {
                         System.out.println("actual result:   " + actualResultSorted.toString());
                         System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
                                 : "FAILURE");
-                }*/
+                }
 		}
 }
