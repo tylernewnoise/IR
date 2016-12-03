@@ -1,128 +1,39 @@
-// DO NOT CHANGE THIS PACKAGE NAME.
 package ue_inforet_bool;
+
+//import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+/*
+private Int2ObjectOpenHashMap<String> allPlotPhrases = new Int2ObjectOpenHashMap<>(530000);
+private Int2ObjectOpenHashMap<String> allTitlePhrases = new Int2ObjectOpenHashMap<>(530000);
+private Int2ObjectOpenHashMap<String> allEpisodeTitlePhrases = new Int2ObjectOpenHashMap<>(220000);
+*/
+
+import com.eaio.stringsearch.StringSearch;
+import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
-
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class BooleanQuery {
-	private ArrayList<String> allMovies = new ArrayList<>(530000);
+	private ArrayList<String> allMoviesList = new ArrayList<>(530000);
 	private HashMap<Integer, String> allPlotPhrases = new HashMap<>(530000);
 	private HashMap<Integer, String> allTitlePhrases = new HashMap<>(530000);
 	private HashMap<Integer, String> allEpisodeTitlePhrases = new HashMap<>(220000);
-	private HashMap<String, HashSet<Integer>> hashType = new HashMap<>(6);
-	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>(150);
 	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>(700000);
 	private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>(150000);
 	private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>(100000);
-	private String tokenPhrase = "";
-	private String token = "";
 
-	/**
-	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
-	 */
+	private HashMap<String, ArrayList<Integer>> hashYear = new HashMap<>(150);
+	private HashMap<String, ArrayList<Integer>> hashType = new HashMap<>(6);
+
 	public BooleanQuery() {
 	}
-
-	/* ******** Boyer Moore ******** */
-	/* thx to en.wikipedia.org */
-	/**
-	 * Returns the index within this string of the first occurrence of the
-	 * specified substring. If it is not a substring, return -1.
-	 *
-	 * @param haystack The string to be scanned
-	 * @param needle   The target string to search
-	 * @return The start index of the substring
-	 */
-	private static int boyerMoore(char[] haystack, char[] needle) {
-		if (needle.length == 0) {
-			return 0;
-		}
-		int charTable[] = makeCharTable(needle);
-		int offsetTable[] = makeOffsetTable(needle);
-		for (int i = needle.length - 1, j; i < haystack.length; ) {
-			for (j = needle.length - 1; needle[j] == haystack[i]; --i, --j) {
-				if (j == 0) {
-					return i;
-				}
-			}
-			// i += needle.length - j; // For naive method
-			i += Math.max(offsetTable[needle.length - 1 - j], charTable[haystack[i]]);
-		}
-		return -1;
-	}
-
-	/**
-	 * Makes the jump table based on the mismatched character information.
-	 */
-	private static int[] makeCharTable(char[] needle) {
-		final int ALPHABET_SIZE = 256;
-		int[] table = new int[ALPHABET_SIZE];
-		for (int i = 0; i < table.length; ++i) {
-			table[i] = needle.length;
-		}
-		for (int i = 0; i < needle.length - 1; ++i) {
-			table[needle[i]] = needle.length - 1 - i;
-		}
-		return table;
-	}
-
-	/**
-	 * Makes the jump table based on the scan offset which mismatch occurs.
-	 */
-	private static int[] makeOffsetTable(char[] needle) {
-		int[] table = new int[needle.length];
-		int lastPrefixPosition = needle.length;
-		for (int i = needle.length - 1; i >= 0; --i) {
-			if (isPrefix(needle, i + 1)) {
-				lastPrefixPosition = i + 1;
-			}
-			table[needle.length - 1 - i] = lastPrefixPosition - i + needle.length - 1;
-		}
-		for (int i = 0; i < needle.length - 1; ++i) {
-			int slen = suffixLength(needle, i);
-			table[slen] = needle.length - 1 - i + slen;
-		}
-		return table;
-	}
-
-	/**
-	 * Is needle[p:end] a prefix of needle?
-	 */
-	private static boolean isPrefix(char[] needle, int p) {
-		for (int i = p, j = 0; i < needle.length; ++i, ++j) {
-			if (needle[i] != needle[j]) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Returns the maximum length of the substring ends at p and is a suffix.
-	 */
-	private static int suffixLength(char[] needle, int p) {
-		int len = 0;
-		for (int i = p, j = needle.length - 1;
-		     i >= 0 && needle[i] == needle[j]; --i, --j) {
-			len += 1;
-		}
-		return len;
-	}
-	/* ******** Boyer Moore ******** */
 
 	/**
 	 * A method for reading the textual movie plot file and building indices. The
@@ -136,49 +47,66 @@ public class BooleanQuery {
 	 *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
 	 *                 use.
 	 */
-	public void buildIndices(String plotFile) {
+	private void buildIndices(String plotFile) {
 		int nextMovieID = 0;
 		int movieID = 0;
+		boolean isPlotLine = false;
+
+		StringBuilder stringBuilder = new StringBuilder(8128);
 
 		/* read from the file - thanks Christoph */
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
+			StandardCharsets.ISO_8859_1))) {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
 				// is it an MV: line?
 				if (line.startsWith("M")) {
-					// this check is necessary due to the fact that the first time we run through
-					// this tokenPhrase is empty. we add here the tokenized phrase for
-					// phrase search
-					if (!tokenPhrase.isEmpty()) {
-						allPlotPhrases.put(movieID, tokenPhrase);
-						tokenPhrase = "";
+					if (isPlotLine) {
+						allPlotPhrases.put(movieID, stringBuilder.toString());
+						isPlotLine = false;
+						stringBuilder = new StringBuilder(8128);
 					}
 					// add an entry and increase movieID
 					movieID = nextMovieID++;
-					allMovies.add(movieID, line);
+					allMoviesList.add(movieID, line);
 					// add movie to list and add title, type and year to the hash maps
 					// remove 'MV: ' first and convert everything toLowerCase()
-					addTitleTypeYearToHashMap(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
+					getTitleTypeYear(movieID, StringUtils.substring(line, 4,
+						line.length()).toLowerCase());
 				}
 				// is it an PL: line?
 				if (StringUtils.substring(line, 0, 3).contains("PL:")) {
-					// tokenize the line and add the tokens to the hash map.
-					addPlotLineToHashMap(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
+					isPlotLine = true;
+
+					StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 4,
+						line.length()).toLowerCase(), " .,:!", false);
+
+					// now tokenize the plot - thanks Jonas
+					while (st.hasMoreTokens()) {
+						String token = st.nextToken();
+						if (token.contains("\"")) {
+							stringBuilder.append(token);
+							stringBuilder.append(" ");
+							continue;
+						}
+						addPlotAndTitleToHashMap(hashPlot, token, movieID);
+						stringBuilder.append(token);
+						stringBuilder.append(" ");
+					}
 				}
 			}
+			// add the last plot phrase
+			allPlotPhrases.put(movieID, stringBuilder.toString());
+			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		// add the last plot phrase
-		if (!tokenPhrase.isEmpty()) {
-			allPlotPhrases.put(movieID, tokenPhrase);
-		}
 	}
 
 	/* adds the movie and it's values to the hash map - thanks Benny */
-	private void addToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
+	private void addPlotAndTitleToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
 		if (hashMap.containsKey(value)) {
 			hashMap.get(value).add(movieID);
 		} else {
@@ -189,34 +117,23 @@ public class BooleanQuery {
 		}
 	}
 
-	/* tokenize and get rid of delimiters - thanks Jonas */
-	private void addPlotLineToHashMap(Integer movieID, String mvLine) {
-		token = "";
-
-		StringTokenizer st = new StringTokenizer(mvLine, " .,:!", false);
-
-		while (st.hasMoreTokens()) {
-			token = st.nextToken();
-			if (token.contains("\"")) {
-				tokenPhrase += token + " ";
-				continue;
-			}
-			addToHashMap(hashPlot, token, movieID);
-			tokenPhrase += token + " ";
+	private void addTypeAndYearToHashMap(HashMap<String, ArrayList<Integer>> hashMap, String value, Integer movieID) {
+		if (hashMap.containsKey(value)) {
+			hashMap.get(value).add(movieID);
+		} else {
+			ArrayList<Integer> movieList = new ArrayList<>();
+			movieList.add(movieID);
+			hashMap.put(value, movieList);
 		}
 	}
 
 	/**
-	 * this method parses the year, title, episode title and adds it to the
-	 * hash map. it basically works like this: first check the type (movie, tv, vg, ...).
-	 * the episode type is a bit tricky: we have to parse the episode title first.
-	 * after that we cut it off and parse the title and year like the other (see
-	 * below on how to)
+	 * this method adds the year, title, episode title to the hash map.
 	 *
 	 * @param movieID Gives each entry in our indices a unique number.
 	 * @param mvLine  Contains all information for the different entries.
 	 */
-	private void addTitleTypeYearToHashMap(int movieID, String mvLine) {
+	private void getTitleTypeYear(int movieID, String mvLine) {
 
 		// remove {{SUSPENDED}}
 		if (mvLine.contains("{{suspended}}")) {
@@ -226,75 +143,73 @@ public class BooleanQuery {
 		// +++ series +++
 		if (mvLine.startsWith("\"") && !mvLine.endsWith("}")) {
 			// add the type to the hash map
-			addToHashMap(hashType, "series", movieID);
+			addTypeAndYearToHashMap(hashType, "series", movieID);
 			parseTitleAndYear(movieID, mvLine, true);
-			// and we're done, no need to check the other if-statements
-			return;
 		}
 		// +++ episode +++
-		if (mvLine.contains("\"") && mvLine.endsWith("}")) {
-			addToHashMap(hashType, "episode", movieID);
+		else if (mvLine.contains("\"") && mvLine.endsWith("}")) {
+			addTypeAndYearToHashMap(hashType, "episode", movieID);
 
 			// first get the episode title and add it to the list. we know form grep that { is never
-			// in a title/year, so we can start there. parsing is basically the same as in
-			// addTokenFromPlotLine
-			StringTokenizer st = new StringTokenizer(mvLine.substring(mvLine.indexOf('{') + 1, mvLine.length() - 1), " .,:!?", false);
-			token = "";
+			// in a title/year, so we can start there.
+			StringTokenizer st = new StringTokenizer(mvLine.substring(mvLine.indexOf('{') + 1,
+				mvLine.length() - 1), " .,:!?", false);
+
+			StringBuilder stringBuilder = new StringBuilder(256);
 
 			while (st.hasMoreTokens()) {
-				token = st.nextToken();
+				String token = st.nextToken();
 				if (token.contains("\"")) {
-					tokenPhrase += token + " ";
+					stringBuilder.append(token);
+					stringBuilder.append(" ");
 					continue;
 				}
-				addToHashMap(hashEpisodeTitle, token, movieID);
-				tokenPhrase += token + " ";
+				addPlotAndTitleToHashMap(hashEpisodeTitle, token, movieID);
+				stringBuilder.append(token);
+				stringBuilder.append(" ");
 			}
 
 			// add the token for the phrase search to the array list
-			allEpisodeTitlePhrases.put(movieID, tokenPhrase);
-			tokenPhrase = "";
+			allEpisodeTitlePhrases.put(movieID, stringBuilder.toString());
 
 			// get rid of the episode title. and proceed like it is an episode
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.indexOf('{')), true);
-			return;
 		}
 		// +++ television +++
-		if (mvLine.contains(") (tv)")) {
-			addToHashMap(hashType, "television", movieID);
+		else if (mvLine.contains(") (tv)")) {
+			addTypeAndYearToHashMap(hashType, "television", movieID);
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 6), false);
-			return;
 		}
 		// +++ video +++
-		if (mvLine.contains(") (v)")) {
-			addToHashMap(hashType, "video", movieID);
+		else if (mvLine.contains(") (v)")) {
+			addTypeAndYearToHashMap(hashType, "video", movieID);
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 5), false);
-			return;
 		}
 		// +++ video game +++
-		if (mvLine.contains(") (vg)")) {
-			addToHashMap(hashType, "videogame", movieID);
+		else if (mvLine.contains(") (vg)")) {
+			addTypeAndYearToHashMap(hashType, "videogame", movieID);
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 6), false);
-			return;
+		} else {
+			// +++ movie +++
+			addTypeAndYearToHashMap(hashType, "movie", movieID);
+			parseTitleAndYear(movieID, mvLine, false);
 		}
-		// +++ movie +++
-		addToHashMap(hashType, "movie", movieID);
-		parseTitleAndYear(movieID, mvLine, false);
 	}
 
-	 /** This method parses the year and the title. it starts with the year because it is always the last
+	/**
+	 * This method parses the year and the title. it starts with the year because it is always the last
 	 * part of the 'MV: ' - line. in the method above we already cut off the the types and before the types is
 	 * ALWAYS the year. after the year is parsed, we cut it off and parse the title from the start. we can
 	 * do that because we already cut off everything else could lead to misinformation.
 	 * for example: MV: Terminator (2033) (1995) -> MV: is already removed in buildIndices and after the year is
 	 * parsed it is cut off and the title is now unique: 'Terminator (2033)'
 	 *
-	 * @param movieID the movie's unique id
-	 * @param mvLine the title containing all info about the movie
+	 * @param movieID  the movie's unique id
+	 * @param mvLine   the title containing all info about the movie
 	 * @param isSeries boolean to determine if it's a series/episode or a movie
 	 */
 	private void parseTitleAndYear(int movieID, String mvLine, boolean isSeries) {
-		token = "";
+		String year = "";
 		int end = 3;
 
 		// first, get the year right from behind
@@ -302,96 +217,64 @@ public class BooleanQuery {
 		// with end we compute the end for the tokenizer
 		for (int i = mvLine.length() - 1; mvLine.charAt(i) != '('; i--) {
 			if (mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9') {
-				token += mvLine.charAt(i);
+				year += mvLine.charAt(i);
 			}
 			end++;
 		}
 		// if the token contains exact 4 digits, we reverse it and add it to the hash map
-		if (token.length() == 4) {
-			addToHashMap(hashYear, new StringBuilder(token).reverse().toString(), movieID);
+		if (year.length() == 4) {
+			addTypeAndYearToHashMap(hashYear, new StringBuilder(year).reverse().toString(), movieID);
 		}
+
 		StringTokenizer st;
+
 		// then parse the title and add the token to hash map similar to addTokenFromPlotList
 		if (isSeries) {
-			st = new StringTokenizer(mvLine.substring(1, mvLine.length() - end), " .,:!?", false);
+			st = new StringTokenizer(mvLine.substring(1, mvLine.length() - end),
+				" .,:!?", false);
 		} else {
-
-			st = new StringTokenizer(mvLine.substring(0, mvLine.length() - end + 1), " .,:!?", false);
+			st = new StringTokenizer(mvLine.substring(0, mvLine.length() - end + 1),
+				" .,:!?", false);
 		}
 
-		token = "";
+		StringBuilder stringBuilder = new StringBuilder(256);
+
 		while (st.hasMoreTokens()) {
-			token = st.nextToken();
+			String token = st.nextToken();
 			if (token.contains("\"")) {
-				tokenPhrase += token + " ";
+				stringBuilder.append(token);
+				stringBuilder.append(" ");
 				continue;
 			}
-			addToHashMap(hashTitle, token, movieID);
-			tokenPhrase += token + " ";
+			addPlotAndTitleToHashMap(hashTitle, token, movieID);
+			stringBuilder.append(token);
+			stringBuilder.append(" ");
 		}
-		allTitlePhrases.put(movieID, tokenPhrase);
-		tokenPhrase = "";
+
+		allTitlePhrases.put(movieID, stringBuilder.toString());
 	}
 
-	/**
-	 * A method for performing a boolean search on a textual movie plot file after
-	 * indices were built using the {@link #buildIndices(String) buildIndices}
-	 * method. The movie plot file contains entries of the <b>types</b> movie,
-	 * series, episode, television, video, and videogame. This method allows term
-	 * and phrase searches (the latter being enclosed in double quotes) on any of
-	 * the <b>fields</b> title, plot, year, episode, and type. Multiple term and
-	 * phrase searches can be combined by using the character sequence " AND ".
-	 * Note that queries are case-insensitive.<br>
-	 * <br>
-	 * Examples of queries include the following:
-	 * <p>
-	 * <pre>
-	 * title:"game of thrones" AND type:episode AND plot:shae AND plot:Baelish
-	 * plot:Skywalker AND type:series
-	 * plot:"year 2200"
-	 * plot:Berlin AND plot:wall AND type:television
-	 * plot:Cthulhu
-	 * title:"saber rider" AND plot:april
-	 * plot:"James Bond" AND plot:"Jaws" AND type:movie
-	 * title:"Pimp my Ride" AND episodetitle:mustang
-	 * plot:"matt berninger"
-	 * title:"grand theft auto" AND type:videogame
-	 * plot:"Jim Jefferies"
-	 * plot:Berlin AND type:videogame
-	 * plot:starcraft AND type:movie
-	 * type:video AND title:"from dusk till dawn"
-	 * </pre>
-	 * <p>
-	 * More details on (a superset of) the query syntax can be found at <a
-	 * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
-	 * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
-	 * <p>
-	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
-	 *
-	 * @param queryString the query string, formatted according to the Lucene query syntax,
-	 *                    but only supporting term search, phrase search, and the AND
-	 *                    operator
-	 * @return the exact content (in the textual movie plot file) of the title
-	 * lines (starting with "MV: ") of the documents matching the query
-	 */
 	public Set<String> booleanQuery(String queryString) {
-		HashSet<String> results = new HashSet<>();
+		HashSet<String> results = new HashSet<>(32);
 
 		/* QUERY IS AN AND SEARCH */
 		if (queryString.contains(" AND ")) {
-			ArrayList<Integer> matchingMovies = new ArrayList<>();
-			// split the queries
+			ArrayList<Integer> matchingMovies = new ArrayList<>(256000);
+
+			// split into single queries
 			String singleQuery[] = queryString.split(" AND ");
 			int howManyQueries = 0;
 
-			// execute every query and safe the result in matchingMovies
+			// execute every query and safe the result in matchingMovies List
+			// tmp is a single query and singleQuery[] a string array which contains
+			// all queries
 			for (String tmp : singleQuery) {
 				if (tmp.contains("\"")) {
-					for (int i : phraseSearch(tmp)) {
+					for (int i : phraseQuerySearch(tmp.toLowerCase())) {
 						matchingMovies.add(i);
 					}
 				} else {
-					for (int i : singleTokenSearch(tmp)) {
+					for (int i : singleTokenSearch(tmp.toLowerCase())) {
 						matchingMovies.add(i);
 					}
 				}
@@ -399,230 +282,222 @@ public class BooleanQuery {
 			}
 
 			// count the movies which fit the queries from above
-			HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(128);
+			// if a movie matches all queries (f.e. 3 times) it is counted 3 times and if a
+			// movie matches only 2 queries, it is counted only 2 times.
+			HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(256000);
+
 			for (int i : matchingMovies) {
 				Integer cnt = countMatchingMovies.get(i);
 				countMatchingMovies.put(i, (cnt == null) ? 1 : cnt + 1);
 			}
 
-			// sort the list for the count, the copyAndSort list is just a helper list
-			// so we can sort the hash map
-			ArrayList<Map.Entry<Integer, Integer>> copyAndSort = new ArrayList<>();
-			copyAndSort.addAll(countMatchingMovies.entrySet());
-			copyAndSort.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-
-			// than add all movies to the result list which matches the
-			// query count (howManyQueries)
-			for (Map.Entry<Integer, Integer> entry : copyAndSort) {
-				if (entry.getValue() != howManyQueries) {
-					break;
+			// run through the hash map and add only the movies which match the count of howManyQueries
+			for (Map.Entry<Integer, Integer> entry : countMatchingMovies.entrySet()) {
+				if (howManyQueries == entry.getValue()) {
+					results.add(allMoviesList.get(entry.getKey()));
 				}
-				results.add(allMovies.get(entry.getKey()));
 			}
+
 		} else if (queryString.contains("\"")) {
 		/* QUERY IS A PHRASE SEARCH */
-			// call method for query search
-			// we get a list with the matching movies
-			for (int i : phraseSearch(queryString)) {
-				results.add(allMovies.get(i));
+			for (int i : phraseQuerySearch(queryString.toLowerCase())) {
+				results.add(allMoviesList.get(i));
 			}
+
 		} else {
 		/* QUERY IS ONLY TOKEN SEARCH */
-			for (int i : singleTokenSearch(queryString)) {
-				results.add(allMovies.get(i));
+			for (int i : singleTokenSearch(queryString.toLowerCase())) {
+				results.add(allMoviesList.get(i));
 			}
 		}
+
 		return results;
 	}
 
-	/* perform a single token search */
-	private List<Integer> singleTokenSearch(String queryString) {
-		ArrayList<Integer> machtingMovies = new ArrayList<>(128);
-		// so first we want to know the field type we have to search in
-		// depending on the field type, we cut off the field and call tokenSearch
-		if (getFieldType(queryString) == 'i') { // title
-			for (int i : tokenSearch(StringUtils.substring(queryString, 6, queryString.length()).toLowerCase(), 'i')) {
-				machtingMovies.add(i);
-			}
-		} else if (getFieldType(queryString) == 'p') { // plot
-			for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 'p')) {
-				machtingMovies.add(i);
-			}
-		} else if (getFieldType(queryString) == 't') { // type
-			for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 't')) {
-				machtingMovies.add(i);
-			}
-		} else if (getFieldType(queryString) == 'y') { // year
-			for (int i : tokenSearch(StringUtils.substring(queryString, 5, queryString.length()).toLowerCase(), 'y')) {
-				machtingMovies.add(i);
-			}
-		} else if (getFieldType(queryString) == 'e') { // episode title
-			for (int i : tokenSearch(StringUtils.substring(queryString, 13, queryString.length()).toLowerCase(), 'e')) {
-				machtingMovies.add(i);
-			}
-		}
-		return machtingMovies;
-	}
-
-	/* perform a phrase search */
-	private List<Integer> phraseSearch(String phraseString) {
-		ArrayList<Integer> matchingMovies = new ArrayList<>();
+	/* perform phrase query search */
+	private List<Integer> phraseQuerySearch(String queryString) {
+		ArrayList<Integer> matchingMovies = new ArrayList<>(32);
 
 		// get the field
-		char fieldTypePhraseQuery = getFieldType(phraseString);
+		char fieldTypePhraseQuery = getFieldTypeForPhraseQuery(queryString);
 
 		// depending on the field cut off the field
 		if (fieldTypePhraseQuery == 'i') {
 			// cut of 'title:'
-			phraseString = StringUtils.substring(phraseString, 7, phraseString.length() - 1).toLowerCase();
+			queryString = StringUtils.substring(queryString, 7, queryString.length() - 1);
 		} else if (fieldTypePhraseQuery == 'p' || fieldTypePhraseQuery == 't' || fieldTypePhraseQuery == 'y') {
 			// cut of 'type:', 'year:', 'plot:'
-			phraseString = StringUtils.substring(phraseString, 6, phraseString.length() - 1).toLowerCase();
+			queryString = StringUtils.substring(queryString, 6, queryString.length() - 1);
 		} else {
 			// cut of 'episodetitle'
-			phraseString = StringUtils.substring(phraseString, 14, phraseString.length() - 1).toLowerCase();
+			queryString = StringUtils.substring(queryString, 14, queryString.length() - 1);
 		}
 
 		// now tokenize the phraseString
-		StringTokenizer st = new StringTokenizer(phraseString, " .,:!", false);
+		StringTokenizer st = new StringTokenizer(queryString, " .,:!", false);
 		// make a list of movies in which at least one of the tokens appear
-		ArrayList<Integer> foundMoviesWithTokensFromPhrases = new ArrayList<>(64);
+		ArrayList<Integer> foundMoviesWithTokensFromPhrases = new ArrayList<>(8128);
 
 		// count how many tokens (aka terms) are in the phrase
 		int howManyTokens = 0;
 
 		while (st.hasMoreTokens()) {
 			// we add every movie to the list in which we find at least one token, we  use our
-			// tokenSearch Method for it
-			for (int i : tokenSearch(st.nextToken(), fieldTypePhraseQuery)) {
+			// tokenSearchForPhraseQuery Method for it
+			for (int i : tokenSearchForPhraseQuery(st.nextToken(), fieldTypePhraseQuery)) {
 				foundMoviesWithTokensFromPhrases.add(i);
 			}
 			howManyTokens++;
 		}
+
 		// now count the occurrence of the movies we got from our token search
-		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(64);
+		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(8128);
 		for (int i : foundMoviesWithTokensFromPhrases) {
 			Integer cnt = countMatchingMovies.get(i);
 			countMatchingMovies.put(i, (cnt == null) ? 1 : cnt + 1); // if cnt == null add 1 else cnt + 1)
 		}
 
-		// sort the list for the count, the copyAndSort list is just a helper list so we can sort the hash map
-		ArrayList<Map.Entry<Integer, Integer>> copyAndSort = new ArrayList<>();
-		copyAndSort.addAll(countMatchingMovies.entrySet());
-		copyAndSort.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+		StringSearch bmhRaita = new BoyerMooreHorspoolRaita();
 
-		// now we use boyer-moore to go through the movies which have all tokens
-		for (Map.Entry<Integer, Integer> entry : copyAndSort) {
-			// run through the list only as long as the count of tokens matches the
-			// appearance count in the movies
-			if (entry.getValue() != howManyTokens) {
-				break;
-			}
-			// call boyer-moore here for the phrase
-			if (fieldTypePhraseQuery == 'i') {
-				// search in title
-				if (boyerMoore(allTitlePhrases.get(entry.getKey()).toCharArray(), phraseString.toCharArray()) > -1) {
-					matchingMovies.add(entry.getKey());
-				}
-			} else if (fieldTypePhraseQuery == 'p') {
-				// search in plot
-				if (boyerMoore(allPlotPhrases.get(entry.getKey()).toCharArray(), phraseString.toCharArray()) > -1) {
-					matchingMovies.add(entry.getKey());
-				}
-			} else {
-				// search in episode title
-				if (boyerMoore(allEpisodeTitlePhrases.get(entry.getKey()).toCharArray(), phraseString.toCharArray()) > -1) {
-					matchingMovies.add(entry.getKey());
+		// run through the hash map and do string search only for movies which have
+		// the same count as howManyTokens
+		for (Map.Entry<Integer, Integer> entry : countMatchingMovies.entrySet()) {
+			if (howManyTokens == entry.getValue()) {
+				if (fieldTypePhraseQuery == 'i') {
+					// search in title
+					// the SearchString class returns -1 if the pattern is not found
+					if (bmhRaita.searchString(allTitlePhrases.get(entry.getKey()),
+						queryString) != -1) {
+						matchingMovies.add(entry.getKey());
+					}
+				} else if (fieldTypePhraseQuery == 'p') {
+					// search in plot
+					if (bmhRaita.searchString(allPlotPhrases.get(entry.getKey()),
+						queryString) != -1) {
+						matchingMovies.add(entry.getKey());
+					}
+				} else {
+					// search in episode title
+					if (bmhRaita.searchString(allEpisodeTitlePhrases.get(entry.getKey()),
+						queryString) != -1) {
+						matchingMovies.add(entry.getKey());
+					}
 				}
 			}
 		}
 		return matchingMovies;
 	}
 
-	/* get the field type from the query - helper method */
-	private char getFieldType(String queryString) {
+	/* get the field type from the phrase query */
+	private char getFieldTypeForPhraseQuery(String queryString) {
 		// title
 		if (queryString.indexOf("i") == 1) {
 			return 'i';
 		}
 		// plot
-		if (queryString.startsWith("p")) {
+		else if (queryString.startsWith("p")) {
 			return 'p';
 		}
 		// type
-		if (queryString.indexOf("y") == 1) {
+		else if (queryString.indexOf("y") == 1) {
 			return 't';
 		}
 		// year
-		if (queryString.startsWith("y")) {
+		else if (queryString.startsWith("y")) {
 			return 'y';
 		}
 		// episode title
-		if (queryString.startsWith("e")) {
+		else {
 			return 'e';
 		}
-		return ' ';
 	}
 
-	/* perform tokenSearch - helper method*/
-	private List<Integer> tokenSearch(String tokenString, char searchField) {
-		ArrayList<Integer> matchingMovies = new ArrayList<>(32);
+	/* perform a simple token search for a term of the phrase query */
+	private List<Integer> tokenSearchForPhraseQuery(String tokenString, char searchField) {
+		ArrayList<Integer> matchingMovies = new ArrayList<>(50000);
 
-		// +++ title +++
-		if (searchField == 'i') {
-			// get all movie ids from the hash map and add them to the matching movies list
+		if (searchField == 'i') { // title
 			if (hashTitle.containsKey(tokenString)) {
 				for (int i : hashTitle.get(tokenString)) {
 					matchingMovies.add(i);
 				}
-				return matchingMovies;
 			}
-			return matchingMovies;
-		}
-		// +++ plot +++
-		if (searchField == 'p') {
+		} else if (searchField == 'p') { // plot
 			if (hashPlot.containsKey(tokenString)) {
 				for (int i : hashPlot.get(tokenString)) {
 					matchingMovies.add(i);
 				}
-				return matchingMovies;
 			}
-			return matchingMovies;
-		}
-		// +++ type +++
-		if (searchField == 't') {
+		} else if (searchField == 't') { // type
 			if (hashType.containsKey(tokenString)) {
 				for (int i : hashType.get(tokenString)) {
 					matchingMovies.add(i);
 				}
-				return matchingMovies;
 			}
-			return matchingMovies;
-		}
-		// +++ year +++
-		if (searchField == 'y') {
+		} else if (searchField == 'y') { // year
 			if (hashYear.containsKey(tokenString)) {
 				for (int i : hashYear.get(tokenString)) {
 					matchingMovies.add(i);
 				}
-				return matchingMovies;
 			}
-			return matchingMovies;
-		}
-		// +++ episode title +++
-		if (searchField == 'e') {
+		} else { // episode title
 			if (hashEpisodeTitle.containsKey(tokenString)) {
 				for (int i : hashEpisodeTitle.get(tokenString)) {
 					matchingMovies.add(i);
 				}
-				return matchingMovies;
 			}
-			return matchingMovies;
+		}
+		return matchingMovies;
+	}
+
+	/* perform a single token search */
+	private List<Integer> singleTokenSearch(String queryString) {
+		ArrayList<Integer> matchingMovies = new ArrayList<>(256000);
+
+		// so first we want to know the field type we have to search in
+		// depending on the field type, we cut off the field and look for the token in the hash map
+		if (queryString.indexOf("i") == 1) { // title
+			if (hashTitle.containsKey(StringUtils.substring(queryString, 6, queryString.length()))) {
+				for (int i : hashTitle.get(StringUtils.substring(queryString, 6,
+					queryString.length()))) {
+					matchingMovies.add(i);
+				}
+			}
+		} else if (queryString.startsWith("p")) { // plot
+			if (hashPlot.containsKey(StringUtils.substring(queryString, 5, queryString.length()))) {
+				for (int i : hashPlot.get(StringUtils.substring(queryString, 5,
+					queryString.length()))) {
+					matchingMovies.add(i);
+				}
+			}
+		} else if (queryString.indexOf("y") == 1) { // type
+			if (hashType.containsKey(StringUtils.substring(queryString, 5, queryString.length()))) {
+				for (int i : hashType.get(StringUtils.substring(queryString, 5,
+					queryString.length()))) {
+					matchingMovies.add(i);
+				}
+			}
+		} else if (queryString.startsWith("y")) { // year
+			if (hashYear.containsKey(StringUtils.substring(queryString, 5, queryString.length()))) {
+				for (int i : hashYear.get(StringUtils.substring(queryString, 5,
+					queryString.length()))) {
+					matchingMovies.add(i);
+				}
+			}
+		} else if (getFieldTypeForPhraseQuery(queryString) == 'e') { // episode title
+			if (hashEpisodeTitle.containsKey(StringUtils.substring(queryString, 13, queryString.length()))) {
+				for (int i : hashEpisodeTitle.get(StringUtils.substring(queryString, 13,
+					queryString.length()))) {
+					matchingMovies.add(i);
+				}
+			}
 		}
 		return matchingMovies;
 	}
 
 	public static void main(String[] args) {
+		ArrayList<Long> allTimes = new ArrayList<>(15);
+		long time;
 		BooleanQuery bq = new BooleanQuery();
 		if (args.length < 3) {
 			System.err
@@ -630,14 +505,18 @@ public class BooleanQuery {
 			System.exit(-1);
 		}
 
+		System.out.println("SPEED SETUP \n");
+
 		// build indices
 		System.out.println("building indices...");
 		long tic = System.nanoTime();
 		Runtime runtime = Runtime.getRuntime();
 		long mem = runtime.totalMemory();
 		bq.buildIndices(args[0]);
+		time = System.nanoTime() - tic;
+		allTimes.add(time);
 		System.out
-			.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
+			.println("runtime: " + time + " nanoseconds");
 		System.out
 			.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L))
 				+ " MB (rough estimate)");
@@ -684,14 +563,12 @@ public class BooleanQuery {
 			// sort expected and determined results for human readability
 			List<String> expectedResultSorted = new ArrayList<>(expectedResult);
 			List<String> actualResultSorted = new ArrayList<>(actualResult);
-			Comparator<String> stringComparator = new Comparator<String>() {
-				@Override
-				public int compare(String o1, String o2) {
-					return o1.compareTo(o2);
-				}
-			};
+			Comparator<String> stringComparator = String::compareTo;
 			expectedResultSorted.sort(stringComparator);
 			actualResultSorted.sort(stringComparator);
+
+			time = System.nanoTime() - tic;
+			allTimes.add(time);
 
 			System.out.println("runtime:         " + (System.nanoTime() - tic)
 				+ " nanoseconds.");
@@ -700,5 +577,23 @@ public class BooleanQuery {
 			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
 				: "FAILURE");
 		}
+		long gesamt = 0;
+		int i = 0;
+		while (i < allTimes.size()) {
+			gesamt += allTimes.get(i);
+			i++;
+		}
+		try {
+			FileWriter writer = new FileWriter("output.txt");
+			for (long str : allTimes) {
+				//writer.write(Integer.toString(i++) + ": " + Long.toString(str) + "\n");
+				writer.write(Long.toString(str) + "\n");
+			}
+			writer.write("gesamt: \n" + Long.toString(gesamt));
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
+
