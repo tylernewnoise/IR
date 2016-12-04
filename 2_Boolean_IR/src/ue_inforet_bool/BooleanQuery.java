@@ -1,37 +1,40 @@
 package ue_inforet_bool;
 
-//import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-/*
-private Int2ObjectOpenHashMap<String> allPlotPhrases = new Int2ObjectOpenHashMap<>(530000);
-private Int2ObjectOpenHashMap<String> allTitlePhrases = new Int2ObjectOpenHashMap<>(530000);
-private Int2ObjectOpenHashMap<String> allEpisodeTitlePhrases = new Int2ObjectOpenHashMap<>(220000);
-*/
-
+// https://github.com/johannburkard/StringSearch
 import com.eaio.stringsearch.StringSearch;
 import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
 
-import org.apache.commons.lang3.StringUtils;
-
+import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class BooleanQuery {
 	private ArrayList<String> allMoviesList = new ArrayList<>(530000);
 	private HashMap<Integer, String> allPlotPhrases = new HashMap<>(530000);
 	private HashMap<Integer, String> allTitlePhrases = new HashMap<>(530000);
 	private HashMap<Integer, String> allEpisodeTitlePhrases = new HashMap<>(220000);
+	private HashMap<String, HashSet<Integer>> hashType = new HashMap<>(6);
+	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>(150);
 	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>(700000);
 	private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>(150000);
 	private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>(100000);
 
-	private HashMap<String, ArrayList<Integer>> hashYear = new HashMap<>(150);
-	private HashMap<String, ArrayList<Integer>> hashType = new HashMap<>(6);
-
+	/**
+	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
+	 */
 	public BooleanQuery() {
 	}
 
@@ -51,8 +54,14 @@ public class BooleanQuery {
 		int nextMovieID = 0;
 		int movieID = 0;
 		boolean isPlotLine = false;
+		hashType.put("video", new HashSet<>(21000));
+		hashType.put("movie", new HashSet<>(250000));
+		hashType.put("series", new HashSet<>(22000));
+		hashType.put("episode", new HashSet<>(222000));
+		hashType.put("videogame", new HashSet<>(2500));
+		hashType.put("television", new HashSet<>(20000));
 
-		StringBuilder stringBuilder = new StringBuilder(8128);
+		StringBuilder stringBuilder = new StringBuilder(6000);
 
 		/* read from the file - thanks Christoph */
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
@@ -65,7 +74,7 @@ public class BooleanQuery {
 					if (isPlotLine) {
 						allPlotPhrases.put(movieID, stringBuilder.toString());
 						isPlotLine = false;
-						stringBuilder = new StringBuilder(8128);
+						stringBuilder = new StringBuilder(6000);
 					}
 					// add an entry and increase movieID
 					movieID = nextMovieID++;
@@ -90,7 +99,7 @@ public class BooleanQuery {
 							stringBuilder.append(" ");
 							continue;
 						}
-						addPlotAndTitleToHashMap(hashPlot, token, movieID);
+						addPlotTitleYearToHashMap(hashPlot, token, movieID);
 						stringBuilder.append(token);
 						stringBuilder.append(" ");
 					}
@@ -106,7 +115,7 @@ public class BooleanQuery {
 	}
 
 	/* adds the movie and it's values to the hash map - thanks Benny */
-	private void addPlotAndTitleToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
+	private void addPlotTitleYearToHashMap(HashMap<String, HashSet<Integer>> hashMap, String value, Integer movieID) {
 		if (hashMap.containsKey(value)) {
 			hashMap.get(value).add(movieID);
 		} else {
@@ -117,22 +126,7 @@ public class BooleanQuery {
 		}
 	}
 
-	private void addTypeAndYearToHashMap(HashMap<String, ArrayList<Integer>> hashMap, String value, Integer movieID) {
-		if (hashMap.containsKey(value)) {
-			hashMap.get(value).add(movieID);
-		} else {
-			ArrayList<Integer> movieList = new ArrayList<>();
-			movieList.add(movieID);
-			hashMap.put(value, movieList);
-		}
-	}
-
-	/**
-	 * this method adds the year, title, episode title to the hash map.
-	 *
-	 * @param movieID Gives each entry in our indices a unique number.
-	 * @param mvLine  Contains all information for the different entries.
-	 */
+	/* gets the year, title, episode title out of the string to the hash map */
 	private void getTitleTypeYear(int movieID, String mvLine) {
 
 		// remove {{SUSPENDED}}
@@ -143,12 +137,14 @@ public class BooleanQuery {
 		// +++ series +++
 		if (mvLine.startsWith("\"") && !mvLine.endsWith("}")) {
 			// add the type to the hash map
-			addTypeAndYearToHashMap(hashType, "series", movieID);
+			hashType.get("series").add(movieID);
+			//addYearToHashMap(hashType, "series", movieID);
 			parseTitleAndYear(movieID, mvLine, true);
 		}
 		// +++ episode +++
 		else if (mvLine.contains("\"") && mvLine.endsWith("}")) {
-			addTypeAndYearToHashMap(hashType, "episode", movieID);
+			//addYearToHashMap(hashType, "episode", movieID);
+			hashType.get("episode").add(movieID);
 
 			// first get the episode title and add it to the list. we know form grep that { is never
 			// in a title/year, so we can start there.
@@ -164,7 +160,7 @@ public class BooleanQuery {
 					stringBuilder.append(" ");
 					continue;
 				}
-				addPlotAndTitleToHashMap(hashEpisodeTitle, token, movieID);
+				addPlotTitleYearToHashMap(hashEpisodeTitle, token, movieID);
 				stringBuilder.append(token);
 				stringBuilder.append(" ");
 			}
@@ -177,37 +173,35 @@ public class BooleanQuery {
 		}
 		// +++ television +++
 		else if (mvLine.contains(") (tv)")) {
-			addTypeAndYearToHashMap(hashType, "television", movieID);
+			//addYearToHashMap(hashType, "television", movieID);
+			hashType.get("television").add(movieID);
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 6), false);
 		}
 		// +++ video +++
 		else if (mvLine.contains(") (v)")) {
-			addTypeAndYearToHashMap(hashType, "video", movieID);
+			//addYearToHashMap(hashType, "video", movieID);
+			hashType.get("video").add(movieID);
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 5), false);
 		}
 		// +++ video game +++
 		else if (mvLine.contains(") (vg)")) {
-			addTypeAndYearToHashMap(hashType, "videogame", movieID);
+			//addYearToHashMap(hashType, "videogame", movieID);
+			hashType.get("videogame").add(movieID);
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.length() - 6), false);
 		} else {
 			// +++ movie +++
-			addTypeAndYearToHashMap(hashType, "movie", movieID);
+			//addYearToHashMap(hashType, "movie", movieID);
+			hashType.get("movie").add(movieID);
 			parseTitleAndYear(movieID, mvLine, false);
 		}
 	}
 
-	/**
-	 * This method parses the year and the title. it starts with the year because it is always the last
+	/* This method parses the year and the title. it starts with the year because it is always the last
 	 * part of the 'MV: ' - line. in the method above we already cut off the the types and before the types is
 	 * ALWAYS the year. after the year is parsed, we cut it off and parse the title from the start. we can
 	 * do that because we already cut off everything else could lead to misinformation.
 	 * for example: MV: Terminator (2033) (1995) -> MV: is already removed in buildIndices and after the year is
-	 * parsed it is cut off and the title is now unique: 'Terminator (2033)'
-	 *
-	 * @param movieID  the movie's unique id
-	 * @param mvLine   the title containing all info about the movie
-	 * @param isSeries boolean to determine if it's a series/episode or a movie
-	 */
+	 * parsed it is cut off and the title is now unique: 'Terminator (2033)' */
 	private void parseTitleAndYear(int movieID, String mvLine, boolean isSeries) {
 		String year = "";
 		int end = 3;
@@ -215,7 +209,7 @@ public class BooleanQuery {
 		// first, get the year right from behind
 		// we start behind the last parenthesis and add only digits to the token
 		// with end we compute the end for the tokenizer
-		for (int i = mvLine.length() - 1; mvLine.charAt(i) != '('; i--) {
+		for (int i = mvLine.length() - 1; mvLine.charAt(i) != '('; --i) {
 			if (mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9') {
 				year += mvLine.charAt(i);
 			}
@@ -223,7 +217,7 @@ public class BooleanQuery {
 		}
 		// if the token contains exact 4 digits, we reverse it and add it to the hash map
 		if (year.length() == 4) {
-			addTypeAndYearToHashMap(hashYear, new StringBuilder(year).reverse().toString(), movieID);
+			addPlotTitleYearToHashMap(hashYear, new StringBuilder(year).reverse().toString(), movieID);
 		}
 
 		StringTokenizer st;
@@ -237,7 +231,7 @@ public class BooleanQuery {
 				" .,:!?", false);
 		}
 
-		StringBuilder stringBuilder = new StringBuilder(256);
+		StringBuilder stringBuilder = new StringBuilder(250);
 
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
@@ -246,7 +240,7 @@ public class BooleanQuery {
 				stringBuilder.append(" ");
 				continue;
 			}
-			addPlotAndTitleToHashMap(hashTitle, token, movieID);
+			addPlotTitleYearToHashMap(hashTitle, token, movieID);
 			stringBuilder.append(token);
 			stringBuilder.append(" ");
 		}
@@ -254,6 +248,47 @@ public class BooleanQuery {
 		allTitlePhrases.put(movieID, stringBuilder.toString());
 	}
 
+	/**
+	 * A method for performing a boolean search on a textual movie plot file after
+	 * indices were built using the {@link #buildIndices(String) buildIndices}
+	 * method. The movie plot file contains entries of the <b>types</b> movie,
+	 * series, episode, television, video, and videogame. This method allows term
+	 * and phrase searches (the latter being enclosed in double quotes) on any of
+	 * the <b>fields</b> title, plot, year, episode, and type. Multiple term and
+	 * phrase searches can be combined by using the character sequence " AND ".
+	 * Note that queries are case-insensitive.<br>
+	 * <br>
+	 * Examples of queries include the following:
+	 * <p>
+	 * <pre>
+	 * title:"game of thrones" AND type:episode AND plot:shae AND plot:Baelish
+	 * plot:Skywalker AND type:series
+	 * plot:"year 2200"
+	 * plot:Berlin AND plot:wall AND type:television
+	 * plot:Cthulhu
+	 * title:"saber rider" AND plot:april
+	 * plot:"James Bond" AND plot:"Jaws" AND type:movie
+	 * title:"Pimp my Ride" AND episodetitle:mustang
+	 * plot:"matt berninger"
+	 * title:"grand theft auto" AND type:videogame
+	 * plot:"Jim Jefferies"
+	 * plot:Berlin AND type:videogame
+	 * plot:starcraft AND type:movie
+	 * type:video AND title:"from dusk till dawn"
+	 * </pre>
+	 * <p>
+	 * More details on (a superset of) the query syntax can be found at <a
+	 * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
+	 * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
+	 * <p>
+	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
+	 *
+	 * @param queryString the query string, formatted according to the Lucene query syntax,
+	 *                    but only supporting term search, phrase search, and the AND
+	 *                    operator
+	 * @return the exact content (in the textual movie plot file) of the title
+	 * lines (starting with "MV: ") of the documents matching the query
+	 */
 	public Set<String> booleanQuery(String queryString) {
 		HashSet<String> results = new HashSet<>(32);
 
@@ -336,7 +371,7 @@ public class BooleanQuery {
 		// now tokenize the phraseString
 		StringTokenizer st = new StringTokenizer(queryString, " .,:!", false);
 		// make a list of movies in which at least one of the tokens appear
-		ArrayList<Integer> foundMoviesWithTokensFromPhrases = new ArrayList<>(8128);
+		ArrayList<Integer> foundMoviesWithTokensFromPhrases = new ArrayList<>(6000);
 
 		// count how many tokens (aka terms) are in the phrase
 		int howManyTokens = 0;
@@ -351,7 +386,7 @@ public class BooleanQuery {
 		}
 
 		// now count the occurrence of the movies we got from our token search
-		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(8128);
+		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(6000);
 		for (int i : foundMoviesWithTokensFromPhrases) {
 			Integer cnt = countMatchingMovies.get(i);
 			countMatchingMovies.put(i, (cnt == null) ? 1 : cnt + 1); // if cnt == null add 1 else cnt + 1)
@@ -496,8 +531,6 @@ public class BooleanQuery {
 	}
 
 	public static void main(String[] args) {
-		ArrayList<Long> allTimes = new ArrayList<>(15);
-		long time;
 		BooleanQuery bq = new BooleanQuery();
 		if (args.length < 3) {
 			System.err
@@ -505,18 +538,14 @@ public class BooleanQuery {
 			System.exit(-1);
 		}
 
-		System.out.println("SPEED SETUP \n");
-
 		// build indices
 		System.out.println("building indices...");
 		long tic = System.nanoTime();
 		Runtime runtime = Runtime.getRuntime();
 		long mem = runtime.totalMemory();
 		bq.buildIndices(args[0]);
-		time = System.nanoTime() - tic;
-		allTimes.add(time);
 		System.out
-			.println("runtime: " + time + " nanoseconds");
+			.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
 		System.out
 			.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L))
 				+ " MB (rough estimate)");
@@ -563,12 +592,14 @@ public class BooleanQuery {
 			// sort expected and determined results for human readability
 			List<String> expectedResultSorted = new ArrayList<>(expectedResult);
 			List<String> actualResultSorted = new ArrayList<>(actualResult);
-			Comparator<String> stringComparator = String::compareTo;
+			Comparator<String> stringComparator = new Comparator<String>() {
+				@Override
+				public int compare(String o1, String o2) {
+					return o1.compareTo(o2);
+				}
+			};
 			expectedResultSorted.sort(stringComparator);
 			actualResultSorted.sort(stringComparator);
-
-			time = System.nanoTime() - tic;
-			allTimes.add(time);
 
 			System.out.println("runtime:         " + (System.nanoTime() - tic)
 				+ " nanoseconds.");
@@ -577,23 +608,5 @@ public class BooleanQuery {
 			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
 				: "FAILURE");
 		}
-		long gesamt = 0;
-		int i = 0;
-		while (i < allTimes.size()) {
-			gesamt += allTimes.get(i);
-			i++;
-		}
-		try {
-			FileWriter writer = new FileWriter("output.txt");
-			for (long str : allTimes) {
-				//writer.write(Integer.toString(i++) + ": " + Long.toString(str) + "\n");
-				writer.write(Long.toString(str) + "\n");
-			}
-			writer.write("gesamt: \n" + Long.toString(gesamt));
-			writer.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }
-
