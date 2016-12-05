@@ -1,8 +1,8 @@
 package ue_inforet_bool;
 
-// https://github.com/johannburkard/StringSearch
 import com.eaio.stringsearch.StringSearch;
 import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
+// from: https://github.com/johannburkard/StringSearch
 
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -50,7 +50,7 @@ public class BooleanQuery {
 	 *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
 	 *                 use.
 	 */
-	private void buildIndices(String plotFile) {
+	 public void buildIndices(String plotFile) {
 		int nextMovieID = 0;
 		int movieID = 0;
 		boolean isPlotLine = false;
@@ -353,19 +353,21 @@ public class BooleanQuery {
 	private List<Integer> phraseQuerySearch(String queryString) {
 		ArrayList<Integer> matchingMovies = new ArrayList<>(32);
 
-		// get the field
-		char fieldTypePhraseQuery = getFieldTypeForPhraseQuery(queryString);
+		char fieldTypePhraseQuery;
 
 		// depending on the field cut off the field
-		if (fieldTypePhraseQuery == 'i') {
+		if (queryString.indexOf("i") == 1) {
 			// cut of 'title:'
 			queryString = StringUtils.substring(queryString, 7, queryString.length() - 1);
-		} else if (fieldTypePhraseQuery == 'p' || fieldTypePhraseQuery == 't' || fieldTypePhraseQuery == 'y') {
+			fieldTypePhraseQuery = 'i';
+		} else if (queryString.startsWith("p")) {
 			// cut of 'type:', 'year:', 'plot:'
 			queryString = StringUtils.substring(queryString, 6, queryString.length() - 1);
+			fieldTypePhraseQuery = 'p';
 		} else {
 			// cut of 'episodetitle'
 			queryString = StringUtils.substring(queryString, 14, queryString.length() - 1);
+			fieldTypePhraseQuery = 'e';
 		}
 
 		// now tokenize the phraseString
@@ -421,30 +423,6 @@ public class BooleanQuery {
 			}
 		}
 		return matchingMovies;
-	}
-
-	/* get the field type from the phrase query */
-	private char getFieldTypeForPhraseQuery(String queryString) {
-		// title
-		if (queryString.indexOf("i") == 1) {
-			return 'i';
-		}
-		// plot
-		else if (queryString.startsWith("p")) {
-			return 'p';
-		}
-		// type
-		else if (queryString.indexOf("y") == 1) {
-			return 't';
-		}
-		// year
-		else if (queryString.startsWith("y")) {
-			return 'y';
-		}
-		// episode title
-		else {
-			return 'e';
-		}
 	}
 
 	/* perform a simple token search for a term of the phrase query */
@@ -519,7 +497,7 @@ public class BooleanQuery {
 					matchingMovies.add(i);
 				}
 			}
-		} else if (getFieldTypeForPhraseQuery(queryString) == 'e') { // episode title
+		} else { // episode title
 			if (hashEpisodeTitle.containsKey(StringUtils.substring(queryString, 13, queryString.length()))) {
 				for (int i : hashEpisodeTitle.get(StringUtils.substring(queryString, 13,
 					queryString.length()))) {
