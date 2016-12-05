@@ -461,14 +461,6 @@ public class BooleanQueryTrove {
 			if (hashPlot.containsKey(tokenString)) {
 				matchingMovies.addAll(hashPlot.get(tokenString));
 			}
-		} else if (searchField == 't') { // type
-			if (hashType.containsKey(tokenString)) {
-				matchingMovies.addAll(hashType.get(tokenString));
-			}
-		} else if (searchField == 'y') { // year
-			if (hashYear.containsKey(tokenString)) {
-				matchingMovies.addAll(hashYear.get(tokenString));
-			}
 		} else { // episode title
 			if (hashEpisodeTitle.containsKey(tokenString)) {
 				matchingMovies.addAll(hashEpisodeTitle.get(tokenString));
