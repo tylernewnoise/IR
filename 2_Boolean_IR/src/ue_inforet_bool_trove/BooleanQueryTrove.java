@@ -1,6 +1,7 @@
 package ue_inforet_bool_trove;
 
 // https://github.com/johannburkard/StringSearch
+
 import com.eaio.stringsearch.StringSearch;
 import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
 
@@ -287,10 +288,12 @@ public class BooleanQueryTrove {
 			}
 
 			// run through the hash map and add only the movies which match the count of howManyQueries
-			for (TIntIntIterator it = countMatchingMovies.iterator(); it.hasNext(); ) {
-				it.advance();
-				if (howManyQueries == it.value()) {
-					results.add(allMoviesList.get(it.key()));
+			TIntIntIterator it3 = countMatchingMovies.iterator();
+			//for (TIntIntIterator it = countMatchingMovies.iterator(); it.hasNext(); ) {
+			for (int i = countMatchingMovies.size(); --i > 0; ) {
+				it3.advance();
+				if (howManyQueries == it3.value()) {
+					results.add(allMoviesList.get(it3.key()));
 				}
 			}
 
@@ -348,35 +351,42 @@ public class BooleanQueryTrove {
 
 		// now count the occurrence of the movies we got from our token search
 		TIntIntHashMap countMatchingMovies = new TIntIntHashMap(8000);
-		for (TIntIterator it = foundMoviesWithTokensFromPhrases.iterator(); it.hasNext(); ) {
+/*		for (TIntIterator it = foundMoviesWithTokensFromPhrases.iterator(); it.hasNext(); ) {
 			countMatchingMovies.adjustOrPutValue(it.next(), 1, 1);
+		}*/
+		TIntIterator it1 = foundMoviesWithTokensFromPhrases.iterator();
+		for (int i = foundMoviesWithTokensFromPhrases.size(); --i > 0; ) {
+			countMatchingMovies.adjustOrPutValue(it1.next(), 1, 1);
+
 		}
 
 		StringSearch bmhRaita = new BoyerMooreHorspoolRaita();
 
 		// run through the hash map and do string search only for movies which have
 		// the same count as howManyTokens
-		for (TIntIntIterator it = countMatchingMovies.iterator(); it.hasNext(); ) {
-			it.advance();
-			if (howManyTokens == it.value()) {
+		TIntIntIterator it2 = countMatchingMovies.iterator();
+		//for (TIntIntIterator it = countMatchingMovies.iterator(); it.hasNext(); ) {
+		for (int i = countMatchingMovies.size(); --i > 0; ) {
+			it2.advance();
+			if (howManyTokens == it2.value()) {
 				// the SearchString class returns -1 if the pattern is not found
 				if (fieldTypePhraseQuery == 'i') {
 					// search in title
-					if (bmhRaita.searchString(hashTitlePhrases.get(it.key()),
+					if (bmhRaita.searchString(hashTitlePhrases.get(it2.key()),
 						queryString) != -1) {
-						matchingMovies.add(it.key());
+						matchingMovies.add(it2.key());
 					}
 				} else if (fieldTypePhraseQuery == 'p') {
 					// search in plot
-					if (bmhRaita.searchString(hashPlotPhrases.get(it.key()),
+					if (bmhRaita.searchString(hashPlotPhrases.get(it2.key()),
 						queryString) != -1) {
-						matchingMovies.add(it.key());
+						matchingMovies.add(it2.key());
 					}
 				} else {
 					// search in episode title
-					if (bmhRaita.searchString(hashEpisodeTitlePhrases.get(it.key()),
+					if (bmhRaita.searchString(hashEpisodeTitlePhrases.get(it2.key()),
 						queryString) != -1) {
-						matchingMovies.add(it.key());
+						matchingMovies.add(it2.key());
 					}
 				}
 			}
@@ -553,8 +563,7 @@ public class BooleanQueryTrove {
 	}
 }
 
-/*
-		long time;
+/*		long time;
 		BooleanQueryTrove bq = new BooleanQueryTrove();
 		if (args.length < 3) {
 			System.err
