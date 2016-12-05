@@ -1,17 +1,18 @@
 package ue_inforet_bool_trove;
 
-// https://github.com/johannburkard/StringSearch
-
 import com.eaio.stringsearch.StringSearch;
 import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
+// from https://github.com/johannburkard/StringSearch
 
-// http://java-performance.info/primitive-types-collections-trove-library
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.set.hash.THashSet;
+// from http://java-performance.info/primitive-types-collections-trove-library
+// and thanks Benny
 
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -27,8 +28,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.StringTokenizer;
 
-// http://javolution.org
 import javolution.text.TextBuilder;
+// http://javolution.org
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,17 +37,19 @@ public class BooleanQueryTrove {
 
 	private ArrayList<String> allMoviesList = new ArrayList<>(530000);
 
-	private THashMap<Integer, String> hashPlotPhrases = new THashMap<>(530000);
-	private THashMap<Integer, String> hashTitlePhrases = new THashMap<>(530000);
-	private THashMap<Integer, String> hashEpisodeTitlePhrases = new THashMap<>(220000);
+	private TIntObjectHashMap<String> hashPlotPhrases = new TIntObjectHashMap<>(530000);
+	private TIntObjectHashMap<String> hashTitlePhrases = new TIntObjectHashMap<>(530000);
+	private TIntObjectHashMap<String> hashEpisodeTitlePhrases = new TIntObjectHashMap<>(220000);
 
-	private THashMap<String, THashSet<Integer>> hashType = new THashMap<>(6);
-	private THashMap<String, THashSet<Integer>> hashYear = new THashMap<>(150);
-	private THashMap<String, THashSet<Integer>> hashPlot = new THashMap<>(700000);
-	private THashMap<String, THashSet<Integer>> hashTitle = new THashMap<>(150000);
-	private THashMap<String, THashSet<Integer>> hashEpisodeTitle = new THashMap<>(100000);
+	private THashMap<String, TIntHashSet> hashType = new THashMap<>(6);
+	private THashMap<String, TIntHashSet> hashYear = new THashMap<>(150);
+	private THashMap<String, TIntHashSet> hashPlot = new THashMap<>(700000);
+	private THashMap<String, TIntHashSet> hashTitle = new THashMap<>(150000);
+	private THashMap<String, TIntHashSet> hashEpisodeTitle = new THashMap<>(100000);
 
-
+	/**
+	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
+	 */
 	public BooleanQueryTrove() {
 	}
 
@@ -66,13 +69,17 @@ public class BooleanQueryTrove {
 		int nextMovieID = 0;
 		int movieID = 0;
 		boolean isPlotLine = false;
-		hashType.put("video", new THashSet<>(21000));
-		hashType.put("movie", new THashSet<>(250000));
-		hashType.put("series", new THashSet<>(22000));
-		hashType.put("episode", new THashSet<>(222000));
-		hashType.put("videogame", new THashSet<>(2500));
-		hashType.put("television", new THashSet<>(20000));
 
+		// there are only 6 types, so we can initialize them already
+		hashType.put("video", new TIntHashSet(21000));
+		hashType.put("movie", new TIntHashSet(250000));
+		hashType.put("series", new TIntHashSet(22000));
+		hashType.put("episode", new TIntHashSet(222000));
+		hashType.put("videogame", new TIntHashSet(2500));
+		hashType.put("television", new TIntHashSet(20000));
+
+		// TextBuilder will build us the Strings and is way faster than the + Operator,
+		// a little bit faster than StringBuilder and is supposed to run in O(logn)
 		TextBuilder textBuilder = new TextBuilder();
 
 		/* read from the file - thanks Christoph */
@@ -83,6 +90,8 @@ public class BooleanQueryTrove {
 			while ((line = reader.readLine()) != null) {
 				// is it an MV: line?
 				if (line.startsWith("M")) {
+					// if isPlotLine is true we know that a new movie-document starts so we have
+					// to add the plot String to the hash map
 					if (isPlotLine) {
 						hashPlotPhrases.put(movieID, textBuilder.toString());
 						isPlotLine = false;
@@ -127,13 +136,12 @@ public class BooleanQueryTrove {
 	}
 
 	/* adds the movie and it's values to the hash map - thanks Benny */
-	private void addPlotTitleYearToHashMap(THashMap<String, THashSet<Integer>> hashMap, String value,
-					       Integer movieID) {
+	private void addPlotTitleYearToHashMap(THashMap<String, TIntHashSet> hashMap, String value, Integer movieID) {
 		if (hashMap.containsKey(value)) {
 			hashMap.get(value).add(movieID);
 		} else {
 			// value has no entry yet, create a list for the value and store film in it
-			THashSet<Integer> movieList = new THashSet<>();
+			TIntHashSet movieList = new TIntHashSet();
 			movieList.add(movieID);
 			hashMap.put(value, movieList);
 		}
@@ -255,6 +263,47 @@ public class BooleanQueryTrove {
 		hashTitlePhrases.put(movieID, textBuilder.toString());
 	}
 
+	/**
+	 * A method for performing a boolean search on a textual movie plot file after
+	 * indices were built using the {@link #buildIndices(String) buildIndices}
+	 * method. The movie plot file contains entries of the <b>types</b> movie,
+	 * series, episode, television, video, and videogame. This method allows term
+	 * and phrase searches (the latter being enclosed in double quotes) on any of
+	 * the <b>fields</b> title, plot, year, episode, and type. Multiple term and
+	 * phrase searches can be combined by using the character sequence " AND ".
+	 * Note that queries are case-insensitive.<br>
+	 * <br>
+	 * Examples of queries include the following:
+	 * <p>
+	 * <pre>
+	 * title:"game of thrones" AND type:episode AND plot:shae AND plot:Baelish
+	 * plot:Skywalker AND type:series
+	 * plot:"year 2200"
+	 * plot:Berlin AND plot:wall AND type:television
+	 * plot:Cthulhu
+	 * title:"saber rider" AND plot:april
+	 * plot:"James Bond" AND plot:"Jaws" AND type:movie
+	 * title:"Pimp my Ride" AND episodetitle:mustang
+	 * plot:"matt berninger"
+	 * title:"grand theft auto" AND type:videogame
+	 * plot:"Jim Jefferies"
+	 * plot:Berlin AND type:videogame
+	 * plot:starcraft AND type:movie
+	 * type:video AND title:"from dusk till dawn"
+	 * </pre>
+	 * <p>
+	 * More details on (a superset of) the query syntax can be found at <a
+	 * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
+	 * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
+	 * <p>
+	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
+	 *
+	 * @param queryString the query string, formatted according to the Lucene query syntax,
+	 *                    but only supporting term search, phrase search, and the AND
+	 *                    operator
+	 * @return the exact content (in the textual movie plot file) of the title
+	 * lines (starting with "MV: ") of the documents matching the query
+	 */
 	public Set<String> booleanQuery(String queryString) {
 		HashSet<String> results = new HashSet<>(32);
 
@@ -282,23 +331,23 @@ public class BooleanQueryTrove {
 			// if a movie matches all queries (f.e. 3 times) it is counted 3 times and if a
 			// movie matches only 2 queries, it is counted only 2 times.
 			TIntIntHashMap countMatchingMovies = new TIntIntHashMap(256000);
+			TIntIterator iterator1 = matchingMovies.iterator();
 
-			for (TIntIterator it = matchingMovies.iterator(); it.hasNext(); ) {
-				countMatchingMovies.adjustOrPutValue(it.next(), 1, 1);
+			for (int i = 0; i < matchingMovies.size(); ++i) {
+				countMatchingMovies.adjustOrPutValue(iterator1.next(), 1, 1);
 			}
 
 			// run through the hash map and add only the movies which match the count of howManyQueries
-			TIntIntIterator it3 = countMatchingMovies.iterator();
-			//for (TIntIntIterator it = countMatchingMovies.iterator(); it.hasNext(); ) {
-			for (int i = countMatchingMovies.size(); --i > 0; ) {
-				it3.advance();
-				if (howManyQueries == it3.value()) {
-					results.add(allMoviesList.get(it3.key()));
+			TIntIntIterator iterator2 = countMatchingMovies.iterator();
+			for (int i = 0; i < countMatchingMovies.size(); ++i) {
+				iterator2.advance();
+				if (howManyQueries == iterator2.value()) {
+					results.add(allMoviesList.get(iterator2.key()));
 				}
 			}
 
 		} else if (queryString.contains("\"")) {
-		/* QUERY IS A PHRASE SEARCH */
+		/* QUERY IS ONLY A PHRASE SEARCH */
 			for (TIntIterator it = phraseQuerySearch(queryString.toLowerCase()).iterator(); it.hasNext(); ) {
 				results.add(allMoviesList.get(it.next()));
 			}
@@ -315,19 +364,21 @@ public class BooleanQueryTrove {
 	private TIntArrayList phraseQuerySearch(String queryString) {
 		TIntArrayList matchingMovies = new TIntArrayList(32);
 
-		// get the field
-		char fieldTypePhraseQuery = getFieldTypeForPhraseQuery(queryString);
+		char fieldTypePhraseQuery;
 
 		// depending on the field cut off the field
-		if (fieldTypePhraseQuery == 'i') {
+		if (queryString.indexOf("i") == 1) {
 			// cut of 'title:'
 			queryString = StringUtils.substring(queryString, 7, queryString.length() - 1);
-		} else if (fieldTypePhraseQuery == 'p' || fieldTypePhraseQuery == 't' || fieldTypePhraseQuery == 'y') {
+			fieldTypePhraseQuery = 'i';
+		} else if (queryString.startsWith("p")) {
 			// cut of 'type:', 'year:', 'plot:'
 			queryString = StringUtils.substring(queryString, 6, queryString.length() - 1);
+			fieldTypePhraseQuery = 'p';
 		} else {
 			// cut of 'episodetitle'
 			queryString = StringUtils.substring(queryString, 14, queryString.length() - 1);
+			fieldTypePhraseQuery = 'e';
 		}
 
 		// now tokenize the phraseString
@@ -351,72 +402,51 @@ public class BooleanQueryTrove {
 
 		// now count the occurrence of the movies we got from our token search
 		TIntIntHashMap countMatchingMovies = new TIntIntHashMap(8000);
-/*		for (TIntIterator it = foundMoviesWithTokensFromPhrases.iterator(); it.hasNext(); ) {
-			countMatchingMovies.adjustOrPutValue(it.next(), 1, 1);
-		}*/
-		TIntIterator it1 = foundMoviesWithTokensFromPhrases.iterator();
-		for (int i = foundMoviesWithTokensFromPhrases.size(); --i > 0; ) {
-			countMatchingMovies.adjustOrPutValue(it1.next(), 1, 1);
+		TIntIterator iterator1 = foundMoviesWithTokensFromPhrases.iterator();
 
+		for (int i = 0; i < foundMoviesWithTokensFromPhrases.size(); ++i) {
+			countMatchingMovies.adjustOrPutValue(iterator1.next(), 1, 1);
 		}
 
 		StringSearch bmhRaita = new BoyerMooreHorspoolRaita();
 
-		// run through the hash map and do string search only for movies which have
+		// run through the hash map and do a string search only for movies which have
 		// the same count as howManyTokens
-		TIntIntIterator it2 = countMatchingMovies.iterator();
-		//for (TIntIntIterator it = countMatchingMovies.iterator(); it.hasNext(); ) {
-		for (int i = countMatchingMovies.size(); --i > 0; ) {
-			it2.advance();
-			if (howManyTokens == it2.value()) {
+		TIntIntIterator iterator2 = countMatchingMovies.iterator();
+		for (int i = 0; i < countMatchingMovies.size(); ++i) {
+			iterator2.advance();
+			if (howManyTokens == iterator2.value()) {
 				// the SearchString class returns -1 if the pattern is not found
 				if (fieldTypePhraseQuery == 'i') {
 					// search in title
-					if (bmhRaita.searchString(hashTitlePhrases.get(it2.key()),
-						queryString) != -1) {
-						matchingMovies.add(it2.key());
+					// do string search only if the query (pattern) is at least less equal than
+					// the text to search in. do this only for title and episodetitle, because the
+					// plot is in most cases quite long
+					if (queryString.length() <= hashTitlePhrases.get(iterator2.key()).length()) {
+						if (bmhRaita.searchString(hashTitlePhrases.get(iterator2.key()),
+							queryString) != -1) {
+							matchingMovies.add(iterator2.key());
+						}
 					}
 				} else if (fieldTypePhraseQuery == 'p') {
 					// search in plot
-					if (bmhRaita.searchString(hashPlotPhrases.get(it2.key()),
+					if (bmhRaita.searchString(hashPlotPhrases.get(iterator2.key()),
 						queryString) != -1) {
-						matchingMovies.add(it2.key());
+						matchingMovies.add(iterator2.key());
 					}
 				} else {
 					// search in episode title
-					if (bmhRaita.searchString(hashEpisodeTitlePhrases.get(it2.key()),
-						queryString) != -1) {
-						matchingMovies.add(it2.key());
+					if (queryString.length() <= hashEpisodeTitlePhrases.get(iterator2.key()).length()) {
+						if (bmhRaita.searchString(hashEpisodeTitlePhrases.get(iterator2.key()),
+							queryString) != -1) {
+							matchingMovies.add(iterator2.key());
+						}
 					}
 				}
 			}
 		}
 
 		return matchingMovies;
-	}
-
-	/* get the field type from the phrase query */
-	private char getFieldTypeForPhraseQuery(String queryString) {
-		// title
-		if (queryString.indexOf("i") == 1) {
-			return 'i';
-		}
-		// plot
-		else if (queryString.startsWith("p")) {
-			return 'p';
-		}
-		// type
-		else if (queryString.indexOf("y") == 1) {
-			return 't';
-		}
-		// year
-		else if (queryString.startsWith("y")) {
-			return 'y';
-		}
-		// episode title
-		else {
-			return 'e';
-		}
 	}
 
 	/* perform a simple token search for a term of the phrase query */
@@ -473,7 +503,7 @@ public class BooleanQueryTrove {
 			if (hashYear.containsKey(tmp)) {
 				matchingMovies.addAll(hashYear.get(tmp));
 			}
-		} else if (getFieldTypeForPhraseQuery(queryString) == 'e') { // episode title
+		} else { // episode title
 			String tmp = StringUtils.substring(queryString, 13, queryString.length());
 			if (hashEpisodeTitle.containsKey(tmp)) {
 				matchingMovies.addAll(hashEpisodeTitle.get(tmp));
@@ -562,72 +592,3 @@ public class BooleanQueryTrove {
 		}
 	}
 }
-
-/*		long time;
-		BooleanQueryTrove bq = new BooleanQueryTrove();
-		if (args.length < 3) {
-			System.err
-				.println("usage: java -jar BooleanQuery.jar <plot list file> <queries file> <results file>");
-			System.exit(-1);
-		}
-
-		// build indices
-		long tic = System.nanoTime();
-		Runtime runtime = Runtime.getRuntime();
-		long mem = runtime.totalMemory();
-		bq.buildIndices(args[0]);
-		time = System.nanoTime() - tic;
-		//System.out.println(time);
-
-		// parsing the queries that are to be run from the queries file
-		List<String> queries = new ArrayList<>();
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-			new FileInputStream(args[1]), StandardCharsets.ISO_8859_1))) {
-			String line;
-			while ((line = reader.readLine()) != null)
-				queries.add(line);
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-
-		// parsing the queries' expected results from the results file
-		List<Set<String>> results = new ArrayList<>();
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-			new FileInputStream(args[2]), StandardCharsets.ISO_8859_1))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				Set<String> result = new HashSet<>();
-				results.add(result);
-				for (int i = 0; i < Integer.parseInt(line); i++) {
-					result.add(reader.readLine());
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-
-		// run queries
-		for (int j = 0; j < 10000; j++) {
-			System.out.println(j);
-			for (int i = 0; i < queries.size(); i++) {
-				String query = queries.get(i);
-				Set<String> expectedResult = i < results.size() ? results.get(i)
-					: new HashSet<>();
-				//System.out.println("query:           " + query);
-				tic = System.nanoTime();
-				Set<String> actualResult = bq.booleanQuery(query);
-
-				// sort expected and determined results for human readability
-				List<String> expectedResultSorted = new ArrayList<>(expectedResult);
-				List<String> actualResultSorted = new ArrayList<>(actualResult);
-				Comparator<String> stringComparator = String::compareTo;
-				expectedResultSorted.sort(stringComparator);
-				actualResultSorted.sort(stringComparator);
-				time = System.nanoTime() - tic;
-				//System.out.println(time);
-			}
-		}
-	}
-}*/
