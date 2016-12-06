@@ -37,9 +37,9 @@ public class BooleanQueryTrove {
 
 	private ArrayList<String> allMoviesList = new ArrayList<>(530000);
 
-	private TIntObjectHashMap<String> hashPlotPhrases = new TIntObjectHashMap<>(530000);
-	private TIntObjectHashMap<String> hashTitlePhrases = new TIntObjectHashMap<>(530000);
-	private TIntObjectHashMap<String> hashEpisodeTitlePhrases = new TIntObjectHashMap<>(220000);
+	private ArrayList<String> plotPhrases = new ArrayList<>(530000);
+	private ArrayList<String> titlePhrases = new ArrayList<>(530000);
+	private TIntObjectHashMap<String> episodetitlePhrases = new TIntObjectHashMap<>(220000);
 
 	private THashMap<String, TIntHashSet> hashType = new THashMap<>(6);
 	private THashMap<String, TIntHashSet> hashYear = new THashMap<>(150);
@@ -93,7 +93,7 @@ public class BooleanQueryTrove {
 					// if isPlotLine is true we know that a new movie-document starts so we have
 					// to add the plot String to the hash map
 					if (isPlotLine) {
-						hashPlotPhrases.put(movieID, textBuilder.toString());
+						plotPhrases.add(movieID, textBuilder.toString());
 						isPlotLine = false;
 						textBuilder = new TextBuilder(6000);
 					}
@@ -102,8 +102,7 @@ public class BooleanQueryTrove {
 					allMoviesList.add(movieID, line);
 					// add movie to list and add title, type and year to the hash maps
 					// remove 'MV: ' first and convert everything toLowerCase()
-					getTitleTypeYear(movieID, StringUtils.substring(line, 4,
-						line.length()).toLowerCase());
+					getTitleTypeYear(movieID, StringUtils.substring(line, 4, line.length()).toLowerCase());
 				}
 				// is it an PL: line?
 				if (StringUtils.substring(line, 0, 3).contains("PL:")) {
@@ -127,7 +126,7 @@ public class BooleanQueryTrove {
 				}
 			}
 			// add the last plot phrase
-			hashPlotPhrases.put(movieID, textBuilder.toString());
+			plotPhrases.add(movieID, textBuilder.toString());
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -183,9 +182,8 @@ public class BooleanQueryTrove {
 				textBuilder.append(token);
 				textBuilder.append(" ");
 			}
-
 			// add the token for the phrase search to the array list
-			hashEpisodeTitlePhrases.put(movieID, textBuilder.toString());
+			episodetitlePhrases.put(movieID, textBuilder.toString());
 
 			// get rid of the episode title. and proceed like it is an episode
 			parseTitleAndYear(movieID, mvLine.substring(0, mvLine.indexOf('{')), true);
@@ -260,7 +258,7 @@ public class BooleanQueryTrove {
 			textBuilder.append(" ");
 		}
 
-		hashTitlePhrases.put(movieID, textBuilder.toString());
+		titlePhrases.add(movieID, textBuilder.toString());
 	}
 
 	/**
@@ -422,22 +420,21 @@ public class BooleanQueryTrove {
 					// do string search only if the query (pattern) is at least less equal than
 					// the text to search in. do this only for title and episodetitle, because the
 					// plot is in most cases quite long
-					if (queryString.length() <= hashTitlePhrases.get(iterator2.key()).length()) {
-						if (bmhRaita.searchString(hashTitlePhrases.get(iterator2.key()),
+					if (queryString.length() <= titlePhrases.get(iterator2.key()).length()) {
+						if (bmhRaita.searchString(titlePhrases.get(iterator2.key()),
 							queryString) != -1) {
 							matchingMovies.add(iterator2.key());
 						}
 					}
 				} else if (fieldTypePhraseQuery == 'p') {
 					// search in plot
-					if (bmhRaita.searchString(hashPlotPhrases.get(iterator2.key()),
-						queryString) != -1) {
+					if (bmhRaita.searchString(plotPhrases.get(iterator2.key()), queryString) != -1) {
 						matchingMovies.add(iterator2.key());
 					}
 				} else {
 					// search in episode title
-					if (queryString.length() <= hashEpisodeTitlePhrases.get(iterator2.key()).length()) {
-						if (bmhRaita.searchString(hashEpisodeTitlePhrases.get(iterator2.key()),
+					if (queryString.length() <= episodetitlePhrases.get(iterator2.key()).length()) {
+						if (bmhRaita.searchString(episodetitlePhrases.get(iterator2.key()),
 							queryString) != -1) {
 							matchingMovies.add(iterator2.key());
 						}
@@ -514,15 +511,13 @@ public class BooleanQueryTrove {
 
 		// build indices
 		System.out.println("building indices...");
+		System.out.println("Trove Variant");
 		long tic = System.nanoTime();
 		Runtime runtime = Runtime.getRuntime();
 		long mem = runtime.totalMemory();
 		bq.buildIndices(args[0]);
-		System.out
-			.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
-		System.out
-			.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L))
-				+ " MB (rough estimate)");
+		System.out.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
+		System.out.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L)) + " MB (rough estimate)");
 
 		// parsing the queries that are to be run from the queries file
 		List<String> queries = new ArrayList<>();
@@ -566,21 +561,14 @@ public class BooleanQueryTrove {
 			// sort expected and determined results for human readability
 			List<String> expectedResultSorted = new ArrayList<>(expectedResult);
 			List<String> actualResultSorted = new ArrayList<>(actualResult);
-			Comparator<String> stringComparator = new Comparator<String>() {
-				@Override
-				public int compare(String o1, String o2) {
-					return o1.compareTo(o2);
-				}
-			};
+			Comparator<String> stringComparator = String::compareTo;
 			expectedResultSorted.sort(stringComparator);
 			actualResultSorted.sort(stringComparator);
 
-			System.out.println("runtime:         " + (System.nanoTime() - tic)
-				+ " nanoseconds.");
+			System.out.println("runtime:         " + (System.nanoTime() - tic) + " nanoseconds.");
 			System.out.println("expected result: " + expectedResultSorted.toString());
 			System.out.println("actual result:   " + actualResultSorted.toString());
-			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
-				: "FAILURE");
+			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS" : "FAILURE");
 		}
 	}
 }
