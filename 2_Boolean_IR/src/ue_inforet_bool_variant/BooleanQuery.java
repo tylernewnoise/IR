@@ -1,24 +1,12 @@
 package ue_inforet_bool_variant;
 
-
-import com.eaio.stringsearch.StringSearch;
-import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
-// from: https://github.com/johannburkard/StringSearch
-
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +26,93 @@ public class BooleanQuery {
 	 */
 	public BooleanQuery() {
 	}
+
+	/* ******** Boyer Moore ******** */
+	/* thx to en.wikipedia.org */
+	/**
+	 * Returns the index within this string of the first occurrence of the
+	 * specified substring. If it is not a substring, return -1.
+	 *
+	 * @param haystack The string to be scanned
+	 * @param needle   The target string to search
+	 * @return The start index of the substring
+	 */
+	private static int boyerMoore(char[] haystack, char[] needle) {
+		if (needle.length == 0) {
+			return 0;
+		}
+		int charTable[] = makeCharTable(needle);
+		int offsetTable[] = makeOffsetTable(needle);
+		for (int i = needle.length - 1, j; i < haystack.length; ) {
+			for (j = needle.length - 1; needle[j] == haystack[i]; --i, --j) {
+				if (j == 0) {
+					return i;
+				}
+			}
+			//i += needle.length - j;  For naive method
+			i += Math.max(offsetTable[needle.length - 1 - j], charTable[haystack[i]]);
+		}
+		return -1;
+	}
+
+	/**
+	 * Makes the jump table based on the mismatched character information.
+	 */
+	private static int[] makeCharTable(char[] needle) {
+		final int ALPHABET_SIZE = 256;
+		int[] table = new int[ALPHABET_SIZE];
+		for (int i = 0; i < table.length; ++i) {
+			table[i] = needle.length;
+		}
+		for (int i = 0; i < needle.length - 1; ++i) {
+			table[needle[i]] = needle.length - 1 - i;
+		}
+		return table;
+	}
+
+	/**
+	 * Makes the jump table based on the scan offset which mismatch occurs.
+	 */
+	private static int[] makeOffsetTable(char[] needle) {
+		int[] table = new int[needle.length];
+		int lastPrefixPosition = needle.length;
+		for (int i = needle.length - 1; i >= 0; --i) {
+			if (isPrefix(needle, i + 1)) {
+				lastPrefixPosition = i + 1;
+			}
+			table[needle.length - 1 - i] = lastPrefixPosition - i + needle.length - 1;
+		}
+		for (int i = 0; i < needle.length - 1; ++i) {
+			int slen = suffixLength(needle, i);
+			table[slen] = needle.length - 1 - i + slen;
+		}
+		return table;
+	}
+
+	/**
+	 * Is needle[p:end] a prefix of needle?
+	 */
+	private static boolean isPrefix(char[] needle, int p) {
+		for (int i = p, j = 0; i < needle.length; ++i, ++j) {
+			if (needle[i] != needle[j]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns the maximum length of the substring ends at p and is a suffix.
+	 */
+	private static int suffixLength(char[] needle, int p) {
+		int len = 0;
+		for (int i = p, j = needle.length - 1;
+		     i >= 0 && needle[i] == needle[j]; --i, --j) {
+			len += 1;
+		}
+		return len;
+	}
+	/* ******** Boyer Moore ******** */
 
 	/**
 	 * A method for reading the textual movie plot file and building indices. The
@@ -389,13 +464,11 @@ public class BooleanQuery {
 		}
 
 		// now count the occurrence of the movies we got from our token search
-		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>(6000);
+		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>();
 		for (int i : foundMoviesWithTokensFromPhrases) {
 			Integer cnt = countMatchingMovies.get(i);
 			countMatchingMovies.put(i, (cnt == null) ? 1 : cnt + 1); // if cnt == null add 1 else cnt + 1)
 		}
-
-		StringSearch bmhRaita = new BoyerMooreHorspoolRaita();
 
 		// run through the hash map and do string search only for movies which have
 		// the same count as howManyTokens
@@ -403,21 +476,18 @@ public class BooleanQuery {
 			if (howManyTokens == entry.getValue()) {
 				if (fieldTypePhraseQuery == 'i') {
 					// search in title
-					// the SearchString class returns -1 if the pattern is not found
-					if (bmhRaita.searchString(allTitlePhrases.get(entry.getKey()),
-						queryString) != -1) {
+					// the boyer-moore function returns -1 if the pattern is not found
+					if (boyerMoore(allTitlePhrases.get(entry.getKey()).toCharArray(), queryString.toCharArray()) > -1) {
 						matchingMovies.add(entry.getKey());
 					}
 				} else if (fieldTypePhraseQuery == 'p') {
 					// search in plot
-					if (bmhRaita.searchString(allPlotPhrases.get(entry.getKey()),
-						queryString) != -1) {
+					if (boyerMoore(allPlotPhrases.get(entry.getKey()).toCharArray(), queryString.toCharArray()) > -1) {
 						matchingMovies.add(entry.getKey());
 					}
 				} else {
 					// search in episode title
-					if (bmhRaita.searchString(allEpisodeTitlePhrases.get(entry.getKey()),
-						queryString) != -1) {
+					if (boyerMoore(allEpisodeTitlePhrases.get(entry.getKey()).toCharArray(), queryString.toCharArray()) > -1) {
 						matchingMovies.add(entry.getKey());
 					}
 				}
@@ -428,7 +498,7 @@ public class BooleanQuery {
 
 	/* perform a simple token search for a term of the phrase query */
 	private List<Integer> tokenSearchForPhraseQuery(String tokenString, char searchField) {
-		ArrayList<Integer> matchingMovies = new ArrayList<>(50000);
+		ArrayList<Integer> matchingMovies = new ArrayList<>();
 
 		if (searchField == 'i') { // title
 			if (hashTitle.containsKey(tokenString)) {
