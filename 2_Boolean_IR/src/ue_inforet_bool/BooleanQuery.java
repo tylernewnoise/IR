@@ -511,7 +511,7 @@ public class BooleanQuery {
 
 		// build indices
 		System.out.println("building indices...");
-		System.out.println("Trove Variant");
+
 		long tic = System.nanoTime();
 		Runtime runtime = Runtime.getRuntime();
 		long mem = runtime.totalMemory();
