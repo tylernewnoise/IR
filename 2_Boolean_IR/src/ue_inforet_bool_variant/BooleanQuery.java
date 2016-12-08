@@ -23,15 +23,15 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 
 public class BooleanQuery {
-	private ArrayList<String> allMoviesList = new ArrayList<>(530000);
-	private HashMap<Integer, String> allPlotPhrases = new HashMap<>(530000);
-	private HashMap<Integer, String> allTitlePhrases = new HashMap<>(530000);
-	private HashMap<Integer, String> allEpisodeTitlePhrases = new HashMap<>(220000);
-	private HashMap<String, HashSet<Integer>> hashType = new HashMap<>(6);
-	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>(150);
-	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>(700000);
-	private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>(150000);
-	private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>(100000);
+	private ArrayList<String> allMoviesList = new ArrayList<>();
+	private HashMap<Integer, String> allPlotPhrases = new HashMap<>();
+	private HashMap<Integer, String> allTitlePhrases = new HashMap<>();
+	private HashMap<Integer, String> allEpisodeTitlePhrases = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashType = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashYear = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashPlot = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashTitle = new HashMap<>();
+	private HashMap<String, HashSet<Integer>> hashEpisodeTitle = new HashMap<>();
 
 	/**
 	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
@@ -55,14 +55,14 @@ public class BooleanQuery {
 		int nextMovieID = 0;
 		int movieID = 0;
 		boolean isPlotLine = false;
-		hashType.put("video", new HashSet<>(21000));
-		hashType.put("movie", new HashSet<>(250000));
-		hashType.put("series", new HashSet<>(22000));
-		hashType.put("episode", new HashSet<>(222000));
-		hashType.put("videogame", new HashSet<>(2500));
-		hashType.put("television", new HashSet<>(20000));
+		hashType.put("video", new HashSet<>());
+		hashType.put("movie", new HashSet<>());
+		hashType.put("series", new HashSet<>());
+		hashType.put("episode", new HashSet<>());
+		hashType.put("videogame", new HashSet<>());
+		hashType.put("television", new HashSet<>());
 
-		StringBuilder stringBuilder = new StringBuilder(6000);
+		StringBuilder stringBuilder = new StringBuilder();
 
 		/* read from the file - thanks Christoph */
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
@@ -75,7 +75,7 @@ public class BooleanQuery {
 					if (isPlotLine) {
 						allPlotPhrases.put(movieID, stringBuilder.toString());
 						isPlotLine = false;
-						stringBuilder = new StringBuilder(6000);
+						stringBuilder = new StringBuilder();
 					}
 					// add an entry and increase movieID
 					movieID = nextMovieID++;
@@ -90,7 +90,7 @@ public class BooleanQuery {
 					isPlotLine = true;
 
 					StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 4,
-						line.length()).toLowerCase(), " .,:!", false);
+						line.length()).toLowerCase(), " .,:!?", false);
 
 					// now tokenize the plot - thanks Jonas
 					while (st.hasMoreTokens()) {
@@ -152,7 +152,7 @@ public class BooleanQuery {
 			StringTokenizer st = new StringTokenizer(mvLine.substring(mvLine.indexOf('{') + 1,
 				mvLine.length() - 1), " .,:!?", false);
 
-			StringBuilder stringBuilder = new StringBuilder(256);
+			StringBuilder stringBuilder = new StringBuilder();
 
 			while (st.hasMoreTokens()) {
 				String token = st.nextToken();
@@ -372,7 +372,7 @@ public class BooleanQuery {
 		}
 
 		// now tokenize the phraseString
-		StringTokenizer st = new StringTokenizer(queryString, " .,:!", false);
+		StringTokenizer st = new StringTokenizer(queryString, " .,:!?", false);
 		// make a list of movies in which at least one of the tokens appear
 		ArrayList<Integer> foundMoviesWithTokensFromPhrases = new ArrayList<>(6000);
 
@@ -466,7 +466,7 @@ public class BooleanQuery {
 
 	/* perform a single token search */
 	private List<Integer> singleTokenSearch(String queryString) {
-		ArrayList<Integer> matchingMovies = new ArrayList<>(256000);
+		ArrayList<Integer> matchingMovies = new ArrayList<>();
 
 		// so first we want to know the field type we have to search in
 		// depending on the field type, we cut off the field and look for the token in the hash map
