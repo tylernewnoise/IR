@@ -109,7 +109,7 @@ public class BooleanQuery {
 					isPlotLine = true;
 
 					StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 4,
-						line.length()).toLowerCase(), " .,:!", false);
+						line.length()).toLowerCase(), " .,:!?", false);
 
 					// now tokenize the plot - thanks Jonas
 					while (st.hasMoreTokens()) {
@@ -380,7 +380,7 @@ public class BooleanQuery {
 		}
 
 		// now tokenize the phraseString
-		StringTokenizer st = new StringTokenizer(queryString, " .,:!", false);
+		StringTokenizer st = new StringTokenizer(queryString, " .,:!?", false);
 
 		// make a list of movies in which at least one of the tokens appear
 		TIntArrayList foundMoviesWithTokensFromPhrases = new TIntArrayList(8000);
