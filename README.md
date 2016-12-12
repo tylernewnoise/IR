@@ -1,7 +1,7 @@
 # Information Retrieval
 * 01 IMDB Spider
 * 02 Boolean Information Retrieval
-* 03
+* 03 Boolean Information Retrieval with Lucene
 * 04
 * 05
 
