@@ -3,6 +3,7 @@
 /IR.iml
 /1_IMDB_Spider/1_IMDB_Spider.iml
 /2_Boolean_IR/2_Boolean_IR.iml
+/3_Boolean_IR_Lucene/3_Boolean_IR_Lucene.iml
 /manifests/
 /.idea/
 
@@ -19,3 +20,4 @@ hs_err_pid*
 
 /2_Boolean_IR/data/plot.list
 /2_Boolean_IR/data/plot_small.list
+/3_Boolean_IR_Lucene/data/plot.list
