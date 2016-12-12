@@ -1,0 +1,11 @@
+title:"game of thrones" AND type:episode AND (plot:Bastards OR (plot:Jon AND plot:Snow)) -plot:son
+title:"Star Wars" AND type:movie AND plot:Luke AND year:[1977 TO 1987]
+plot:Berlin AND plot:wall AND type:television
+plot:men~1 AND plot:women~1 AND plot:love AND plot:fool AND type:movie
+title:westworld AND type:episode AND year:2016 AND plot:Dolores
+plot:You AND plot:never AND plot:get AND plot:A AND plot:second AND plot:chance
+plot:Hero AND plot:Villain AND plot:destroy AND type:movie
+(plot:lover -plot:perfect) AND plot:unfaithful* AND plot:husband AND plot:affair AND type:movie
+(plot:Innocent OR plot:Guilty) AND plot:crime AND plot:murder AND plot:court AND plot:judge AND type:movie
+plot:Hero AND plot:Marvel -plot:DC AND type:movie
+plot:Hero AND plot:DC -plot:Marvel AND type:movie
