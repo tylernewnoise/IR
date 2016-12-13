@@ -447,6 +447,7 @@ public class BooleanQuery {
 		}
 
 		// now tokenize the phraseString
+		StringBuilder stringBuilder = new StringBuilder();
 		StringTokenizer st = new StringTokenizer(queryString, " .,:!?", false);
 		// make a list of movies in which at least one of the tokens appear
 		ArrayList<Integer> foundMoviesWithTokensFromPhrases = new ArrayList<>(6000);
@@ -455,13 +456,17 @@ public class BooleanQuery {
 		int howManyTokens = 0;
 
 		while (st.hasMoreTokens()) {
+			String tmp = st.nextToken();
 			// we add every movie to the list in which we find at least one token, we  use our
 			// tokenSearchForPhraseQuery Method for it
-			for (int i : tokenSearchForPhraseQuery(st.nextToken(), fieldTypePhraseQuery)) {
+			for (int i : tokenSearchForPhraseQuery(tmp, fieldTypePhraseQuery)) {
 				foundMoviesWithTokensFromPhrases.add(i);
 			}
+			stringBuilder.append(tmp);
+			stringBuilder.append(" ");
 			howManyTokens++;
 		}
+		String phraseQuery = stringBuilder.toString();
 
 		// now count the occurrence of the movies we got from our token search
 		HashMap<Integer, Integer> countMatchingMovies = new HashMap<>();
@@ -477,17 +482,17 @@ public class BooleanQuery {
 				if (fieldTypePhraseQuery == 'i') {
 					// search in title
 					// the boyer-moore function returns -1 if the pattern is not found
-					if (boyerMoore(allTitlePhrases.get(entry.getKey()).toCharArray(), queryString.toCharArray()) > -1) {
+					if (boyerMoore(allTitlePhrases.get(entry.getKey()).toCharArray(), phraseQuery.toCharArray()) > -1) {
 						matchingMovies.add(entry.getKey());
 					}
 				} else if (fieldTypePhraseQuery == 'p') {
 					// search in plot
-					if (boyerMoore(allPlotPhrases.get(entry.getKey()).toCharArray(), queryString.toCharArray()) > -1) {
+					if (boyerMoore(allPlotPhrases.get(entry.getKey()).toCharArray(), phraseQuery.toCharArray()) > -1) {
 						matchingMovies.add(entry.getKey());
 					}
 				} else {
 					// search in episode title
-					if (boyerMoore(allEpisodeTitlePhrases.get(entry.getKey()).toCharArray(), queryString.toCharArray()) > -1) {
+					if (boyerMoore(allEpisodeTitlePhrases.get(entry.getKey()).toCharArray(), phraseQuery.toCharArray()) > -1) {
 						matchingMovies.add(entry.getKey());
 					}
 				}
