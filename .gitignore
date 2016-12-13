@@ -11,7 +11,7 @@
 *.class
 
 # Package Files #
-*.jar
+# *.jar
 *.war
 *.ear
 
@@ -24,3 +24,6 @@ hs_err_pid*
 /2_Boolean_IR/data/plot.list
 /2_Boolean_IR/data/plot_small.list
 /3_Boolean_IR_Lucene/data/plot.list
+/1_IMDB_Spider/jars/
+/2_Boolean_IR/jars/
+/3_Boolean_IR_Lucene/jar/
