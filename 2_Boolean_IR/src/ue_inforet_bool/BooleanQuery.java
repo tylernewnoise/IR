@@ -380,6 +380,7 @@ public class BooleanQuery {
 		}
 
 		// now tokenize the phraseString
+		TextBuilder textBuilder = new TextBuilder();
 		StringTokenizer st = new StringTokenizer(queryString, " .,:!?", false);
 
 		// make a list of movies in which at least one of the tokens appear
@@ -389,14 +390,19 @@ public class BooleanQuery {
 		int howManyTokens = 0;
 
 		while (st.hasMoreTokens()) {
+			String tmp = st.nextToken();
 			// we add every movie to the list in which we find at least one token, we use our
 			// tokenSearchForPhraseQuery Method for it
-			for (TIntIterator it = tokenSearchForPhraseQuery(st.nextToken(), fieldTypePhraseQuery).iterator();
+			for (TIntIterator it = tokenSearchForPhraseQuery(tmp, fieldTypePhraseQuery).iterator();
 			     it.hasNext(); ) {
 				foundMoviesWithTokensFromPhrases.add(it.next());
 			}
+			textBuilder.append(tmp);
+			textBuilder.append(" ");
 			howManyTokens++;
 		}
+
+		String phraseQuery = textBuilder.toString();
 
 		// now count the occurrence of the movies we got from our token search
 		TIntIntHashMap countMatchingMovies = new TIntIntHashMap(8000);
@@ -420,22 +426,22 @@ public class BooleanQuery {
 					// do string search only if the query (pattern) is at least less equal than
 					// the text to search in. do this only for title and episodetitle, because the
 					// plot is in most cases quite long
-					if (queryString.length() <= titlePhrases.get(iterator2.key()).length()) {
+					if (phraseQuery.length() <= titlePhrases.get(iterator2.key()).length()) {
 						if (bmhRaita.searchString(titlePhrases.get(iterator2.key()),
-							queryString) != -1) {
+							phraseQuery) != -1) {
 							matchingMovies.add(iterator2.key());
 						}
 					}
 				} else if (fieldTypePhraseQuery == 'p') {
 					// search in plot
-					if (bmhRaita.searchString(plotPhrases.get(iterator2.key()), queryString) != -1) {
+					if (bmhRaita.searchString(plotPhrases.get(iterator2.key()), phraseQuery) != -1) {
 						matchingMovies.add(iterator2.key());
 					}
 				} else {
 					// search in episode title
-					if (queryString.length() <= episodetitlePhrases.get(iterator2.key()).length()) {
+					if (phraseQuery.length() <= episodetitlePhrases.get(iterator2.key()).length()) {
 						if (bmhRaita.searchString(episodetitlePhrases.get(iterator2.key()),
-							queryString) != -1) {
+							phraseQuery) != -1) {
 							matchingMovies.add(iterator2.key());
 						}
 					}
