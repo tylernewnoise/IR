@@ -36,7 +36,18 @@ public class BooleanQueryLucene {
 	 *          use.
 	 */
 	public void buildIndices(String plotFile) {
-		// TODO: insert code here
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
+			StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null){
+				// TODO add Lucene Stuff here
+
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 
 	/**
