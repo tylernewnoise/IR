@@ -5,12 +5,11 @@ import com.eaio.stringsearch.BoyerMooreHorspoolRaita;
 // from https://github.com/johannburkard/StringSearch
 
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.map.hash.TIntIntHashMap;
 // from http://java-performance.info/primitive-types-collections-trove-library
 // and thanks Benny
 
@@ -37,8 +36,8 @@ public class BooleanQuery {
 
 	private ArrayList<String> allMoviesList = new ArrayList<>(530000);
 
-	private ArrayList<String> plotPhrases = new ArrayList<>(530000);
-	private ArrayList<String> titlePhrases = new ArrayList<>(530000);
+	private TIntObjectHashMap<String> plotPhrases = new TIntObjectHashMap<>(530000);
+	private TIntObjectHashMap<String> titlePhrases = new TIntObjectHashMap<>(530000);
 	private TIntObjectHashMap<String> episodetitlePhrases = new TIntObjectHashMap<>(220000);
 
 	private THashMap<String, TIntHashSet> hashType = new THashMap<>(6);
@@ -93,7 +92,7 @@ public class BooleanQuery {
 					// if isPlotLine is true we know that a new movie-document starts so we have
 					// to add the plot String to the hash map
 					if (isPlotLine) {
-						plotPhrases.add(movieID, textBuilder.toString());
+						plotPhrases.put(movieID, textBuilder.toString());
 						isPlotLine = false;
 						textBuilder = new TextBuilder(6000);
 					}
@@ -126,7 +125,7 @@ public class BooleanQuery {
 				}
 			}
 			// add the last plot phrase
-			plotPhrases.add(movieID, textBuilder.toString());
+			plotPhrases.put(movieID, textBuilder.toString());
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -258,7 +257,7 @@ public class BooleanQuery {
 			textBuilder.append(" ");
 		}
 
-		titlePhrases.add(movieID, textBuilder.toString());
+		titlePhrases.put(movieID, textBuilder.toString());
 	}
 
 	/**
@@ -307,55 +306,75 @@ public class BooleanQuery {
 
 		/* QUERY IS AN AND SEARCH */
 		if (queryString.contains(" AND ")) {
-			TIntArrayList matchingMovies = new TIntArrayList(256000);
+			TIntHashSet intersection = new TIntHashSet(20000);
+			THashSet<String> alreadyQueriedTokens = new THashSet<>(512);
 
-			// split into single queries
 			String singleQuery[] = queryString.split(" AND ");
-			int howManyQueries = 0;
 
-			// execute every query and safe the result in matchingMovies List
-			// tmp is a single query and singleQuery[] a string array which contains
-			// all queries
-			for (String tmp : singleQuery) {
-				if (tmp.contains("\"")) {
-					matchingMovies.addAll(phraseQuerySearch(tmp.toLowerCase()));
-				} else {
-					matchingMovies.addAll(singleTokenSearch(tmp.toLowerCase()));
+			// do a first search so we have a first list for the intersection
+			if (singleQuery[0].contains("\"")) {
+				alreadyQueriedTokens.add(singleQuery[0]);
+				intersection.addAll(phraseQuerySearch(singleQuery[0].toLowerCase()));
+
+			} else {
+				alreadyQueriedTokens.add(singleQuery[0]);
+				intersection.addAll(singleTokenSearch(singleQuery[0].toLowerCase()));
+			}
+
+			for (int i = 1; i < singleQuery.length; ++i) {
+				// we can stop if there's only one entry in the intersection
+				if (intersection.size() == 1) {
+					break;
 				}
-				howManyQueries++;
-			}
-
-			// count the movies which fit the queries from above
-			// if a movie matches all queries (f.e. 3 times) it is counted 3 times and if a
-			// movie matches only 2 queries, it is counted only 2 times.
-			TIntIntHashMap countMatchingMovies = new TIntIntHashMap(256000);
-			TIntIterator iterator1 = matchingMovies.iterator();
-
-			for (int i = 0; i < matchingMovies.size(); ++i) {
-				countMatchingMovies.adjustOrPutValue(iterator1.next(), 1, 1);
-			}
-
-			// run through the hash map and add only the movies which match the count of howManyQueries
-			TIntIntIterator iterator2 = countMatchingMovies.iterator();
-			for (int i = 0; i < countMatchingMovies.size(); ++i) {
-				iterator2.advance();
-				if (howManyQueries == iterator2.value()) {
-					results.add(allMoviesList.get(iterator2.key()));
+				// only search if it wasn't done before
+				if (!alreadyQueriedTokens.contains(singleQuery[i])) {
+					TIntHashSet matchingMovies = new TIntHashSet(20000);
+					if (singleQuery[i].contains("\"")) { // phrasequery
+						matchingMovies.addAll(phraseQuerySearch(singleQuery[i].toLowerCase()));
+						// if the retainAll method is not true it can mean two things:
+						// we found an identical list or we found nothing. if the latter is the
+						// case we have to be sure so we make an intersection "the other way
+						// 'round". in this case retainAll() would remove everything from the
+						// matchingMovies set and we can stop searching further
+						if (!intersection.retainAll(matchingMovies)) {
+							matchingMovies.retainAll(intersection);
+							if (matchingMovies.size() == 0) {
+								return results;
+							}
+						}
+					} else { // tokenquery
+						matchingMovies.addAll(singleTokenSearch(singleQuery[i].toLowerCase()));
+						if (!intersection.retainAll(matchingMovies)) {
+							matchingMovies.retainAll(intersection);
+							if (matchingMovies.size() == 0) {
+								return results;
+							}
+						}
+					}
+					alreadyQueriedTokens.add(singleQuery[i]);
 				}
 			}
 
+			// add everything to the results
+			TIntIterator it = intersection.iterator();
+			for (int i = 0; i < intersection.size(); ++i) {
+				results.add(allMoviesList.get(it.next()));
+			}
+
+			return results;
 		} else if (queryString.contains("\"")) {
 		/* QUERY IS ONLY A PHRASE SEARCH */
 			for (TIntIterator it = phraseQuerySearch(queryString.toLowerCase()).iterator(); it.hasNext(); ) {
 				results.add(allMoviesList.get(it.next()));
 			}
+			return results;
 		} else {
 		/* QUERY IS ONLY TOKEN SEARCH */
 			for (TIntIterator it = singleTokenSearch(queryString.toLowerCase()).iterator(); it.hasNext(); ) {
 				results.add(allMoviesList.get(it.next()));
 			}
+			return results;
 		}
-		return results;
 	}
 
 	/* perform phrase query search */
@@ -383,67 +402,60 @@ public class BooleanQuery {
 		TextBuilder textBuilder = new TextBuilder();
 		StringTokenizer st = new StringTokenizer(queryString, " .,:!?", false);
 
-		// make a list of movies in which at least one of the tokens appear
-		TIntArrayList foundMoviesWithTokensFromPhrases = new TIntArrayList(8000);
+		String tmp = st.nextToken();
+		textBuilder.append(tmp);
+		textBuilder.append(" ");
 
-		// count how many tokens (aka terms) are in the phrase
-		int howManyTokens = 0;
+		TIntHashSet intersection = new TIntHashSet();
+		THashSet<String> alreadyQueriedTokens = new THashSet<>();
+
+		// do a first search to fill the list for the intersection
+		intersection.addAll(tokenSearchForPhraseQuery(tmp, fieldTypePhraseQuery));
+		alreadyQueriedTokens.add(tmp);
 
 		while (st.hasMoreTokens()) {
-			String tmp = st.nextToken();
-			// we add every movie to the list in which we find at least one token, we use our
-			// tokenSearchForPhraseQuery Method for it
-			for (TIntIterator it = tokenSearchForPhraseQuery(tmp, fieldTypePhraseQuery).iterator();
-			     it.hasNext(); ) {
-				foundMoviesWithTokensFromPhrases.add(it.next());
+			tmp = st.nextToken();
+			// only search and check for intersection if the token wasn't searched before or
+			// if the intersection-list is != 1
+			if (!alreadyQueriedTokens.contains(tmp) || intersection.size() != 1) {
+				TIntHashSet foundMoviesWithTokensFromPhrases = new TIntHashSet();
+				foundMoviesWithTokensFromPhrases.addAll(tokenSearchForPhraseQuery(tmp,
+					fieldTypePhraseQuery));
+				intersection.retainAll(foundMoviesWithTokensFromPhrases);
+				alreadyQueriedTokens.add(tmp);
 			}
 			textBuilder.append(tmp);
 			textBuilder.append(" ");
-			howManyTokens++;
 		}
 
 		String phraseQuery = textBuilder.toString();
 
-		// now count the occurrence of the movies we got from our token search
-		TIntIntHashMap countMatchingMovies = new TIntIntHashMap(8000);
-		TIntIterator iterator1 = foundMoviesWithTokensFromPhrases.iterator();
-
-		for (int i = 0; i < foundMoviesWithTokensFromPhrases.size(); ++i) {
-			countMatchingMovies.adjustOrPutValue(iterator1.next(), 1, 1);
-		}
-
 		StringSearch bmhRaita = new BoyerMooreHorspoolRaita();
 
-		// run through the hash map and do a string search only for movies which have
-		// the same count as howManyTokens
-		TIntIntIterator iterator2 = countMatchingMovies.iterator();
-		for (int i = 0; i < countMatchingMovies.size(); ++i) {
-			iterator2.advance();
-			if (howManyTokens == iterator2.value()) {
-				// the SearchString class returns -1 if the pattern is not found
-				if (fieldTypePhraseQuery == 'i') {
-					// search in title
-					// do string search only if the query (pattern) is at least less equal than
-					// the text to search in. do this only for title and episodetitle, because the
-					// plot is in most cases quite long
-					if (phraseQuery.length() <= titlePhrases.get(iterator2.key()).length()) {
-						if (bmhRaita.searchString(titlePhrases.get(iterator2.key()),
-							phraseQuery) != -1) {
-							matchingMovies.add(iterator2.key());
-						}
+		TIntIterator iterator = intersection.iterator();
+		for (int i = 0; i < intersection.size(); ++i) {
+			int it = iterator.next();
+			// the SearchString class returns -1 if the pattern is not found
+			if (fieldTypePhraseQuery == 'i') {
+				// search in title
+				// do string search only if the query (pattern) is at least less equal than
+				// the text to search in. do this only for title and episodetitle, because the
+				// plot is in most cases quite long
+				if (phraseQuery.length() <= titlePhrases.get(it).length()) {
+					if (bmhRaita.searchString(titlePhrases.get(it), phraseQuery) != -1) {
+						matchingMovies.add(it);
 					}
-				} else if (fieldTypePhraseQuery == 'p') {
-					// search in plot
-					if (bmhRaita.searchString(plotPhrases.get(iterator2.key()), phraseQuery) != -1) {
-						matchingMovies.add(iterator2.key());
-					}
-				} else {
-					// search in episode title
-					if (phraseQuery.length() <= episodetitlePhrases.get(iterator2.key()).length()) {
-						if (bmhRaita.searchString(episodetitlePhrases.get(iterator2.key()),
-							phraseQuery) != -1) {
-							matchingMovies.add(iterator2.key());
-						}
+				}
+			} else if (fieldTypePhraseQuery == 'p') {
+				// search in plot
+				if (bmhRaita.searchString(plotPhrases.get(it), phraseQuery) != -1) {
+					matchingMovies.add(it);
+				}
+			} else {
+				// search in episode title
+				if (phraseQuery.length() <= episodetitlePhrases.get(it).length()) {
+					if (bmhRaita.searchString(episodetitlePhrases.get(it), phraseQuery) != -1) {
+						matchingMovies.add(it);
 					}
 				}
 			}
