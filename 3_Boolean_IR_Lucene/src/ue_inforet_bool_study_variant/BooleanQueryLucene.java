@@ -1,8 +1,7 @@
-// DO NOT CHANGE THIS PACKAGE NAME.
+/* ***** BooleanQueryLuce - Variant ***** */
 package ue_inforet_bool_study_variant;
 
-// for indexing
-
+// indexing
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
@@ -33,11 +32,16 @@ import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
 import java.util.ArrayList;
-import java.util.Comparator;
+
+// threading
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 import javolution.text.TextBuilder;
 
 public class BooleanQueryLucene {
+	private ExecutorService executorService;
 
 	/**
 	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
@@ -63,28 +67,28 @@ public class BooleanQueryLucene {
 		Directory index = new RAMDirectory();
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
-		Document doc = new Document();
-
 		TextBuilder textBuilder = new TextBuilder();
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
-			StandardCharsets.ISO_8859_1))) {
-			IndexWriter indexWriter = new IndexWriter(index, config);
-			String line;
+		System.out.println("Found " + Runtime.getRuntime().availableProcessors() + " Cores.");
+		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-			while ((line = reader.readLine()) != null) {
+		try (BufferedReader lineReader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
+			StandardCharsets.ISO_8859_1))) {
+			String line;
+			final IndexWriter indexWriter = new IndexWriter(index, config);
+			ArrayList<String> documentForThreadList = new ArrayList<>(3);
+
+			while ((line = lineReader.readLine()) != null) {
 				if (line.startsWith("M")) {
 					if (isPlotLine) {
-						doc.add(new TextField("plot", textBuilder.toString(),
-							Field.Store.YES));
-						indexWriter.addDocument(doc);
+						documentForThreadList.add(textBuilder.toString());
+						startThreads(documentForThreadList, indexWriter);
 						isPlotLine = false;
-						doc = new Document();
 						textBuilder = new TextBuilder();
+						documentForThreadList = new ArrayList<>(3);
 					}
-
-					doc.add(new TextField("mvline", line, Field.Store.YES));
-					getTitleTypeYear(doc, line.substring(4, line.length()));
+					documentForThreadList.add(line);
+					documentForThreadList.add(line.substring(4, line.length()));
 				}
 				if (line.startsWith("PL:")) {
 					textBuilder.append(line.substring(4, line.length()));
@@ -92,10 +96,14 @@ public class BooleanQueryLucene {
 					isPlotLine = true;
 				}
 			}
-			doc.add(new TextField("plot", textBuilder.toString(), Field.Store.YES));
-			indexWriter.addDocument(doc);
+
+			documentForThreadList.add(textBuilder.toString());
+			documentToIndex(documentForThreadList, indexWriter);
+			lineReader.close();
+			executorService.shutdown();
+			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			indexWriter.close();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -122,6 +130,22 @@ public class BooleanQueryLucene {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
+	}
+
+	private void startThreads(ArrayList<String> documentList, IndexWriter indexWriter) {
+		executorService.execute(()-> documentToIndex(documentList, indexWriter));
+	}
+
+	private void documentToIndex(ArrayList<String> documentList, IndexWriter indexWriter) {
+		try {
+			Document doc = new Document();
+			doc.add(new TextField("mvline", documentList.get(0), Field.Store.YES));
+			doc.add(new TextField("plot", documentList.get(2), Field.Store.YES));
+			getTitleTypeYear(doc, documentList.get(1));
+			indexWriter.addDocument(doc);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void getTitleTypeYear(Document doc, String mvLine) {
@@ -183,7 +207,7 @@ public class BooleanQueryLucene {
 			end++;
 		}
 
-		doc.add((new StringField("year", new StringBuilder(textBuilder.toString()).reverse().toString(),
+		doc.add((new StringField("year", new TextBuilder(textBuilder.toString()).reverse().toString(),
 			Field.Store.YES)));
 
 		if (isSeries) {
@@ -322,5 +346,4 @@ public class BooleanQueryLucene {
 
 		bq.close();
 	}
-
 }
