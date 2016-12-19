@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
-import javolution.text.TextBuilder;
-
 
 public class BooleanQueryLucene {
 	private ExecutorService executorService;
@@ -60,7 +58,7 @@ public class BooleanQueryLucene {
 		StandardAnalyzer analyzer = new StandardAnalyzer();
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
-		TextBuilder textBuilder = new TextBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 
 		System.out.println("Found " + Runtime.getRuntime().availableProcessors() + " Cores.");
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -74,23 +72,23 @@ public class BooleanQueryLucene {
 			while ((line = lineReader.readLine()) != null) {
 				if (line.startsWith("M")) {
 					if (isPlotLine) {
-						documentForThreadList.add(textBuilder.toString());
+						documentForThreadList.add(stringBuilder.toString());
 						startThreads(documentForThreadList, indexWriter);
 						isPlotLine = false;
-						textBuilder = new TextBuilder();
+						stringBuilder= new StringBuilder();
 						documentForThreadList = new ArrayList<>(3);
 					}
 					documentForThreadList.add(line);
 					documentForThreadList.add(line.substring(4, line.length()));
 				}
 				if (line.startsWith("PL:")) {
-					textBuilder.append(line.substring(4, line.length()));
-					textBuilder.append(" ");
+					stringBuilder.append(line.substring(4, line.length()));
+					stringBuilder.append(" ");
 					isPlotLine = true;
 				}
 			}
 
-			documentForThreadList.add(textBuilder.toString());
+			documentForThreadList.add(stringBuilder.toString());
 			documentToIndex(documentForThreadList, indexWriter);
 			lineReader.close();
 			executorService.shutdown();
@@ -134,14 +132,14 @@ public class BooleanQueryLucene {
 		else if (mvLine.contains("\"") && mvLine.endsWith("}")) {
 			doc.add((new TextField("type", "episode", Field.Store.YES)));
 
-			TextBuilder textBuilder = new TextBuilder();
+			StringBuilder stringBuilder = new StringBuilder();
 
 			for (int i = mvLine.length() - 2; mvLine.charAt(i) != '{'; --i) {
-				textBuilder.append(mvLine.charAt(i));
+				stringBuilder.append(mvLine.charAt(i));
 			}
 
 			doc.add((new TextField("episodetitle",
-				new TextBuilder(textBuilder.toString()).reverse().toString(), Field.Store.YES)));
+				new StringBuilder(stringBuilder.toString()).reverse().toString(), Field.Store.YES)));
 
 			parseTitleAndYear(doc, mvLine.substring(0, mvLine.indexOf('{') - 1), true);
 		}
@@ -168,16 +166,16 @@ public class BooleanQueryLucene {
 
 	private void parseTitleAndYear(Document doc, String mvLine, boolean isSeries) {
 		int end = 3;
-		TextBuilder textBuilder = new TextBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 
 		for (int i = mvLine.length() - 2; mvLine.charAt(i) != '('; --i) {
 			if (mvLine.charAt(i) >= '0' && mvLine.charAt(i) <= '9') {
-				textBuilder.append(mvLine.charAt(i));
+				stringBuilder.append(mvLine.charAt(i));
 			}
 			end++;
 		}
 
-		doc.add((new StringField("year", new TextBuilder(textBuilder.toString()).reverse().toString(),
+		doc.add((new StringField("year", new StringBuilder(stringBuilder.toString()).reverse().toString(),
 			Field.Store.YES)));
 
 		if (isSeries) {
