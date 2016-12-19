@@ -12,13 +12,23 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
+// searching
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.IndexSearcher;
+
+// file input
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-
 import java.nio.charset.StandardCharsets;
 
+// results output
 import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
@@ -30,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+// http://javolution.org/
 import javolution.text.TextBuilder;
-
 
 public class BooleanQueryLucene {
 	private ExecutorService executorService;
@@ -225,8 +235,25 @@ public class BooleanQueryLucene {
 	 * lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
-		// TODO insert code here
-		return new HashSet<>();
+		HashSet<String> results = new HashSet<>();
+
+		StandardAnalyzer analyzer = new StandardAnalyzer();
+		try {
+			IndexReader reader = DirectoryReader.open(index);
+			IndexSearcher searcher = new IndexSearcher(reader);
+			Query q = new QueryParser("", analyzer).parse(queryString);
+			TopDocs docs = searcher.search(q, Integer.MAX_VALUE);
+			ScoreDoc[] hits = docs.scoreDocs;
+			for (ScoreDoc hit : hits) {
+				int docID = hit.doc;
+				Document d = searcher.doc(docID);
+				results.add(d.get("mvline"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return results;
 	}
 
 	/**
