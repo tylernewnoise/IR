@@ -12,15 +12,6 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
-// for simple query testing
-/*import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;*/
-
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -32,6 +23,7 @@ import java.util.Set;
 import java.util.List;
 import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 // threading
 import java.util.concurrent.TimeUnit;
@@ -40,8 +32,10 @@ import java.util.concurrent.ExecutorService;
 
 import javolution.text.TextBuilder;
 
+
 public class BooleanQueryLucene {
 	private ExecutorService executorService;
+	private Directory index = new RAMDirectory();
 
 	/**
 	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
@@ -64,7 +58,6 @@ public class BooleanQueryLucene {
 	public void buildIndices(String plotFile) {
 		boolean isPlotLine = false;
 		StandardAnalyzer analyzer = new StandardAnalyzer();
-		Directory index = new RAMDirectory();
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		TextBuilder textBuilder = new TextBuilder();
@@ -107,33 +100,10 @@ public class BooleanQueryLucene {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		// for testing
-/*		try {
-			//Query q = new QueryParser("year", analyzer).parse("year:1995");
-			//Query q = new QueryParser("title", analyzer).parse("title:Genisys");
-			//Query q = new QueryParser("type", analyzer).parse("type:television");
-			//Query q = new QueryParser("year", analyzer).parse("year:2015");
-			Query q = new QueryParser("type", analyzer).parse("type:videogame");
-
-			IndexReader reader = DirectoryReader.open(index);
-			IndexSearcher searcher = new IndexSearcher(reader);
-			TopDocs docs = searcher.search(q, Integer.MAX_VALUE);
-			ScoreDoc[] hits = docs.scoreDocs;
-
-			// display results
-			System.out.println("Found " + hits.length + " hits.");
-			for (int i = 0; i < hits.length; ++i) {
-				int docId = hits[i].doc;
-				Document document = searcher.doc(docId);
-				System.out.println((i + 1) + ". " + document.get("mvline"));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
 	}
 
 	private void startThreads(ArrayList<String> documentList, IndexWriter indexWriter) {
-		executorService.execute(()-> documentToIndex(documentList, indexWriter));
+		executorService.execute(() -> documentToIndex(documentList, indexWriter));
 	}
 
 	private void documentToIndex(ArrayList<String> documentList, IndexWriter indexWriter) {
@@ -255,7 +225,7 @@ public class BooleanQueryLucene {
 	 * lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
-		// TODO: insert code here
+		// TODO insert code here
 		return new HashSet<>();
 	}
 
@@ -319,7 +289,7 @@ public class BooleanQueryLucene {
 			System.exit(-1);
 		}
 
-		/*// run queries
+		// run queries
 		for (int i = 0; i < queries.size(); i++) {
 			String query = queries.get(i);
 			Set<String> expectedResult = i < results.size() ? results.get(i)
@@ -342,7 +312,7 @@ public class BooleanQueryLucene {
 			System.out.println("actual result:   " + actualResultSorted.toString());
 			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
 				: "FAILURE");
-		}*/
+		}
 
 		bq.close();
 	}
