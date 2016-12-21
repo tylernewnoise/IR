@@ -39,7 +39,8 @@ import org.apache.lucene.search.TopDocs;
 
 
 public class BooleanQueryLucene {
-
+	// global accessible index :)
+	Directory index = new RAMDirectory();
 	/**
 	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
 	 */
@@ -71,7 +72,7 @@ public class BooleanQueryLucene {
 			Analyzer myAnalyzer = new StandardAnalyzer();
 			// Specify	a	directory	and	an	index	writer
 			//VORLAGE Directory index = FSDirectory.open(new File(plotFile).toPath()); aber RAM reicht ja ;)
-			Directory index = new RAMDirectory();
+			//make it global: Directory index = new RAMDirectory();
 			IndexWriterConfig config = new IndexWriterConfig(myAnalyzer);
 
 			IndexWriter writer = new IndexWriter(index, config);
@@ -85,7 +86,7 @@ public class BooleanQueryLucene {
 
 			while ((line = reader.readLine()) != null){
 				if (line.startsWith("MV:") && (lastLineWasPlot)) {
-					doc.add(new TextField("plotline", currentMovieString.toString(), Field.Store.YES));
+					doc.add(new TextField("plot", currentMovieString.toString(), Field.Store.YES));
 					writer.addDocument(doc);
 					currentMovieString = new StringBuilder();
 					doc = new Document();
@@ -102,7 +103,7 @@ public class BooleanQueryLucene {
 				}
 			}
 			// after last line was read from file - last operation has to be triggered
-			doc.add(new TextField("plotline", currentMovieString.toString(), Field.Store.YES));
+			doc.add(new TextField("plot", currentMovieString.toString(), Field.Store.YES));
 			writer.addDocument(doc);
 			writer.close();
 
@@ -114,7 +115,7 @@ public class BooleanQueryLucene {
 				//Query q = new QueryParser("type", analyzer).parse("type:television");
 				//Query q = new QueryParser("year", myAnalyzer).parse("year:2015");
 				//Query q = new QueryParser("type", myAnalyzer).parse("type:videogame");
-				Query q = new QueryParser("plotline", myAnalyzer).parse("Marshall");
+				Query q = new QueryParser("plot", myAnalyzer).parse("Marshall");
 				IndexReader reader2 = DirectoryReader.open(index);
 				IndexSearcher searcher = new IndexSearcher(reader2);
 				TopDocs docs = searcher.search(q, Integer.MAX_VALUE);
