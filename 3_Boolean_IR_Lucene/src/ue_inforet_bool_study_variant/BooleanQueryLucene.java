@@ -3,21 +3,22 @@ package ue_inforet_bool_study_variant;
 
 // indexing
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.LogMergePolicy;
+import org.apache.lucene.index.LogDocMergePolicy;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
 // searching
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.IndexSearcher;
 
@@ -66,7 +67,10 @@ public class BooleanQueryLucene {
 	public void buildIndices(String plotFile) {
 		boolean isPlotLine = false;
 
-		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		LogMergePolicy log = new LogDocMergePolicy();
+		log.setMergeFactor(2000);
+		IndexWriterConfig config = new IndexWriterConfig(analyzer).setMergePolicy(log);
+
 		StringBuilder stringBuilder = new StringBuilder();
 
 		System.out.println("Found " + Runtime.getRuntime().availableProcessors() + " Cores.");
@@ -116,8 +120,8 @@ public class BooleanQueryLucene {
 	private void documentToIndex(ArrayList<String> documentList, IndexWriter indexWriter) {
 		try {
 			Document doc = new Document();
-			doc.add(new TextField("mvline", documentList.get(0), Field.Store.YES));
-			doc.add(new TextField("plot", documentList.get(2), Field.Store.NO));
+			doc.add(new StringField("mvline", documentList.get(0), StringField.Store.YES));
+			doc.add(new TextField("plot", documentList.get(2), TextField.Store.NO));
 			getTitleTypeYear(doc, documentList.get(1));
 			indexWriter.addDocument(doc);
 		} catch (Exception e) {
@@ -134,12 +138,12 @@ public class BooleanQueryLucene {
 
 		// +++ series +++
 		if (mvLine.startsWith("\"") && !mvLine.endsWith("}")) {
-			doc.add(new TextField("type", "series", Field.Store.NO));
+			doc.add(new StringField("type", "series", StringField.Store.NO));
 			parseTitleAndYear(doc, mvLine, true);
 		}
 		// +++ episode +++
 		else if (mvLine.contains("\"") && mvLine.endsWith("}")) {
-			doc.add(new TextField("type", "episode", Field.Store.NO));
+			doc.add(new StringField("type", "episode", StringField.Store.NO));
 
 			StringBuilder stringBuilder = new StringBuilder();
 
@@ -148,27 +152,27 @@ public class BooleanQueryLucene {
 			}
 
 			doc.add(new TextField("episodetitle",
-				new StringBuilder(stringBuilder.toString()).reverse().toString(), Field.Store.NO));
+				new StringBuilder(stringBuilder.toString()).reverse().toString(), TextField.Store.NO));
 
 			parseTitleAndYear(doc, mvLine.substring(0, mvLine.indexOf('{') - 1), true);
 		}
 		// +++ television +++
 		else if (mvLine.contains(") (TV)")) {
-			doc.add(new TextField("type", "television", Field.Store.NO));
+			doc.add(new StringField("type", "television", StringField.Store.NO));
 			parseTitleAndYear(doc, mvLine.substring(0, mvLine.length() - 5), false);
 		}
 		// +++ video +++
 		else if (mvLine.contains(") (V)")) {
-			doc.add(new TextField("type", "video", Field.Store.NO));
+			doc.add(new StringField("type", "video", StringField.Store.NO));
 			parseTitleAndYear(doc, mvLine.substring(0, mvLine.length() - 4), false);
 		}
 		// +++ video game +++
 		else if (mvLine.contains(") (VG)")) {
-			doc.add(new TextField("type", "videogame", Field.Store.NO));
+			doc.add(new StringField("type", "videogame", StringField.Store.NO));
 			parseTitleAndYear(doc, mvLine.substring(0, mvLine.length() - 5), false);
 		} else {
 			// +++ movie +++
-			doc.add(new TextField("type", "movie", Field.Store.NO));
+			doc.add(new StringField("type", "movie", StringField.Store.NO));
 			parseTitleAndYear(doc, mvLine, false);
 		}
 	}
@@ -187,15 +191,15 @@ public class BooleanQueryLucene {
 		String year = stringBuilder.reverse().toString();
 
 		if (year.length() == 4) {
-			doc.add(new StringField("year", year, Field.Store.NO));
+			doc.add(new StringField("year", year, StringField.Store.NO));
 		}
 
 		if (isSeries) {
 			doc.add(new TextField("title", mvLine.substring(1, mvLine.length() - end - 1),
-				Field.Store.NO));
+				TextField.Store.NO));
 		} else {
 			doc.add(new TextField("title", mvLine.substring(0, mvLine.length() - end),
-				Field.Store.NO));
+				TextField.Store.NO));
 		}
 	}
 
@@ -236,7 +240,6 @@ public class BooleanQueryLucene {
 	 */
 	public Set<String> booleanQuery(String queryString) {
 		HashSet<String> results = new HashSet<>();
-
 		try {
 			IndexReader reader = DirectoryReader.open(index);
 			IndexSearcher searcher = new IndexSearcher(reader);
