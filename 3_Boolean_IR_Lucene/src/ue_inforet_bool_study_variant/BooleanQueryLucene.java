@@ -42,6 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
 public class BooleanQueryLucene {
+	// global variables for thread executing, lucene's index directory and analyzer
 	private ExecutorService executorService;
 	private Directory index = new RAMDirectory();
 	private StandardAnalyzer analyzer = new StandardAnalyzer();
@@ -67,6 +68,7 @@ public class BooleanQueryLucene {
 	public void buildIndices(String plotFile) {
 		boolean isPlotLine = false;
 
+		// change the merge factor
 		LogMergePolicy log = new LogDocMergePolicy();
 		log.setMergeFactor(2000);
 		IndexWriterConfig config = new IndexWriterConfig(analyzer).setMergePolicy(log);
@@ -82,6 +84,9 @@ public class BooleanQueryLucene {
 			final IndexWriter indexWriter = new IndexWriter(index, config);
 			ArrayList<String> documentForThreadList = new ArrayList<>(3);
 
+			// how this works: run through the file line by line and put every line from a movie
+			// (aka document) in an ArrayList; give this ArrayList to a thread and let the tread
+			// do the indexing
 			while ((line = lineReader.readLine()) != null) {
 				if (line.startsWith("M")) {
 					if (isPlotLine) {
@@ -101,8 +106,10 @@ public class BooleanQueryLucene {
 				}
 			}
 
+			// add the very last line of the file to the ArrayList
 			documentForThreadList.add(stringBuilder.toString());
 			documentToIndex(documentForThreadList, indexWriter);
+			// close everything and wait until all threads are finished
 			lineReader.close();
 			executorService.shutdown();
 			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -113,14 +120,18 @@ public class BooleanQueryLucene {
 		}
 	}
 
+	// start a thread
 	private void startThreads(ArrayList<String> documentList, IndexWriter indexWriter) {
 		executorService.execute(() -> documentToIndex(documentList, indexWriter));
 	}
 
+	// add an document to lucene's index
 	private void documentToIndex(ArrayList<String> documentList, IndexWriter indexWriter) {
 		try {
 			Document doc = new Document();
+			// add the complete "MV:-Line" to the lucene document so we can retrieve it later
 			doc.add(new StringField("mvline", documentList.get(0), StringField.Store.YES));
+			// add the plot, title, type and year fields to the document
 			doc.add(new TextField("plot", documentList.get(2), TextField.Store.NO));
 			getTitleTypeYear(doc, documentList.get(1));
 			indexWriter.addDocument(doc);
@@ -129,6 +140,7 @@ public class BooleanQueryLucene {
 		}
 	}
 
+	// extract the type, title and year, the latter two with the help of parseTitleAndYear()
 	private void getTitleTypeYear(Document doc, String mvLine) {
 
 		// remove {{SUSPENDED}}
@@ -240,15 +252,15 @@ public class BooleanQueryLucene {
 	 */
 	public Set<String> booleanQuery(String queryString) {
 		HashSet<String> results = new HashSet<>();
+
+		// retrieve the results of the queries; this is mainly from lucenetutorial.com
 		try {
 			IndexReader reader = DirectoryReader.open(index);
 			IndexSearcher searcher = new IndexSearcher(reader);
 			Query q = new QueryParser("", analyzer).parse(queryString);
 			TopDocs docs = searcher.search(q, Integer.MAX_VALUE);
-			ScoreDoc[] hits = docs.scoreDocs;
-			for (ScoreDoc hit : hits) {
-				int docID = hit.doc;
-				Document d = searcher.doc(docID);
+			for (ScoreDoc hit : docs.scoreDocs) {
+				Document d = searcher.doc(hit.doc);
 				results.add(d.get("mvline"));
 			}
 		} catch (Exception e) {
@@ -274,8 +286,6 @@ public class BooleanQueryLucene {
 				.println("usage: java -jar BooleanQuery.jar <plot list file> <queries file> <results file>");
 			System.exit(-1);
 		}
-
-		System.out.println("Boolean Query Lucene Falkos Variant");
 
 		// build indices
 		System.out.println("building indices...");
