@@ -1,36 +1,39 @@
 // DO NOT CHANGE THIS PACKAGE NAME.
 package ue_inforet_bool_study;
 
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.File;
-
-import java.nio.charset.StandardCharsets;
-
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Comparator;
-
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.store.RAMDirectory;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 
 
 public class BooleanQueryLucene {
 	// global accessible index :)
 	Directory index = new RAMDirectory();
+	// set Analyzer
+	Analyzer myAnalyzer = new StandardAnalyzer();
 	/**
 	 * DO NOT CHANGE THE CONSTRUCTOR. DO NOT ADD PARAMETERS TO THE CONSTRUCTOR.
 	 */
@@ -58,8 +61,7 @@ public class BooleanQueryLucene {
 			boolean lastLineWasPlot = false; // check if new MV Line starts
 			StringBuilder currentMovieString = new StringBuilder();  // concatenate the plotstring
 
-			// set Analyzer
-			Analyzer myAnalyzer = new StandardAnalyzer();
+
 			// Specify a directory (happend earlier) and an index writer
 			IndexWriterConfig config = new IndexWriterConfig(myAnalyzer);
 			// open a new IndexWriter instance
@@ -208,9 +210,25 @@ public class BooleanQueryLucene {
 	 * @return the exact content (in the textual movie plot file) of the title
 	 *         lines (starting with "MV: ") of the documents matching the query
 	 */
-	public Set<String> booleanQuery(String queryString) {
-		// TODO: insert code here
-		return new HashSet<>();
+	public Set<String> booleanQuery(String queryString) throws ParseException, IOException {
+		HashSet<String> returnList = new HashSet<>();
+		if (queryString.length() > 0){
+			Query query = new QueryParser("title", myAnalyzer).parse(queryString);
+			IndexReader reader = DirectoryReader.open(index);
+			IndexSearcher searcher = new IndexSearcher(reader);
+			TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
+			ScoreDoc[] hits = docs.scoreDocs;
+			for (int i = 0; i < hits.length; i++){
+				int docID = hits[i].doc;
+				Document d = searcher.doc(docID);
+				returnList.add(d.get("movieline"));
+			}
+		} else {
+			System.err
+				  .println("No query given.");
+			System.exit(-1);
+		}
+		return returnList;
 	}
 
 	/**
@@ -222,7 +240,7 @@ public class BooleanQueryLucene {
 		// TODO: you may insert code here
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, ParseException {
 		BooleanQueryLucene bq = new BooleanQueryLucene();
 		if (args.length < 3) {
 			System.err
