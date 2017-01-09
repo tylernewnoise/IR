@@ -2,7 +2,7 @@
 * 01 IMDB Spider
 * 02 Boolean Information Retrieval
 * 03 Boolean Information Retrieval with Lucene
-* 04
+* 04 Synonym Expansion with Lucene and WordNet
 * 05
 
 * GitHub Hilfe Seiten
