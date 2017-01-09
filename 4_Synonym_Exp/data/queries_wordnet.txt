@@ -1,0 +1,8 @@
+plot:Elvis AND plot:is AND plot:not AND plot:dead AND type:movie
+(title:Star AND title:Trek) OR (title:Star AND title:Wars) AND year:2016
+plot:donald AND plot:trump AND plot:president AND type:movie AND year:2016
+plot:supercomputer AND type:movie
+title:flesh AND title:fable
+title:Voyager AND plot:daydream AND plot:doc
+plot:awful AND type:videogame AND title:2
+plot:omnibus AND plot:driver AND plot:poetry
