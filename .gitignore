@@ -29,3 +29,4 @@ hs_err_pid*
 /2_Boolean_IR/jars/
 /3_Boolean_IR_Lucene/jar/
 /4_Synonym_Exp/jar/
+/4_Synonym_Exp/data/dict/
