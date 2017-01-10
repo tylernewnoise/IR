@@ -13,6 +13,11 @@ import org.apache.lucene.index.LogDocMergePolicy;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
+// building synset index
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import org.apache.commons.lang3.StringUtils;
+
 // searching
 /*import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -30,26 +35,24 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 // results output
-import java.util.Set;
-import java.util.List;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 
 // threading
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
+
 public class BooleanQueryWordnet {
 	// global variables for thread executing, lucene's index directory and analyzer
 	private ExecutorService executorService;
 	private Directory index = new RAMDirectory();
 	private StandardAnalyzer analyzer = new StandardAnalyzer();
 
+	private THashMap<String, THashSet> allSynonyms = new THashMap<>(200000);
+
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
 	 * OF THE CONSTRUCTOR.
-	 *
 	 */
 	public BooleanQueryWordnet() {
 	}
@@ -59,31 +62,103 @@ public class BooleanQueryWordnet {
 	 * The data.[noun, verb, adj, adv] files contain the synsets.​
 	 * The [noun, verb, adj, adv].exc	files contain the base forms
 	 * of irregular words.
-	 *
+	 * <p>
 	 * Please refer to ​
-	 *  http://wordnet.princeton.edu/man/wndb.5WN.html
+	 * http://wordnet.princeton.edu/man/wndb.5WN.html
 	 * regarding the syntax of these plain files.​
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 *
 	 * @param wordnetDir the directory of the wordnet files
 	 */
 	public void buildSynsets(String wordnetDir) {
-		// TODO: insert code here
+
+		int cnt = 0;
+		int start = 1;
+		int howManyWords = 0;
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(wordnetDir
+			+ "/data.adv"), StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				++cnt;
+				// skip the first 29 lines
+				if (start < 30) {
+					++start;
+					continue;
+				}
+
+				// how many words are in the synset
+				howManyWords = Integer.parseInt(StringUtils.substring(line, 14, 16), 16);
+				// tokenize the rest of the line, start after all the info-gibberish
+				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.length()), " 0", false);
+
+				String word = st.nextToken();
+				// if the first word is not a single-token synonym we can skip the shit
+				if (word.contains("_")) {
+					continue;
+				}
+				// TODO check if its only one word
+
+
+				// else create a list of all the words
+				ArrayList<String> words = new ArrayList<>();
+				words.add(word);
+				// we have to decrease this already if there's only one word
+				--howManyWords;
+
+				// now check if there're some synonyms and add them to our list of words
+				while (howManyWords > 0) {
+					String token = st.nextToken();
+					if (token.contains("_")) {
+						--howManyWords;
+						continue;
+					}
+					words.add(token);
+					--howManyWords;
+				}
+
+				// now create all possible relations
+				for (int i = 0; i < words.size(); ++i) {
+					for (int j = 0; j < words.size(); ++j) {
+						if (j == i) {
+							continue;
+						}
+						System.out.println(words.get(i) + " " + words.get(j));
+						addSynsToMap(words.get(i), words.get(j));
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		//System.out.println(allSynonyms.size());
+		//System.out.println("Lines: " + cnt);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addSynsToMap(String word, String synonym) {
+		if (allSynonyms.containsKey(word)) {
+			allSynonyms.get(word).add(synonym);
+		} else {
+			THashSet synset = new THashSet();
+			synset.add(synonym);
+			allSynonyms.put(word, synset);
+		}
 	}
 
 	/**
 	 * A method for reading the textual movie plot file and building a Lucene index.
 	 * The purpose of the index is to speed up subsequent boolean searches using
 	 * the {@link #booleanQuery(String) booleanQuery} method.
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 *
-	 * @param plotFile
-	 *          the textual movie plot file 'plot.list', obtainable from <a
-	 *          href="http://www.imdb.com/interfaces"
-	 *          >http://www.imdb.com/interfaces</a> for personal, non-commercial
-	 *          use.
+	 * @param plotFile the textual movie plot file 'plot.list', obtainable from <a
+	 *                 href="http://www.imdb.com/interfaces"
+	 *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
+	 *                 use.
 	 */
 	public void buildIndices(String plotFile) {
 		boolean isPlotLine = false;
@@ -237,6 +312,7 @@ public class BooleanQueryWordnet {
 				TextField.Store.NO));
 		}
 	}
+
 	/**
 	 * A method for performing a boolean search on a textual movie plot file after
 	 * Lucene indices were built using the {@link #buildIndices(String) buildIndices}
@@ -246,17 +322,16 @@ public class BooleanQueryWordnet {
 	 * episode, and type. Note that queries are case-insensitive and stop words are
 	 * removed.<br>
 	 * <br>
-	 *
+	 * <p>
 	 * More details on the query syntax can be found at <a
 	 * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
 	 * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 *
-	 * @param queryString
-	 *          the query string, formatted according to the Lucene query syntax.
+	 * @param queryString the query string, formatted according to the Lucene query syntax.
 	 * @return the exact content (in the textual movie plot file) of the title
-	 *         lines (starting with "MV: ") of the documents matching the query
+	 * lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
 		// TODO: insert code here
@@ -265,7 +340,7 @@ public class BooleanQueryWordnet {
 
 	/**
 	 * A method for closing any open file handels or a ThreadPool.
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 */
 	public void close() {
@@ -292,7 +367,7 @@ public class BooleanQueryWordnet {
 		BooleanQueryWordnet bq = new BooleanQueryWordnet();
 		bq.buildSynsets(wordNetDir);
 
-		bq.buildIndices(plotFile);
+		//bq.buildIndices(plotFile);
 		System.gc();
 		try {
 			Thread.sleep(10);
@@ -307,7 +382,7 @@ public class BooleanQueryWordnet {
 				+ " MB (rough estimate)");
 
 		// parsing the queries that are to be run from the queries file
-		List<String> queries = new ArrayList<>();
+/*		List<String> queries = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
 			new FileInputStream(args[2]), StandardCharsets.ISO_8859_1))) {
 			String line;
@@ -358,7 +433,7 @@ public class BooleanQueryWordnet {
 			System.out.println("actual result (" + actualResultSorted.size() + "):   " + actualResultSorted.toString());
 			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
 				: "FAILURE");
-		}
+		}*/
 
 		bq.close();
 	}
