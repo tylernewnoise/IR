@@ -72,6 +72,9 @@ public class BooleanQueryLucene {
 		LogMergePolicy log = new LogDocMergePolicy();
 		log.setMergeFactor(2000);
 		IndexWriterConfig config = new IndexWriterConfig(analyzer).setMergePolicy(log);
+		config.setMaxBufferedDocs(600000);
+		config.setRAMBufferSizeMB(IndexWriterConfig.DISABLE_AUTO_FLUSH);
+		config.setUseCompoundFile(false);
 
 		StringBuilder stringBuilder = new StringBuilder();
 
