@@ -81,13 +81,17 @@ public class BooleanQueryWordnet {
 		parseDataFile(wordnetDir + "/data.verb");
 		parseDataFile(wordnetDir + "/data.noun");
 		// TODO exception lists
-
 		System.out.println("size: " + allSynonyms.size());
 	}
 
 	private void parseDataFile(String file){
 		int start = 1;
 		int howManyWords = 0;
+		boolean isAdjective = false;
+
+		if (file.endsWith("adj")) {
+			isAdjective = true;
+		}
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
 			StandardCharsets.ISO_8859_1))) {
@@ -102,28 +106,44 @@ public class BooleanQueryWordnet {
 				// how many words are in the synset
 				howManyWords = Integer.parseInt(StringUtils.substring(line, 14, 16), 16);
 				// tokenize the rest of the line, start after all the info-gibberish
-				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.length()), " ", false);
+				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.
+					length()), " ", false);
 				String word = st.nextToken();
 
-				// if the first word is not a single-token synonym we can skip everything
-				if (word.contains("_")) {
+				// if there's only one word and its not a single-token synonym we can skip everything
+				if (word.contains("_") && howManyWords == 1) {
 					continue;
 				}
 
 				// if there's only one word...
 				if (howManyWords == 1) {
-					allSynonyms.put(word, new THashSet());
+					if (isAdjective && word.endsWith(")")) {
+						allSynonyms.put(StringUtils.substring(word, 0, word.indexOf("(")).
+							toLowerCase(), new THashSet());
+					} else {
+						allSynonyms.put(word.toLowerCase(), new THashSet());
+					}
 					continue;
 				}
 
 				// else create a list of all the words
 				ArrayList<String> words = new ArrayList<>();
-				words.add(word);
+
+				// add the first word only if is a single-token synonym
+				if (!word.contains("_")){
+					if (isAdjective && word.endsWith(")")) {
+						words.add(StringUtils.substring(word, 0, word.indexOf("(")).
+							toLowerCase());
+					} else {
+						words.add(word.toLowerCase());
+					}
+				}
+
 				// we have to decrease this already because we already got one word
 				--howManyWords;
 				st.nextToken();
 
-				// now add the synonyms to our list of words
+				// add the synonyms to our list of words
 				while (howManyWords > 0) {
 					String token = st.nextToken();
 					if (token.contains("_")) {
@@ -131,12 +151,17 @@ public class BooleanQueryWordnet {
 						st.nextToken();
 						continue;
 					}
-					words.add(token);
+					if (isAdjective && word.endsWith(")")) {
+						words.add(StringUtils.substring(token, 0, token.indexOf("(")).
+							toLowerCase());
+					} else {
+						words.add(token.toLowerCase());
+					}
 					--howManyWords;
 					st.nextToken();
 				}
 
-				// now create all possible relations
+				// create all possible relations
 				for (int i = 0; i < words.size(); ++i) {
 					for (int j = 0; j < words.size(); ++j) {
 						if (j == i) {
@@ -390,11 +415,8 @@ public class BooleanQueryWordnet {
 			e1.printStackTrace();
 		}
 
-		System.out
-			.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
-		System.out
-			.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L))
-				+ " MB (rough estimate)");
+		System.out.println("runtime: " + (System.nanoTime() - tic) + " nanoseconds");
+		System.out.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L)) + " MB (rough estimate)");
 
 		// parsing the queries that are to be run from the queries file
 /*		List<String> queries = new ArrayList<>();
