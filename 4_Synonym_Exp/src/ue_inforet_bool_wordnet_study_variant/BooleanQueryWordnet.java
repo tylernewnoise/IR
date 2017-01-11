@@ -52,7 +52,7 @@ public class BooleanQueryWordnet {
 	private StandardAnalyzer analyzer = new StandardAnalyzer();
 
 	// synonyms
-	private THashMap<String, THashSet> allSynonyms = new THashMap<>(80000);
+	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>(80000);
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -84,9 +84,9 @@ public class BooleanQueryWordnet {
 		System.out.println("size: " + allSynonyms.size());
 	}
 
-	private void parseDataFile(String file){
+	private void parseDataFile(String file) {
 		int start = 1;
-		int howManyWords = 0;
+		int howManyWords;
 		boolean isAdjective = false;
 
 		if (file.endsWith("adj")) {
@@ -105,6 +105,7 @@ public class BooleanQueryWordnet {
 
 				// how many words are in the synset
 				howManyWords = Integer.parseInt(StringUtils.substring(line, 14, 16), 16);
+
 				// tokenize the rest of the line, start after all the info-gibberish
 				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.
 					length()), " ", false);
@@ -115,13 +116,18 @@ public class BooleanQueryWordnet {
 					continue;
 				}
 
-				// if there's only one word...
+				// if there's only one word add it only if it is not already in our lexicon
 				if (howManyWords == 1) {
 					if (isAdjective && word.endsWith(")")) {
-						allSynonyms.put(StringUtils.substring(word, 0, word.indexOf("(")).
-							toLowerCase(), new THashSet());
+						String tmp = StringUtils.substring(word, 0, word.indexOf("(")).
+							toLowerCase();
+						if (!allSynonyms.containsKey(tmp)) {
+							allSynonyms.put(tmp, new THashSet<>());
+						}
 					} else {
-						allSynonyms.put(word.toLowerCase(), new THashSet());
+						if (!allSynonyms.containsKey(word)) {
+							allSynonyms.put(word.toLowerCase(), new THashSet<>());
+						}
 					}
 					continue;
 				}
@@ -130,7 +136,7 @@ public class BooleanQueryWordnet {
 				ArrayList<String> words = new ArrayList<>();
 
 				// add the first word only if is a single-token synonym
-				if (!word.contains("_")){
+				if (!word.contains("_")) {
 					if (isAdjective && word.endsWith(")")) {
 						words.add(StringUtils.substring(word, 0, word.indexOf("(")).
 							toLowerCase());
@@ -177,14 +183,40 @@ public class BooleanQueryWordnet {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addSynsToMap(String word, String synonym) {
 		if (allSynonyms.containsKey(word)) {
 			allSynonyms.get(word).add(synonym);
 		} else {
-			THashSet synset = new THashSet();
+			THashSet<String> synset = new THashSet<>();
 			synset.add(synonym);
 			allSynonyms.put(word, synset);
+		}
+	}
+
+	private void parseExcFile(String file) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+			StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+
+				// tokenize the exceptions
+				StringTokenizer st = new StringTokenizer(line, " ", false);
+				ArrayList<String> words = new ArrayList<>(3);
+				while (st.hasMoreTokens()) {
+					String token = st.nextToken();
+					if (token.contains("_")) {
+						continue;
+					}
+					words.add(token);
+				}
+
+				for (int i = words.size(); i > 1; --i) {
+					// yikes
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 
