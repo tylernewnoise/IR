@@ -14,6 +14,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
 // building synset index
+import java.util.StringTokenizer;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import org.apache.commons.lang3.StringUtils;
@@ -35,7 +36,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 // results output
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 // threading
 import java.util.concurrent.TimeUnit;
@@ -48,7 +51,8 @@ public class BooleanQueryWordnet {
 	private Directory index = new RAMDirectory();
 	private StandardAnalyzer analyzer = new StandardAnalyzer();
 
-	private THashMap<String, THashSet> allSynonyms = new THashMap<>(200000);
+	// synonyms
+	private THashMap<String, THashSet> allSynonyms = new THashMap<>(80000);
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -72,16 +76,23 @@ public class BooleanQueryWordnet {
 	 * @param wordnetDir the directory of the wordnet files
 	 */
 	public void buildSynsets(String wordnetDir) {
+		parseDataFile(wordnetDir + "/data.adv");
+		parseDataFile(wordnetDir + "/data.adj");
+		parseDataFile(wordnetDir + "/data.verb");
+		parseDataFile(wordnetDir + "/data.noun");
+		// TODO exception lists
 
-		int cnt = 0;
+		System.out.println("size: " + allSynonyms.size());
+	}
+
+	private void parseDataFile(String file){
 		int start = 1;
 		int howManyWords = 0;
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(wordnetDir
-			+ "/data.adv"), StandardCharsets.ISO_8859_1))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
+			StandardCharsets.ISO_8859_1))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				++cnt;
 				// skip the first 29 lines
 				if (start < 30) {
 					++start;
@@ -91,31 +102,38 @@ public class BooleanQueryWordnet {
 				// how many words are in the synset
 				howManyWords = Integer.parseInt(StringUtils.substring(line, 14, 16), 16);
 				// tokenize the rest of the line, start after all the info-gibberish
-				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.length()), " 0", false);
-
+				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.length()), " ", false);
 				String word = st.nextToken();
-				// if the first word is not a single-token synonym we can skip the shit
+
+				// if the first word is not a single-token synonym we can skip everything
 				if (word.contains("_")) {
 					continue;
 				}
-				// TODO check if its only one word
 
+				// if there's only one word...
+				if (howManyWords == 1) {
+					allSynonyms.put(word, new THashSet());
+					continue;
+				}
 
 				// else create a list of all the words
 				ArrayList<String> words = new ArrayList<>();
 				words.add(word);
-				// we have to decrease this already if there's only one word
+				// we have to decrease this already because we already got one word
 				--howManyWords;
+				st.nextToken();
 
-				// now check if there're some synonyms and add them to our list of words
+				// now add the synonyms to our list of words
 				while (howManyWords > 0) {
 					String token = st.nextToken();
 					if (token.contains("_")) {
 						--howManyWords;
+						st.nextToken();
 						continue;
 					}
 					words.add(token);
 					--howManyWords;
+					st.nextToken();
 				}
 
 				// now create all possible relations
@@ -124,7 +142,6 @@ public class BooleanQueryWordnet {
 						if (j == i) {
 							continue;
 						}
-						System.out.println(words.get(i) + " " + words.get(j));
 						addSynsToMap(words.get(i), words.get(j));
 					}
 				}
@@ -133,8 +150,6 @@ public class BooleanQueryWordnet {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		//System.out.println(allSynonyms.size());
-		//System.out.println("Lines: " + cnt);
 	}
 
 	@SuppressWarnings("unchecked")
