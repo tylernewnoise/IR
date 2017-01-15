@@ -14,6 +14,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
 // building synset index
+import java.util.Map;
 import java.util.StringTokenizer;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
@@ -52,7 +53,10 @@ public class BooleanQueryWordnet {
 	private StandardAnalyzer analyzer = new StandardAnalyzer();
 
 	// synonyms
-	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>(80000);
+	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>(89200);
+	private THashMap<String, THashSet<String>> adverbs = new THashMap<>(3800);
+	private THashMap<String, THashSet<String>> adjectivs = new THashMap<>(22800);
+	private THashMap<String, THashSet<String>> verbs = new THashMap<>(11500);
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -76,29 +80,36 @@ public class BooleanQueryWordnet {
 	 * @param wordnetDir the directory of the wordnet files
 	 */
 	public void buildSynsets(String wordnetDir) {
-		parseDataFile(wordnetDir + "/data.adv");
-		parseDataFile(wordnetDir + "/data.adj");
-		parseDataFile(wordnetDir + "/data.verb");
-		parseDataFile(wordnetDir + "/data.noun");
-		// TODO exception lists
-		System.out.println("size: " + allSynonyms.size());
+		parseDataFile(wordnetDir + "data.adv", adverbs);
+		parseDataFile(wordnetDir + "data.verb", verbs);
+		parseDataFile(wordnetDir + "data.adj", adjectivs);
+		parseDataFile(wordnetDir + "data.noun", allSynonyms);
+
+		parseExcFile(wordnetDir + "verb.exc", verbs);
+		parseExcFile(wordnetDir + "adv.exc", adverbs);
+		parseExcFile(wordnetDir + "adj.exc", adjectivs);
+		parseExcFile(wordnetDir + "noun.exc", allSynonyms);
+
+		mergeSynsets(adverbs);
+		mergeSynsets(verbs);
+		mergeSynsets(adjectivs);
+		//print();
 	}
 
-	private void parseDataFile(String file) {
-		int start = 1;
+	private void parseDataFile(String file, THashMap<String, THashSet<String>> hashMap) {
+		int start = 0;
 		int howManyWords;
 		boolean isAdjective = false;
 
-		if (file.endsWith("adj")) {
+		if (file.endsWith(".adj")) {
 			isAdjective = true;
 		}
 
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-			StandardCharsets.ISO_8859_1))) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.ISO_8859_1))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// skip the first 29 lines
-				if (start < 30) {
+				if (start < 29) {
 					++start;
 					continue;
 				}
@@ -107,73 +118,59 @@ public class BooleanQueryWordnet {
 				howManyWords = Integer.parseInt(StringUtils.substring(line, 14, 16), 16);
 
 				// tokenize the rest of the line, start after all the info-gibberish
-				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.
-					length()), " ", false);
-				String word = st.nextToken();
+				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.length()), " ", false);
+				String token = st.nextToken();
 
 				// if there's only one word and its not a single-token synonym we can skip everything
-				if (word.contains("_") && howManyWords == 1) {
+				if (token.contains("_") && howManyWords == 1) {
 					continue;
 				}
 
-				// if there's only one word add it only if it is not already in our lexicon
-				if (howManyWords == 1) {
-					if (isAdjective && word.endsWith(")")) {
-						String tmp = StringUtils.substring(word, 0, word.indexOf("(")).
-							toLowerCase();
-						if (!allSynonyms.containsKey(tmp)) {
-							allSynonyms.put(tmp, new THashSet<>());
-						}
-					} else {
-						if (!allSynonyms.containsKey(word)) {
-							allSynonyms.put(word.toLowerCase(), new THashSet<>());
-						}
-					}
-					continue;
-				}
+				// create a synset
+				ArrayList<String> synset = new ArrayList<>();
 
-				// else create a list of all the words
-				ArrayList<String> words = new ArrayList<>();
-
-				// add the first word only if is a single-token synonym
-				if (!word.contains("_")) {
-					if (isAdjective && word.endsWith(")")) {
-						words.add(StringUtils.substring(word, 0, word.indexOf("(")).
-							toLowerCase());
-					} else {
-						words.add(word.toLowerCase());
-					}
-				}
-
-				// we have to decrease this already because we already got one word
-				--howManyWords;
-				st.nextToken();
-
-				// add the synonyms to our list of words
+				// add all the synonyms to our synset
 				while (howManyWords > 0) {
-					String token = st.nextToken();
+					// skip if it's not a single-token synonym
 					if (token.contains("_")) {
 						--howManyWords;
 						st.nextToken();
+						token = st.nextToken();
 						continue;
 					}
-					if (isAdjective && word.endsWith(")")) {
-						words.add(StringUtils.substring(token, 0, token.indexOf("(")).
-							toLowerCase());
+					// check adjective syntax
+					if (isAdjective && (token.endsWith("(p)") || token.endsWith("(a)") || token.endsWith("(ip)"))) {
+						if (token.endsWith("(p)") || token.endsWith("(a)")) {
+							synset.add(StringUtils.substring(token, 0, token.length() - 3).toLowerCase());
+						} else {
+							synset.add(StringUtils.substring(token, 0, token.length() - 4).toLowerCase());
+						}
 					} else {
-						words.add(token.toLowerCase());
+						synset.add(token.toLowerCase());
 					}
 					--howManyWords;
 					st.nextToken();
+					token = st.nextToken();
 				}
 
-				// create all possible relations
-				for (int i = 0; i < words.size(); ++i) {
-					for (int j = 0; j < words.size(); ++j) {
-						if (j == i) {
-							continue;
+				// if the synset contains after all only one word
+				if (synset.size() == 1) {
+					hashMap.putIfAbsent(synset.get(0), new THashSet<>());
+					// if the synset contains more than one word we have to build the relations
+				} else if (synset.size() > 1) {
+					for (int i = 0; i < synset.size(); ++i) {
+						for (int j = 0; j < synset.size(); ++j) {
+							if (i == j) {
+								continue;
+							}
+							if (hashMap.containsKey(synset.get(i))) {
+								hashMap.get(synset.get(i)).add(synset.get(j));
+							} else {
+								THashSet<String> tmp = new THashSet<>();
+								tmp.add(synset.get(j));
+								hashMap.put(synset.get(i), tmp);
+							}
 						}
-						addSynsToMap(words.get(i), words.get(j));
 					}
 				}
 			}
@@ -183,40 +180,75 @@ public class BooleanQueryWordnet {
 		}
 	}
 
-	private void addSynsToMap(String word, String synonym) {
-		if (allSynonyms.containsKey(word)) {
-			allSynonyms.get(word).add(synonym);
-		} else {
-			THashSet<String> synset = new THashSet<>();
-			synset.add(synonym);
-			allSynonyms.put(word, synset);
-		}
-	}
-
-	private void parseExcFile(String file) {
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),
-			StandardCharsets.ISO_8859_1))) {
+	private void parseExcFile(String file, THashMap<String, THashSet<String>> hashMap) {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.ISO_8859_1))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 
 				// tokenize the exceptions
 				StringTokenizer st = new StringTokenizer(line, " ", false);
-				ArrayList<String> words = new ArrayList<>(3);
+				ArrayList<String> exceptions = new ArrayList<>(3);
 				while (st.hasMoreTokens()) {
 					String token = st.nextToken();
 					if (token.contains("_")) {
 						continue;
 					}
-					words.add(token);
+					exceptions.add(token.toLowerCase());
 				}
 
-				for (int i = words.size(); i > 1; --i) {
-					// yikes
+				// we need at least two valid entries in our exception list
+				if (exceptions.size() < 2) {
+					continue;
+				}
+
+				// check if the exception-word is already in our list
+				hashMap.putIfAbsent(exceptions.get(0), new THashSet<>());
+
+				// now run through the exceptions and union the synsets
+				for (int i = exceptions.size() - 1; i > 0; --i) {
+					// first, check if the word is already in our database
+					if (!hashMap.containsKey(exceptions.get(i))) {
+						// if not add it
+						hashMap.put(exceptions.get(i), new THashSet<>());
+						// hashMap.get(exceptions.get(0)).add(exceptions.get(i)); // and add the new word to the synset
+					} else {
+						hashMap.get(exceptions.get(0)).addAll(hashMap.get(exceptions.get(i)));
+						// add the word itself to the synset
+						hashMap.get(exceptions.get(0)).add(exceptions.get(i));
+					}
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
+		}
+	}
+
+	private void mergeSynsets(THashMap<String, THashSet<String>> hashMap) {
+		for (Map.Entry<String, THashSet<String>> synsetEntry : hashMap.entrySet()) {
+			if (!allSynonyms.containsKey(synsetEntry.getKey())) {
+				allSynonyms.put(synsetEntry.getKey(), synsetEntry.getValue());
+			} else {
+				for (String tmp : (synsetEntry.getValue())) {
+					allSynonyms.get(synsetEntry.getKey()).add(tmp);
+				}
+			}
+		}
+	}
+
+	private void print() {
+		System.out.println("deep: " + allSynonyms.get("deep"));
+		System.out.println("deeply " + allSynonyms.get("deeply"));
+		System.out.println("deeper " + allSynonyms.get("deeper"));
+		System.out.println("extoll " + allSynonyms.get("extoll"));
+		System.out.println("extol " + allSynonyms.get("extol"));
+		System.out.println("extolled " + allSynonyms.get("extolled"));
+
+		ArrayList<String> print = new ArrayList<>();
+		print.addAll(allSynonyms.get("better"));
+		for (String aPrint : print) {
+			System.out.print(aPrint);
+			System.out.println();
 		}
 	}
 
@@ -508,4 +540,3 @@ public class BooleanQueryWordnet {
 	}
 
 }
-
