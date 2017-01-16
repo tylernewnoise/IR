@@ -21,13 +21,13 @@ import gnu.trove.set.hash.THashSet;
 import org.apache.commons.lang3.StringUtils;
 
 // searching
-/*import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.IndexSearcher;*/
+import org.apache.lucene.search.IndexSearcher;
 
 // file input
 import java.io.IOException;
@@ -37,9 +37,11 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
 // results output
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 // threading
 import java.util.concurrent.TimeUnit;
@@ -438,8 +440,61 @@ public class BooleanQueryWordnet {
 	 * lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
-		// TODO: insert code here
-		return new HashSet<>();
+		// first parse the goddam string. yikes
+		StringBuilder newQuery = new StringBuilder();
+		StringTokenizer st = new StringTokenizer(queryString, " :", false);
+
+		while (st.hasMoreTokens()) {
+			String field = st.nextToken();
+			newQuery.append(field).append(":"); // add the first field
+			// now check for synoyms of the token
+			String token = st.nextToken().toLowerCase(); //toLowerCase for continuity because everything else is in lowerCase
+			newQuery.append(token); // append the original token to the new query
+			// now search and check for synonyms
+			if (allSynonyms.containsKey(token) && allSynonyms.get(token).size() != 0){
+				// add a whitespace
+				newQuery.append(" ");
+				// if there is a parenthesis in the field remove it
+				if (field.startsWith("(")) {
+					field = field.replace("(", "");
+				}
+				// add an AND for expansion
+				newQuery.append("AND (");
+
+				ArrayList<String> synset = new ArrayList<>();
+				// add all the synsets to a new list
+				synset.addAll(allSynonyms.get(token));
+				// run through it and add it to our new query
+				for (int i = 0; i < synset.size(); ++i) {
+					newQuery.append(field).append(":").append(synset.get(i));
+					// if there is more than one word in our synlist add an OR
+					if (i < synset.size() - 1) {
+						newQuery.append(" OR ");
+					}
+				}
+				// close the expansion
+				newQuery.append(")");
+			}
+			// add the AND, OR, NOT
+			if (st.hasMoreTokens()) {
+				newQuery.append(" ").append(st.nextToken()).append(" ");
+			}
+		}
+
+		HashSet<String> results = new HashSet<>();
+		try {
+			IndexReader reader = DirectoryReader.open(index);
+			IndexSearcher searcher = new IndexSearcher(reader);
+			Query q = new QueryParser("", analyzer).parse(newQuery.toString());
+			TopDocs docs = searcher.search(q, 1000);
+			for (ScoreDoc hit : docs.scoreDocs) {
+				Document d = searcher.doc(hit.doc);
+				results.add(d.get("mvline"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
 	}
 
 	/**
@@ -471,7 +526,7 @@ public class BooleanQueryWordnet {
 		BooleanQueryWordnet bq = new BooleanQueryWordnet();
 		bq.buildSynsets(wordNetDir);
 
-		//bq.buildIndices(plotFile);
+		bq.buildIndices(plotFile);
 		System.gc();
 		try {
 			Thread.sleep(10);
@@ -483,7 +538,7 @@ public class BooleanQueryWordnet {
 		System.out.println("memory: " + ((runtime.totalMemory() - mem) / (1048576L)) + " MB (rough estimate)");
 
 		// parsing the queries that are to be run from the queries file
-/*		List<String> queries = new ArrayList<>();
+		List<String> queries = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(
 			new FileInputStream(args[2]), StandardCharsets.ISO_8859_1))) {
 			String line;
@@ -534,7 +589,7 @@ public class BooleanQueryWordnet {
 			System.out.println("actual result (" + actualResultSorted.size() + "):   " + actualResultSorted.toString());
 			System.out.println(expectedResult.equals(actualResult) ? "SUCCESS"
 				: "FAILURE");
-		}*/
+		}
 
 		bq.close();
 	}
