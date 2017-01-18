@@ -55,10 +55,10 @@ public class BooleanQueryWordnet {
 	private StandardAnalyzer analyzer = new StandardAnalyzer();
 
 	// synonyms
-	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>(89200);
-	private THashMap<String, THashSet<String>> adverbs = new THashMap<>(3800);
-	private THashMap<String, THashSet<String>> adjectivs = new THashMap<>(22800);
-	private THashMap<String, THashSet<String>> verbs = new THashMap<>(11500);
+	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>(67000);
+	private THashMap<String, THashSet<String>> adverbs = new THashMap<>(2300);
+	private THashMap<String, THashSet<String>> adjectivs = new THashMap<>(16000);
+	private THashMap<String, THashSet<String>> verbs = new THashMap<>(9100);
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -95,7 +95,6 @@ public class BooleanQueryWordnet {
 		mergeSynsets(adverbs);
 		mergeSynsets(verbs);
 		mergeSynsets(adjectivs);
-		//print();
 	}
 
 	private void parseDataFile(String file, THashMap<String, THashSet<String>> hashMap) {
@@ -123,8 +122,8 @@ public class BooleanQueryWordnet {
 				StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 17, line.length()), " ", false);
 				String token = st.nextToken();
 
-				// if there's only one word and its not a single-token synonym we can skip everything
-				if (token.contains("_") && howManyWords == 1) {
+				// if there's only one word we can skip everything
+				if (howManyWords == 1) {
 					continue;
 				}
 
@@ -158,16 +157,18 @@ public class BooleanQueryWordnet {
 				// if the synset contains after all only one word
 				if (synset.size() == 1) {
 					hashMap.putIfAbsent(synset.get(0), new THashSet<>());
-					// if the synset contains more than one word we have to build the relations
 				} else if (synset.size() > 1) {
+					// if the synset contains more than one word we have to build the relations
 					for (int i = 0; i < synset.size(); ++i) {
 						for (int j = 0; j < synset.size(); ++j) {
 							if (i == j) {
 								continue;
 							}
+							// add a relation
 							if (hashMap.containsKey(synset.get(i))) {
 								hashMap.get(synset.get(i)).add(synset.get(j));
 							} else {
+								// create a new synset
 								THashSet<String> tmp = new THashSet<>();
 								tmp.add(synset.get(j));
 								hashMap.put(synset.get(i), tmp);
@@ -208,15 +209,17 @@ public class BooleanQueryWordnet {
 
 				// now run through the exceptions and union the synsets
 				for (int i = exceptions.size() - 1; i > 0; --i) {
-					// first, check if the word is already in our database
-					if (!hashMap.containsKey(exceptions.get(i))) {
-						// if not add it
-						hashMap.put(exceptions.get(i), new THashSet<>());
-						// hashMap.get(exceptions.get(0)).add(exceptions.get(i)); // and add the new word to the synset
-					} else {
-						hashMap.get(exceptions.get(0)).addAll(hashMap.get(exceptions.get(i)));
-						// add the word itself to the synset
-						hashMap.get(exceptions.get(0)).add(exceptions.get(i));
+					// does the word even exist
+					if (hashMap.containsKey(exceptions.get(i))) {
+						// if the comparison does not exist we have to add it first
+						if (!hashMap.contains(exceptions.get(i - 1))) {
+							hashMap.put(exceptions.get(i - 1), new THashSet<>());
+						}
+						// now add all
+						hashMap.get(exceptions.get(i - 1)).addAll(hashMap.get(exceptions.get(i)));
+						// add word itself
+
+						hashMap.get(exceptions.get(i - 1)).add(exceptions.get(i));
 					}
 				}
 			}
@@ -227,30 +230,16 @@ public class BooleanQueryWordnet {
 	}
 
 	private void mergeSynsets(THashMap<String, THashSet<String>> hashMap) {
+		// run through the complete hashmap and check every word
+		// since nouns are the biggest we use them as our merge-target
 		for (Map.Entry<String, THashSet<String>> synsetEntry : hashMap.entrySet()) {
 			if (!allSynonyms.containsKey(synsetEntry.getKey())) {
+				// create a new synset if it's not already there
 				allSynonyms.put(synsetEntry.getKey(), synsetEntry.getValue());
 			} else {
-				for (String tmp : (synsetEntry.getValue())) {
-					allSynonyms.get(synsetEntry.getKey()).add(tmp);
-				}
+				// or add everything to the existing one
+				allSynonyms.get(synsetEntry.getKey()).addAll(synsetEntry.getValue());
 			}
-		}
-	}
-
-	private void print() {
-		System.out.println("deep: " + allSynonyms.get("deep"));
-		System.out.println("deeply " + allSynonyms.get("deeply"));
-		System.out.println("deeper " + allSynonyms.get("deeper"));
-		System.out.println("extoll " + allSynonyms.get("extoll"));
-		System.out.println("extol " + allSynonyms.get("extol"));
-		System.out.println("extolled " + allSynonyms.get("extolled"));
-
-		ArrayList<String> print = new ArrayList<>();
-		print.addAll(allSynonyms.get("better"));
-		for (String aPrint : print) {
-			System.out.print(aPrint);
-			System.out.println();
 		}
 	}
 
@@ -440,53 +429,67 @@ public class BooleanQueryWordnet {
 	 * lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
-		// first parse the goddam string. yikes
 		StringBuilder newQuery = new StringBuilder();
-		StringTokenizer st = new StringTokenizer(queryString, " :", false);
+		StringTokenizer st = new StringTokenizer(queryString, " (:)", true);
 
 		while (st.hasMoreTokens()) {
-			String field = st.nextToken();
-			newQuery.append(field).append(":"); // add the first field
-			// now check for synoyms of the token
-			String token = st.nextToken().toLowerCase(); //toLowerCase for continuity because everything else is in lowerCase
-			newQuery.append(token); // append the original token to the new query
-			// now search and check for synonyms
-			if (allSynonyms.containsKey(token) && allSynonyms.get(token).size() != 0){
-				// add a whitespace
-				newQuery.append(" ");
-				// if there is a parenthesis in the field remove it
-				if (field.startsWith("(")) {
-					field = field.replace("(", "");
-				}
-				// add an AND for expansion
-				newQuery.append("AND (");
+			String token = st.nextToken();
 
-				ArrayList<String> synset = new ArrayList<>();
-				// add all the synsets to a new list
-				synset.addAll(allSynonyms.get(token));
-				// run through it and add it to our new query
-				for (int i = 0; i < synset.size(); ++i) {
-					newQuery.append(field).append(":").append(synset.get(i));
-					// if there is more than one word in our synlist add an OR
-					if (i < synset.size() - 1) {
-						newQuery.append(" OR ");
+			if (token.equals("(")) {
+				newQuery.append("(");
+
+			} else if (token.equals(")")) {
+				newQuery.append(")");
+
+			} else {
+				String field = token.intern();
+				st.nextToken(); // colon
+
+				token = st.nextToken().toLowerCase(); // the actual word to get the synsets
+
+				// now search and check for synonyms
+				if (allSynonyms.containsKey(token) && allSynonyms.get(token).size() != 0) {
+					newQuery.append("(");
+					ArrayList<String> synset = new ArrayList<>();
+					// add all the synsets to a new list
+					synset.addAll(allSynonyms.get(token));
+					// run through it and add it to our new query
+					for (int i = 0; i < synset.size(); ++i) {
+						newQuery.append(field).append(":").append(synset.get(i));
+						// if there is more than one word in our synlist add an OR
+						if (i < synset.size() - 1) {
+							newQuery.append(" OR ");
+						}
+						if (synset.size() == 1) {
+							newQuery.append(" OR");
+						}
+					}
+					newQuery.append(" ").append(field).append(":").append(token).append(")");
+					// close the expansion
+				} else {
+					newQuery.append(field).append(":").append(token); // add the first field
+				}
+				// add AND, OR, NOT and closing parenthesis
+				if (st.hasMoreTokens()) {
+					while (st.hasMoreTokens()) {
+						token = st.nextToken();
+						if (token.equals(")")) {
+							newQuery.append(")");
+						} else {
+							newQuery.append(token).append(st.nextToken()).append(st.nextToken());
+							break;
+						}
 					}
 				}
-				// close the expansion
-				newQuery.append(")");
-			}
-			// add the AND, OR, NOT
-			if (st.hasMoreTokens()) {
-				newQuery.append(" ").append(st.nextToken()).append(" ");
 			}
 		}
 
 		HashSet<String> results = new HashSet<>();
 		try {
+			Query q = new QueryParser("", analyzer).parse(newQuery.toString());
 			IndexReader reader = DirectoryReader.open(index);
 			IndexSearcher searcher = new IndexSearcher(reader);
-			Query q = new QueryParser("", analyzer).parse(newQuery.toString());
-			TopDocs docs = searcher.search(q, 1000);
+			TopDocs docs = searcher.search(q, 100);
 			for (ScoreDoc hit : docs.scoreDocs) {
 				Document d = searcher.doc(hit.doc);
 				results.add(d.get("mvline"));
@@ -575,7 +578,6 @@ public class BooleanQueryWordnet {
 			System.out.println("query:           " + query);
 			tic = System.nanoTime();
 			Set<String> actualResult = bq.booleanQuery(query);
-
 			// sort expected and determined results for human readability
 			List<String> expectedResultSorted = new ArrayList<>(expectedResult);
 			List<String> actualResultSorted = new ArrayList<>(actualResult);
@@ -593,5 +595,4 @@ public class BooleanQueryWordnet {
 
 		bq.close();
 	}
-
 }
