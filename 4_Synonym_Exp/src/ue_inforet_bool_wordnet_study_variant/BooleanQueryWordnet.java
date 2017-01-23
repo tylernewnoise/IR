@@ -431,31 +431,36 @@ public class BooleanQueryWordnet {
 				newQuery.append("(");
 			} else {
 				String field = token.intern();
-				st.nextToken(); // this token is the colon after the field type
-				token = st.nextToken().toLowerCase().intern(); // the actual word we're searching a synset for
-
-				// now search and check for synonyms
-				if (allSynonyms.containsKey(token) && allSynonyms.get(token).size() > 1) {
-					// we blow up the query and start with a parenthesis
-					newQuery.append("(");
-
-					// add all the synsets to a list
-					ArrayList<String> synset = new ArrayList<>();
-					synset.addAll(allSynonyms.get(token));
-
-					// run through the synset list and add the content to our new query
-					for (int i = 0; i < synset.size(); ++i) {
-						newQuery.append(field).append(":").append(synset.get(i));
-						// add an OR after each word
-						if (i < synset.size() - 1) {
-							newQuery.append(" OR ");
-						}
-					}
-					// close the expansion
-					newQuery.append(")");
+				// if the field is type or year we don't need to check for synonyms
+				if (field.equals("type") || field.equals("year")){
+					newQuery.append(field).append(st.nextToken()).append(st.nextToken());
 				} else {
-					// if there are no synonyms for the query just add the query itself
-					newQuery.append(field).append(":").append(token);
+					st.nextToken(); // this token is the colon after the field type
+					token = st.nextToken().toLowerCase().intern(); // the actual word we're searching a synset for
+
+					// now search and check for synonyms
+					if (allSynonyms.containsKey(token) && allSynonyms.get(token).size() > 1) {
+						// we blow up the query and start with a parenthesis
+						newQuery.append("(");
+
+						// add all the synsets to a list
+						ArrayList<String> synset = new ArrayList<>();
+						synset.addAll(allSynonyms.get(token));
+
+						// run through the synset list and add the content to our new query
+						for (int i = 0; i < synset.size(); ++i) {
+							newQuery.append(field).append(":").append(synset.get(i));
+							// add an OR after each word
+							if (i < synset.size() - 1) {
+								newQuery.append(" OR ");
+							}
+						}
+						// close the expansion
+						newQuery.append(")");
+					} else {
+						// if there are no synonyms for the query just add the query itself
+						newQuery.append(field).append(":").append(token);
+					}
 				}
 
 				// check if the query is finished; if not add AND, OR, NOT or closing parenthesis
