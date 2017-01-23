@@ -165,9 +165,6 @@ public class BooleanQueryWordnet {
 		allSynonyms.putAll(adjectives);
 		allSynonyms.putAll(adverbs);
 		allSynonyms.putAll(verbs);
-		adjectives.clear();
-		adverbs.clear();
-		verbs.clear();
 	}
 
 	/**
