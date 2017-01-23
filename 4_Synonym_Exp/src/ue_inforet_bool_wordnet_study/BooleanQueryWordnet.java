@@ -139,7 +139,12 @@ public class BooleanQueryWordnet {
 		}
 	}
 
-	/* Adds a  List (HashSet) of synonyms of a single token to a HashMap */
+	 /***Adds a  List (HashSet) of synonyms of a single token to a HashMap
+	 *
+	 * @param hashMap
+	 * @param token
+	 * @param synonymList
+	 */
 	private static void addToHashmap(THashMap<String, THashSet<String>> hashMap, String token, THashSet<String> synonymList) {
 		if (hashMap.containsKey(token)) {
 			hashMap.get(token).addAll(synonymList);
@@ -153,6 +158,9 @@ public class BooleanQueryWordnet {
 		}
 	}
 
+	/***
+	 * Merges all HashMaps into allSynonyms HashMap
+	 */
 	private static void mergeHashMaps(){
 		allSynonyms.putAll(adjectives);
 		allSynonyms.putAll(adverbs);
