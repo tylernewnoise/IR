@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 public class BooleanQueryWordnet {
-
+	// global accessible index :)
+	Directory index = new RAMDirectory();
+	// set Analyzer
+	Analyzer myAnalyzer = new StandardAnalyzer();
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
 	 * OF THE CONSTRUCTOR.
@@ -41,6 +44,10 @@ public class BooleanQueryWordnet {
 		// TODO: insert code here
 	}
 
+	public void synDex (ArrayList<String> tokenList){
+
+	}
+
 	/**
 	 * A method for reading the textual movie plot file and building a Lucene index.
 	 * The purpose of the index is to speed up subsequent boolean searches using
@@ -55,7 +62,122 @@ public class BooleanQueryWordnet {
 	 *          use.
 	 */
 	public void buildIndices(String plotFile) {
-		// TODO: insert code here
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
+
+			String line;  // current input (line)
+			boolean lastLineWasPlot = false; // check if new MV Line starts
+			StringBuilder currentMovieString = new StringBuilder();  // concatenate the plotstring
+
+
+			// Specify a directory (happend earlier) and an index writer
+			IndexWriterConfig config = new IndexWriterConfig(myAnalyzer);
+			// open a new IndexWriter instance
+			IndexWriter writer = new IndexWriter(index, config);
+			// Create a document (and add this document to the index, later):
+			Document doc = new Document();
+
+			while ((line = reader.readLine()) != null){
+				// recognize MV: lines and handle them
+				// new movie starts --> write old currentMovieString to Index and reset doc and currentMovieString
+				if (line.startsWith("MV:") && (lastLineWasPlot)) {
+					doc.add(new TextField("plot", currentMovieString.toString(), Field.Store.YES));
+					writer.addDocument(doc);
+					currentMovieString = new StringBuilder();
+					doc = new Document();
+					lastLineWasPlot = false;
+				}
+				// handle the new movie line
+				if (line.startsWith("MV:") && (!lastLineWasPlot)) {
+					doc.add(new TextField("movieline", line, Field.Store.YES));
+					getTitleTypeYear(doc, line.substring(4, line.length()));
+				}
+				// detect and handle the (new) plotline
+				if (line.startsWith("PL:")) {
+					currentMovieString.append(line.substring(4, line.length()));
+					currentMovieString.append(" ");  // Space necessary at the end of each plotline!
+					lastLineWasPlot = true;
+				}
+			}
+			// after last line was read from file - last write operation has to be triggered!
+			doc.add(new TextField("plot", currentMovieString.toString(), Field.Store.YES));
+			writer.addDocument(doc);
+			// close index writer
+			writer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
+	// helper Methods
+	private void getTitleTypeYear(Document doc, String movieline) {
+
+		// remove {{SUSPENDED}}
+		if (movieline.contains("{{suspended}}")) {
+			movieline = movieline.replace(" {{suspended}}", "");
+		}
+
+		// +++ series +++
+		if (movieline.startsWith("\"") && !movieline.endsWith("}")) {
+			doc.add((new TextField("type", "series", Field.Store.YES)));
+			parseTitleAndYear(doc, movieline, true);
+		}
+		// +++ episode +++
+		else if (movieline.contains("\"") && movieline.endsWith("}")) {
+			doc.add((new TextField("type", "episode", Field.Store.YES)));
+
+			StringBuilder currentString = new StringBuilder();
+
+			for (int i = movieline.length() - 2; movieline.charAt(i) != '{'; --i) {
+				currentString.append(movieline.charAt(i));
+			}
+
+			doc.add((new TextField("episodetitle",
+				  new StringBuilder(currentString.toString()).reverse().toString(), Field.Store.YES)));
+
+			parseTitleAndYear(doc, movieline.substring(0, movieline.indexOf('{') - 1), true);
+		}
+		// +++ television +++
+		else if (movieline.contains(") (TV)")) {
+			doc.add((new TextField("type", "television", Field.Store.YES)));
+			parseTitleAndYear(doc, movieline.substring(0, movieline.length() - 5), false);
+		}
+		// +++ video +++
+		else if (movieline.contains(") (V)")) {
+			doc.add((new TextField("type", "video", Field.Store.YES)));
+			parseTitleAndYear(doc, movieline.substring(0, movieline.length() - 4), false);
+		}
+		// +++ video game +++
+		else if (movieline.contains(") (VG)")) {
+			doc.add((new TextField("type", "videogame", Field.Store.YES)));
+			parseTitleAndYear(doc, movieline.substring(0, movieline.length() - 5), false);
+		} else {
+			// +++ movie +++
+			doc.add((new TextField("type", "movie", Field.Store.YES)));
+			parseTitleAndYear(doc, movieline, false);
+		}
+	}
+
+	// helper 2
+	private void parseTitleAndYear(Document doc, String movieline, boolean isSeries) {
+		int end = 3;
+		StringBuilder currentString = new StringBuilder();
+
+		for (int i = movieline.length() - 2; movieline.charAt(i) != '('; --i) {
+			if (movieline.charAt(i) >= '0' && movieline.charAt(i) <= '9') {
+				currentString.append(movieline.charAt(i));
+			}
+			end++;
+		}
+		doc.add((new StringField("year", new StringBuilder(currentString.toString()).reverse().toString(), Field.Store.YES)));
+
+		if (isSeries) {
+			doc.add((new TextField("title", movieline.substring(1, movieline.length() - end - 1), Field.Store.YES)));
+		} else {
+			doc.add((new TextField("title", movieline.substring(0, movieline.length() - end), Field.Store.YES)));
+		}
 	}
 
 	/**
@@ -79,10 +201,27 @@ public class BooleanQueryWordnet {
 	 * @return the exact content (in the textual movie plot file) of the title
 	 *         lines (starting with "MV: ") of the documents matching the query
 	 */
-	public Set<String> booleanQuery(String queryString) {
-		// TODO: insert code here
-		return new HashSet<>();
+	public Set<String> booleanQuery(String queryString) throws ParseException, IOException {
+		HashSet<String> returnList = new HashSet<>();
+		if (queryString.length() > 0){
+			Query query = new QueryParser("title", myAnalyzer).parse(queryString);
+			IndexReader reader = DirectoryReader.open(index);
+			IndexSearcher searcher = new IndexSearcher(reader);
+			TopDocs docs = searcher.search(query, Integer.MAX_VALUE);
+			ScoreDoc[] hits = docs.scoreDocs;
+			for (int i = 0; i < hits.length; i++){
+				int docID = hits[i].doc;
+				Document d = searcher.doc(docID);
+				returnList.add(d.get("movieline"));
+			}
+		} else {
+			System.err
+				  .println("No query given.");
+			System.exit(-1);
+		}
+		return returnList;
 	}
+
 
 	/**
 	 * A method for closing any open file handels or a ThreadPool.
