@@ -13,6 +13,16 @@ import java.util.List;
 import java.util.Set;
 
 public class BooleanQueryWordnet {
+	// global accessible index :)
+	Directory index = new RAMDirectory();
+	// set Analyzer
+	Analyzer myAnalyzer = new StandardAnalyzer();
+
+
+	private static THashMap<String, THashSet<String>> allSynonyms = new THashMap<>();
+	private static THashMap<String, THashSet<String>> adverbs = new THashMap<>();
+	private static THashMap<String, THashSet<String>> adjectives = new THashMap<>();
+	private static THashMap<String, THashSet<String>> verbs = new THashMap<>();
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -39,6 +49,117 @@ public class BooleanQueryWordnet {
 	 */
 	public void buildSynsets(String wordnetDir) {
 		// TODO: insert code here
+	}
+
+	/***Adds a list of token into the fitting Hashmap
+	 *
+	 * @param tokenList
+	 * @param type
+	 */
+	public static void synDex (THashSet<String> tokenList, int type){
+		THashSet<String> baseFormSynset = new THashSet<>();
+		switch (type) {
+
+			case 1: //data adjective
+				for (String token : tokenList){
+					addToHashmap(adjectives, token, tokenList);
+				}
+				break;
+			case 2: //data adverbs
+				for (String token : tokenList) {
+					addToHashmap(adverbs, token, tokenList);
+				}
+				break;
+			case 3: //data nouns
+				for (String token : tokenList) {
+					addToHashmap(allSynonyms, token, tokenList);
+				}
+				break;
+			case 4: //data verbs
+				for (String token : tokenList) {
+					addToHashmap(verbs, token, tokenList);
+				}
+				break;
+			case 5: //exc adjectives
+				baseFormSynset.clear();
+				baseFormSynset.addAll(tokenList);
+				for (String token : tokenList){
+					baseFormSynset.remove(token);
+					for (String item : baseFormSynset){
+						addToHashmap(adjectives, token, baseFormSynset); // add extensions
+						if (adjectives.get(item) != null){
+							addToHashmap(adjectives, token, adjectives.get(item) ); //add synonyms of extentions
+						}
+					}
+				}
+				break;
+			case 6: //exc adverbs
+				baseFormSynset.clear();
+				baseFormSynset.addAll(tokenList);
+				for (String token : tokenList){
+					baseFormSynset.remove(token);
+					for (String item : baseFormSynset){
+						addToHashmap(adverbs, token, baseFormSynset); // add extensions
+						if (adverbs.get(item) != null){
+							addToHashmap(adverbs, token, adverbs.get(item) ); //add synonyms of extentions
+						}
+					}
+				}
+				break;
+			case 7: //exc nouns
+				baseFormSynset.clear();
+				baseFormSynset.addAll(tokenList);
+				for (String token : tokenList){
+					tokenList.
+					baseFormSynset.remove(token);
+					for (String item : baseFormSynset){
+						addToHashmap(allSynonyms, token, baseFormSynset); // add extensions
+						if (allSynonyms.get(item) != null){
+							addToHashmap(allSynonyms, token, allSynonyms.get(item) ); //add synonyms of extentions
+						}
+					}
+				}
+				break;
+			case 8: // exc verbs
+				baseFormSynset.clear();
+				baseFormSynset.addAll(tokenList);
+				for (String token : tokenList){
+					baseFormSynset.remove(token);
+					for (String item : baseFormSynset){
+						addToHashmap(verbs, token, baseFormSynset); // add extensions
+						if (verbs.get(item) != null){
+							addToHashmap(verbs, token, verbs.get(item) ); //add synonyms of extentions
+						}
+					}
+				}
+				break;
+			default:
+				System.out.println("Type > 8. Undefined type!");
+				break;
+		}
+	}
+
+	/* Adds a  List (HashSet) of synonyms of a single token to a HashMap */
+	private static void addToHashmap(THashMap<String, THashSet<String>> hashMap, String token, THashSet<String> synonymList) {
+		if (hashMap.containsKey(token)) {
+			hashMap.get(token).addAll(synonymList);
+			hashMap.get(token).remove(token);
+		} else {
+			// value has no entry yet, create a list for the value and store film in it
+			THashSet<String> tempHashSet = new THashSet<>();
+			tempHashSet.addAll(synonymList);
+			tempHashSet.remove(token); //remove itself from Hashset
+			hashMap.put(token, tempHashSet);
+		}
+	}
+
+	private static void mergeHashMaps(){
+		allSynonyms.putAll(adjectives);
+		allSynonyms.putAll(adverbs);
+		allSynonyms.putAll(verbs);
+		adjectives.clear();
+		adverbs.clear();
+		verbs.clear();
 	}
 
 	/**
