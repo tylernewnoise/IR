@@ -113,7 +113,6 @@ public class BooleanQueryWordnet {
 				baseFormSynset.clear();
 				baseFormSynset.addAll(tokenList);
 				for (String token : tokenList){
-					tokenList.
 					baseFormSynset.remove(token);
 					for (String item : baseFormSynset){
 						addToHashmap(allSynonyms, token, baseFormSynset); // add extensions
