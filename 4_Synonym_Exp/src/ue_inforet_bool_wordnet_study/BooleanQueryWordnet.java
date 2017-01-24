@@ -5,6 +5,7 @@ import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
@@ -13,7 +14,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.apache.lucene.document.Document;
+import java.util.Map;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.IndexSearcher;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BooleanQueryWordnet {
 	// global accessible index :)
@@ -198,6 +212,46 @@ public class BooleanQueryWordnet {
 		// TODO: insert code here
 	}
 
+	public static String parseQueryString(String originalQuery) {
+		HashSet<String> toModify = new HashSet<>();
+		String modString = originalQuery;
+		Pattern plPattern = Pattern.compile("plot:[^ )]*");
+		Pattern tlPattern = Pattern.compile("title:[^ )]*");
+		Matcher matcher = plPattern.matcher(originalQuery);
+		while (matcher.find()) {
+			toModify.add(matcher.group(0));
+		}
+		matcher = tlPattern.matcher((originalQuery));
+		while (matcher.find()) {
+			toModify.add(matcher.group(0));
+		}
+		for (String picked : toModify) {
+			String prefix = "";
+			String suffix = "";
+			if (picked.startsWith("t")) {
+				prefix = "title:";
+				suffix = picked.substring(6);
+			}
+			else {
+				prefix = "plot:";
+				suffix = picked.substring(5);
+			}
+			StringBuilder st = new StringBuilder();
+			if (allSynonyms.containsKey(suffix) &&!allSynonyms.get(suffix).isEmpty()) {
+				st.append("("+picked);
+				for (String synonym : allSynonyms.get(suffix)) {
+					st.append(" OR "+prefix+synonym);
+				}
+				st.append(")");
+			}
+			else {
+				st.append(picked);
+			}
+			modString = modString.replaceAll(picked, st.toString());
+		}
+		return modString;
+	}
+
 	/**
 	 * A method for performing a boolean search on a textual movie plot file after
 	 * Lucene indices were built using the {@link #buildIndices(String) buildIndices}
@@ -220,8 +274,23 @@ public class BooleanQueryWordnet {
 	 *         lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
-		// TODO: insert code here
-		return new HashSet<>();
+		HashSet<String> results = new HashSet<>();
+
+		try {
+			IndexReader indexReader = DirectoryReader.open(index);
+			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
+			Query qry = new QueryParser("title", myAnalyzer).parse(parseQueryString(queryString));
+			TopDocs hits = indexSearcher.search(qry, Integer.MAX_VALUE);
+			for(ScoreDoc scoreDoc : hits.scoreDocs) {
+				Document doc = indexSearcher.doc(scoreDoc.doc);
+				results.add(doc.get("mvline"));
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		return results;
 	}
 
 	/**
