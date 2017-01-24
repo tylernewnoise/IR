@@ -163,10 +163,22 @@ public class BooleanQueryWordnet {
 	/***
 	 * Merges all HashMaps into allSynonyms HashMap
 	 */
-	private static void mergeHashMaps(){
-		allSynonyms.putAll(adjectives);
-		allSynonyms.putAll(adverbs);
-		allSynonyms.putAll(verbs);
+	private static void mergeLists(){
+		ArrayList<THashMap<String, THashSet<String>>> allLists = new ArrayList<>();
+		allLists.add(adjectives);
+		allLists.add(adverbs);
+		allLists.add(verbs);
+
+		for (THashMap<String, THashSet<String>> list : allLists){
+			for (Map.Entry<String, THashSet<String>> synsetEntry : list.entrySet()) {
+				if (!allSynonyms.containsKey(synsetEntry.getKey())) {
+					allSynonyms.put(synsetEntry.getKey(), synsetEntry.getValue());
+				} else {
+					allSynonyms.get(synsetEntry.getKey()).addAll(synsetEntry.getValue());
+				}
+			}
+		}
+
 	}
 
 	/**
