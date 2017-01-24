@@ -212,7 +212,7 @@ public class BooleanQueryWordnet {
 		// TODO: insert code here
 	}
 
-	public static String parseQueryString(String originalQuery) {
+	public String parseQueryString(String originalQuery) {
 		HashSet<String> toModify = new HashSet<>();
 		String modString = originalQuery;
 		Pattern plPattern = Pattern.compile("plot:[^ )]*");
@@ -226,8 +226,8 @@ public class BooleanQueryWordnet {
 			toModify.add(matcher.group(0));
 		}
 		for (String picked : toModify) {
-			String prefix = "";
-			String suffix = "";
+			String prefix;
+			String suffix;
 			if (picked.startsWith("t")) {
 				prefix = "title:";
 				suffix = picked.substring(6);
@@ -236,11 +236,12 @@ public class BooleanQueryWordnet {
 				prefix = "plot:";
 				suffix = picked.substring(5);
 			}
+			suffix = suffix.toLowerCase();
 			StringBuilder st = new StringBuilder();
 			if (allSynonyms.containsKey(suffix) &&!allSynonyms.get(suffix).isEmpty()) {
-				st.append("("+picked);
+				st.append("(").append(picked.toLowerCase());
 				for (String synonym : allSynonyms.get(suffix)) {
-					st.append(" OR "+prefix+synonym);
+					st.append(" OR ").append(prefix+synonym);
 				}
 				st.append(")");
 			}
