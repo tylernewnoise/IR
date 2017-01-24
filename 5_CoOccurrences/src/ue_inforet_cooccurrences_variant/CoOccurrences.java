@@ -1,6 +1,5 @@
 package ue_inforet_cooccurrences_variant;
 
-import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -66,7 +65,9 @@ public class CoOccurrences {
 			StandardCharsets.ISO_8859_1))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("MV:") || (line.startsWith("PL:"))) {
+				if (line.startsWith("MV:")) {
+					parseTitle(StringUtils.substring(line, 4, line.length()).toLowerCase());
+				} else if (line.startsWith("PL:")) {
 					StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 4,
 						line.length()).toLowerCase(), " .,:!?", false);
 					while (st.hasMoreTokens()) {
@@ -78,13 +79,71 @@ public class CoOccurrences {
 					}
 				}
 			}
-		} catch (Exception e) {
+		} catch (
+			Exception e)
+
+		{
 			e.printStackTrace();
 		}
 		System.out.println("Tokenized " + allWords.size() + " token.");
 	}
 
-	private void sortWordCount() {
+	// handle the different title formats
+	private void parseTitle(String title) {
+		// remove {{SUSPENDED}}
+		if (title.contains("{{suspended}}")) {
+			title = title.replace(" {{suspended}}", "").intern();
+		}
+
+		StringTokenizer st;
+
+		// +++ series +++
+		if (title.startsWith("\"") && !title.endsWith("}")) {
+			int end = 3;
+			// remove the year
+			for (int i = title.length() - 1; title.charAt(i) != '('; --i) {
+				end++;
+			}
+
+			st = new StringTokenizer(title.substring(1, title.length() - end).intern(), " .,:!?", false);
+		}
+		// +++ episode +++
+		else if (title.startsWith("\"") && title.endsWith("}")) {
+			int end = 3;
+
+			// remove episodeTitle
+			title = StringUtils.substring(title, 0, title.indexOf('{') - 1).toLowerCase().intern();
+
+			// remove the year
+			for (int i = title.length() - 1; title.charAt(i) != '('; --i) {
+				end++;
+			}
+
+			st = new StringTokenizer(title.substring(1, title.length() - end).intern()," .,:!?", false);
+		}
+		// +++ movie +++
+		else {
+			int end = 3;
+			// remove the year
+			for (int i = title.length() - 1; title.charAt(i) != '('; --i) {
+				end++;
+			}
+
+			st = new StringTokenizer(title.substring(0, title.length() - end + 1).intern()," .,:!?", false);
+		}
+
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			if (!stopWords.contains(token)) {
+				allWords.putIfAbsent(token, new TIntArrayList());
+				wordCount.adjustOrPutValue(token, 1, 1);
+			}
+			//System.out.println(token);
+		}
+	}
+
+
+/*	private void sortWordCount() {
 		TObjectIntIterator it = wordCount.iterator();
 
 		for (int i = 0; i < wordCount.size(); ++i) {
@@ -94,15 +153,15 @@ public class CoOccurrences {
 
 		sortedWords.sort((o1, o2) -> o2.second.compareTo(o1.second));
 
-/*		for (int i = 0; i < 10; ++i) {
+*//*		for (int i = 0; i < 10; ++i) {
 			System.out.println("word: \"" + sortedWords.get(i).first + "\", count: " + sortedWords.get(i).second);
-		}*/
+		}*//*
 		int occur = 0;
 		while (sortedWords.get(occur).second > 1000) {
 			++occur;
 		}
 		System.out.println("Number of words with occurrences > 1k: " + occur + ".");
-	}
+	}*/
 
 	public static void main(String[] args) {
 		CoOccurrences co = new CoOccurrences();
@@ -122,6 +181,6 @@ public class CoOccurrences {
 		tac = tac / 1000000000;
 		System.out.println("Time: " + tac + "s");
 
-		co.sortWordCount();
+		//co.sortWordCount();
 	}
 }
