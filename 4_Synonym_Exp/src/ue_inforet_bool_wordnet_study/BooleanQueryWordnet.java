@@ -63,22 +63,23 @@ public class BooleanQueryWordnet {
 					continue;
 				}
 				// split read words
-				String[] justSplit = StringUtils.substring(line, 17).split( Pattern.quote( " \\d " ) );
+				String[] justSplit = StringUtils.substring(line, 17).split( Pattern.quote( " " ) );
 				// read/process the split words
 
 				THashSet<String> tmp =  new THashSet<>();
-				for (int i=0; i < justSplit.length; i++){
+				for (int i=0; i <= wordCount;) {
 					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
+						i = i+2;
 						continue; // leave this word alone
 					}
 					// adjective?
-					if (adjective && (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)") || justSplit[i].endsWith("(ip)"))){
-						if (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)")){
+					if (adjective && (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)") || justSplit[i].endsWith("(ip)"))) {
+						if (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)")) {
 							justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 3);
-						}
-						else justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 4);
+						} else justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 4);
 					}
 					tmp.add(justSplit[i].toLowerCase());
+					i = i+2;
 				}
 				synDex(tmp, type); // run bennys magic
 			}
