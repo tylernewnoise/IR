@@ -3,32 +3,7 @@ package ue_inforet_bool_wordnet_study;
 
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.*;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.apache.lucene.document.Document;
-import java.util.Map;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.IndexSearcher;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -39,7 +14,6 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -48,16 +22,113 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 public class BooleanQueryWordnet {
 	// global accessible index :)
 	Directory index = new RAMDirectory();
 	// set Analyzer
 	Analyzer myAnalyzer = new StandardAnalyzer();
 
-	private static THashMap<String, THashSet<String>> allSynonyms = new THashMap<>();
-	private static THashMap<String, THashSet<String>> adverbs = new THashMap<>();
-	private static THashMap<String, THashSet<String>> adjectives = new THashMap<>();
-	private static THashMap<String, THashSet<String>> verbs = new THashMap<>();
+ 	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>();
+	private THashMap<String, THashSet<String>> verbs = new THashMap<>();
+ 	private THashMap<String, THashSet<String>> adjectives = new THashMap<>();
+ 	private THashMap<String, THashSet<String>> adverbs = new THashMap<>();
+
+ 	// Parse Data Files
+	private void parseData(String fileName, int type) {
+		int wordCount;
+		int skipNotice = 29; // 29 lines of copyright notice to skip
+		boolean adjective = fileName.endsWith("adj"); // special handling for adjectives necessary
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (skipNotice > 0){
+					skipNotice--; // count down
+					continue;  // break the current while cycle to skip notice
+				}
+
+				// Get the expected amount of words in the current line
+				wordCount = Integer.parseInt(StringUtils.substring(line,14,16),16);  // 14,16 -> to get the 2 digit Hex val. Last 16 because its Hex
+				if (wordCount == 1) { // only one word...
+					continue;
+				}
+				// split read words
+				String[] justSplit = StringUtils.substring(line, 18).split( Pattern.quote( " 0 " ) );
+				// read/process the split words
+
+				if (justSplit[0].contains("_")) {   // does this one word is made of >=2 tokens?
+					continue; // leave this line alone
+				}
+
+				THashSet<String> tmp =  new THashSet<>();
+				for (int i=0; i < wordCount; i++){
+					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
+						continue; // leave this word alone
+					}
+					// adjective?
+					if (adjective && (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)") || justSplit[i].endsWith("(ip)"))){
+						if (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)")){
+							justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 3);
+						}
+						else justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 4);
+					}
+					tmp.add(justSplit[i].toLowerCase());
+				}
+				synDex(tmp, type); // run bennys magic
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
+	// Parse Exc Files
+	private void parseExc(String fileName, int type) {
+		int wordCount;
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				// split read words
+				String[] justSplit = StringUtils.substring(line, 0).split( Pattern.quote( " " ) );
+
+				// wenn nur ein Wort in der Zeile ist... skippe Zeile
+				wordCount = justSplit.length;
+				if (wordCount < 2) continue;
+
+				// else
+				// read/process the split words
+				if (justSplit[0].contains("_")) {   // does this one word is made of >=2 tokens?
+					continue; // leave this line alone
+				}
+
+				THashSet<String> tmp =  new THashSet<>();
+				for (int i=0; i < wordCount; i++){
+					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
+						continue; // leave this word alone
+					}
+					tmp.add(justSplit[i].toLowerCase());
+				}
+				synDex(tmp, type); // run bennys magic :)
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -82,7 +153,16 @@ public class BooleanQueryWordnet {
 	 * @param wordnetDir the directory of the wordnet files
 	 */
 	public void buildSynsets(String wordnetDir) {
-		// TODO: insert code here
+		parseData(wordnetDir + "data.noun", 3);
+		parseData(wordnetDir + "data.verb", 4);
+		parseData(wordnetDir + "data.adj", 1);
+		parseData(wordnetDir + "data.adv", 2);
+		parseExc(wordnetDir + "noun.exc", 7);
+		parseExc(wordnetDir + "verb.exc", 8);
+		parseExc(wordnetDir + "adj.exc", 5);
+		parseExc(wordnetDir + "adv.exc", 6);
+
+		mergeLists();
 	}
 
 	/***Adds a list of token into the fitting Hashmap
@@ -90,7 +170,7 @@ public class BooleanQueryWordnet {
 	 * @param tokenList
 	 * @param type
 	 */
-	public static void synDex (THashSet<String> tokenList, int type){
+	private void synDex (THashSet<String> tokenList, int type){
 		THashSet<String> baseFormSynset = new THashSet<>();
 		switch (type) {
 
@@ -178,7 +258,7 @@ public class BooleanQueryWordnet {
 	 * @param token
 	 * @param synonymList
 	 */
-	private static void addToHashmap(THashMap<String, THashSet<String>> hashMap, String token, THashSet<String> synonymList) {
+	private void addToHashmap(THashMap<String, THashSet<String>> hashMap, String token, THashSet<String> synonymList) {
 		if (hashMap.containsKey(token)) {
 			hashMap.get(token).addAll(synonymList);
 			hashMap.get(token).remove(token);
@@ -194,7 +274,7 @@ public class BooleanQueryWordnet {
 	/***
 	 * Merges all HashMaps into allSynonyms HashMap
 	 */
-	private static void mergeLists(){
+	private void mergeLists(){
 		ArrayList<THashMap<String, THashSet<String>>> allLists = new ArrayList<>();
 		allLists.add(adjectives);
 		allLists.add(adverbs);
@@ -345,7 +425,7 @@ public class BooleanQueryWordnet {
 		}
 	}
 
-	public String parseQueryString(String originalQuery) {
+	private String parseQueryString(String originalQuery) {
 		HashSet<String> toModify = new HashSet<>();
 		String modString = originalQuery;
 		Pattern plPattern = Pattern.compile("plot:[^ )]*");
@@ -374,7 +454,7 @@ public class BooleanQueryWordnet {
 			if (allSynonyms.containsKey(suffix) &&!allSynonyms.get(suffix).isEmpty()) {
 				st.append("(").append(picked.toLowerCase());
 				for (String synonym : allSynonyms.get(suffix)) {
-					st.append(" OR ").append(prefix+synonym);
+					st.append(" OR ").append(prefix).append(synonym);
 				}
 				st.append(")");
 			}
