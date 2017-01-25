@@ -11,8 +11,107 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+
 
 public class BooleanQueryWordnet {
+
+ 	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>();
+	private THashMap<String, THashSet<String>> verbs = new THashMap<>();
+ 	private THashMap<String, THashSet<String>> adjectivs = new THashMap<>();
+ 	private THashMap<String, THashSet<String>> adverbs = new THashMap<>();
+
+ 	// Parse Data Files
+	private void parseData(String fileName, int type) {
+		int wordCount = 0;
+		int skipNotice = 29; // 29 lines of copyright notice to skip
+		boolean adjective = fileName.endsWith("adj"); // special handling for adjectives necessary
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (skipNotice > 0){
+					skipNotice--; // count down
+					continue;  // break the current while cycle to skip notice
+				}
+
+				// Get the expected amount of words in the current line
+				wordCount = Integer.parseInt(StringUtils.substring(line,14,16),16);  // 14,16 -> to get the 2 digit Hex val. Last 16 because its Hex
+				if (wordCount == 1) { // only one word...
+					continue;
+				}
+				// split read words
+				String[] justSplit = StringUtils.substring(line, 18).split( Pattern.quote( " 0 " ) );
+				// read/process the split words
+
+				if (justSplit[0].contains("_")) {   // does this one word is made of >=2 tokens?
+					continue; // leave this line alone
+				}
+
+				THashSet<String> tmp =  new THashSet();
+				for (int i=0; i < wordCount; i++){
+					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
+						continue; // leave this word alone
+					}
+					// adjective?
+					if (adjective && (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)") || justSplit[i].endsWith("(ip)"))){
+						if (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)")){
+							justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 3);
+						}
+						else justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 4);
+					}
+					tmp.add(justSplit[i].toLowerCase());
+				}
+				synDex(tmp, type); // run bennys magic
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
+
+	// Parse Exc Files
+	private void parseExc(String fileName, int type) {
+		int wordCount = 0;
+
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				// split read words
+				String[] justSplit = StringUtils.substring(line, 0).split( Pattern.quote( " " ) );
+
+				// wenn nur ein Wort in der Zeile ist... skippe Zeile
+				wordCount = justSplit.length;
+				if (wordCount < 2) continue;
+
+				// else
+				// read/process the split words
+				if (justSplit[0].contains("_")) {   // does this one word is made of >=2 tokens?
+					continue; // leave this line alone
+				}
+
+				THashSet<String> tmp =  new THashSet();
+				for (int i=0; i < wordCount; i++){
+					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
+						continue; // leave this word alone
+					}
+					tmp.add(justSplit[i].toLowerCase());
+				}
+				synDex(tmp, type); // run bennys magic :)
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
 
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
@@ -39,6 +138,18 @@ public class BooleanQueryWordnet {
 	 */
 	public void buildSynsets(String wordnetDir) {
 		// TODO: insert code here
+		parseData(wordnetDir + "data.noun", 3);
+		parseData(wordnetDir + "data.verb", 4);
+		parseData(wordnetDir + "data.adj", 1);
+		parseData(wordnetDir + "data.adv", 2);
+		parseExc(wordnetDir + "noun.exc", 7);
+		parseExc(wordnetDir + "verb.exc", 8);
+		parseExc(wordnetDir + "adj.exc", 5);
+		parseExc(wordnetDir + "adv.exc", 6);
+
+		mergeLists(adverbs);
+		mergeLists(verbs);
+		mergeLists(adjectivs);
 	}
 
 	/**
