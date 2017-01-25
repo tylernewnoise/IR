@@ -10,6 +10,12 @@ public class Bigram {
 	private String second;
 	private double score;
 
+	public Bigram(String first, String second) {
+		this.first = first;
+		this.second = second;
+		this.score = -1;
+	}
+
 	public int hashCode() {
 		return this.first.hashCode() + this.second.hashCode();
 	}
@@ -29,26 +35,10 @@ public class Bigram {
 
 	/***
 	 *
-	 * @param first sets first word of the bigram
-	 */
-	void setFirst(String first) {
-		this.first = first;
-	}
-
-	/***
-	 *
 	 * @return second word of the bigram
 	 */
 	String getSecond() {
 		return this.second;
-	}
-
-	/***
-	 *
-	 * @param second sets second word of the bigram
-	 */
-	void setSecond(String second) {
-		this.second = second;
 	}
 
 	/***
@@ -75,5 +65,4 @@ public class Bigram {
 			return this.score;
 		}
 	}
-
 }
