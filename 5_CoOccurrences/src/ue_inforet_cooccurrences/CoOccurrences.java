@@ -136,12 +136,12 @@ public class CoOccurrences {
 		}
 
 		// if there is only one word in the title add the word to the overall wordcount
-		if (titleTokens.size() < 2) {
+		if (titleTokens.size() == 1) {
 			// count it only if it is not a stop word
 			if (!stopWords.contains(titleTokens.get(0))) {
 				allWords.adjustOrPutValue(titleTokens.get(0), 1, 1);
 			}
-		} else {
+		} else if (titleTokens.size() > 1) {
 			createBiGram(titleTokens);
 		}
 	}
