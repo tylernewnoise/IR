@@ -81,7 +81,9 @@ public class BooleanQueryWordnet {
 					tmp.add(justSplit[i].toLowerCase());
 					i = i+2;
 				}
-				synDex(tmp, type); // run bennys magic
+				if (tmp.size() > 0) {
+					synDex(tmp, type); // run bennys magic :)
+				}
 			}
 		}
 		catch (IOException e) {
@@ -117,7 +119,9 @@ public class BooleanQueryWordnet {
 					}
 					tmp.add(justSplit[i].toLowerCase());
 				}
-				synDex(tmp, type); // run bennys magic :)
+				if (tmp.size() > 0) {
+					synDex(tmp, type); // run bennys magic :)
+				}
 			}
 		}
 		catch (IOException e) {
@@ -150,14 +154,14 @@ public class BooleanQueryWordnet {
 	 * @param wordnetDir the directory of the wordnet files
 	 */
 	public void buildSynsets(String wordnetDir) {
-		parseData(wordnetDir + "data.noun", 3);
-		parseData(wordnetDir + "data.verb", 4);
+		parseData(wordnetDir + "data2.noun", 3);
+		/*parseData(wordnetDir + "data.verb", 4);
 		parseData(wordnetDir + "data.adj", 1);
 		parseData(wordnetDir + "data.adv", 2);
 		parseExc(wordnetDir + "noun.exc", 7);
 		parseExc(wordnetDir + "verb.exc", 8);
 		parseExc(wordnetDir + "adj.exc", 5);
-		parseExc(wordnetDir + "adv.exc", 6);
+		parseExc(wordnetDir + "adv.exc", 6);*/
 
 		mergeLists();
 	}
