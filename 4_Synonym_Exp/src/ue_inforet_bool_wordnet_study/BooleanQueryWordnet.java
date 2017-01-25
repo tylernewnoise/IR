@@ -63,11 +63,11 @@ public class BooleanQueryWordnet {
 					continue;
 				}
 				// split read words
-				String[] justSplit = StringUtils.substring(line, 17).split( Pattern.quote( " 0 " ) );
-
+				String[] justSplit = StringUtils.substring(line, 17).split( Pattern.quote( " \\d " ) );
 				// read/process the split words
+
 				THashSet<String> tmp =  new THashSet<>();
-				for (int i=0; i < wordCount; i++){
+				for (int i=0; i < justSplit.length; i++){
 					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
 						continue; // leave this word alone
 					}
@@ -105,6 +105,9 @@ public class BooleanQueryWordnet {
 
 				// else
 				// read/process the split words
+				if (justSplit[0].contains("_")) {   // does this one word is made of >=2 tokens?
+					continue; // leave this line alone
+				}
 
 				THashSet<String> tmp =  new THashSet<>();
 				for (int i=0; i < wordCount; i++){
