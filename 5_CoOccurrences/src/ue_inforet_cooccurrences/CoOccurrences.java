@@ -33,29 +33,55 @@ public class CoOccurrences {
 	}
 
 	private void parsePlotList(String plotFile) {
+		boolean isPlotLine = false;
+		ArrayList<String> plotTokens = new ArrayList<>();
+
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
 			StandardCharsets.ISO_8859_1))) {
 			String line;
 
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("MV:")) {
+					// was the line before a PL:-line? if yes make some bigrams of the plot
+					if (isPlotLine) {
+						createBiGram(plotTokens);
+						// create a new list for the next plot description
+						plotTokens = new ArrayList<>();
+						isPlotLine = false;
+					}
 					parseTitle(line.substring(4, line.length()).toLowerCase());
 				} else if (line.startsWith("PL:")) {
+					isPlotLine = true;
+
 					StringTokenizer st = new StringTokenizer(line.substring(4, line.length()).
 						toLowerCase(), " .,:!?", false);
+
+					// tokenize the plot
 					while (st.hasMoreTokens()) {
-						String token = st.nextToken();
-						if (!stopWords.contains(token)) {
-							allWords.adjustOrPutValue(token, 1, 1);
-						}
-						// TODO add occurrences and check for stop words and stuff
-						// check if line before was MV:Line or plot. if plot, take the last word
-						// as well
+						plotTokens.add(st.nextToken());
 					}
 				}
 			}
+			// add the last plot of the file
+			createBiGram(plotTokens);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void createBiGram(ArrayList<String> tokenList) {
+		// count the words in the plot without stop-words
+		for (String token : tokenList) {
+			if (!stopWords.contains(token)) {
+				allWords.adjustOrPutValue(token, 1, 1);
+			}
+		}
+		// create some bigrams
+		for (int i = 0; i + 1 < tokenList.size(); ++i) {
+			// check for stop words in the bigram
+			if (!stopWords.contains(tokenList.get(i)) && !stopWords.contains(tokenList.get(i + 1))) {
+				allBigrams.adjustOrPutValue(new Bigram(tokenList.get(i), tokenList.get(i + 1)), 1, 1);
+			}
 		}
 	}
 
@@ -116,22 +142,7 @@ public class CoOccurrences {
 				allWords.adjustOrPutValue(titleTokens.get(0), 1, 1);
 			}
 		} else {
-			// count the words in the title (excluding stop words)
-			for (String token : titleTokens) {
-				if (!stopWords.contains(token)) {
-					allWords.adjustOrPutValue(token, 1, 1);
-				}
-			}
-			// run through the list, build the bigrams if possible and count it
-			for (int i = 0; i + 1 < titleTokens.size(); ++i) {
-				// check for stop words
-				if (!stopWords.contains(titleTokens.get(i)) && !stopWords.contains(titleTokens.get(i + 1))) {
-					Bigram bg = new Bigram();
-					bg.setFirst(titleTokens.get(i));
-					bg.setSecond(titleTokens.get(i + 1));
-					allBigrams.adjustOrPutValue(bg, 1, 1);
-				}
-			}
+			createBiGram(titleTokens);
 		}
 	}
 
@@ -147,5 +158,6 @@ public class CoOccurrences {
 		co.parseStopWords();
 		System.out.println("Parsing plot.list...");
 		co.parsePlotList(args[0]);
+
 	}
 }
