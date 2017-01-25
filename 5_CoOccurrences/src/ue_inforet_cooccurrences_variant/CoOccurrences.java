@@ -1,7 +1,6 @@
 package ue_inforet_cooccurrences_variant;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.THashMap;
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -18,33 +17,31 @@ import org.apache.commons.lang3.StringUtils;
 
 public class CoOccurrences {
 	private THashSet<String> stopWords = new THashSet<>(175);
-	private THashMap<String, TIntArrayList> allWords = new THashMap<>();
-	private TObjectIntHashMap<String> wordCount = new TObjectIntHashMap<>();
-	private ArrayList<Tuple<String, Integer>> sortedWords = new ArrayList<>();
+	private TObjectIntHashMap<Bigram<String, String>> allBigrams = new TObjectIntHashMap<>(7650000);
+	private TObjectIntHashMap<String> wordCount = new TObjectIntHashMap<>(766000);
 
 	// constructor
 	private CoOccurrences() {
 	}
 
-	class Tuple<K, V> {
+	class Bigram<K, V> {
 		K first;
 		V second;
 
-		Tuple(K f, V s) {
+		Bigram(K f, V s) {
 			this.first = f;
 			this.second = s;
 		}
 
-/*		@Override
 		public int hashCode() {
 			return this.first.hashCode() + this.second.hashCode();
 		}
 
-		@Override
+		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		public boolean equals(Object obj) {
-			return this.first.equals(((Tuple<?, ?>) obj).first)
-				&& this.second.equals(((Tuple<?, ?>) obj).second);
-		}*/
+			return this.first.equals(((Bigram<?, ?>) obj).first)
+				&& this.second.equals(((Bigram<?, ?>) obj).second);
+		}
 	}
 
 	// parse and safe the stop-words
@@ -60,29 +57,59 @@ public class CoOccurrences {
 		}
 	}
 
+	// parse the plot.list file
 	private void parsePlotList(String plotFile) {
+		boolean isPlotLine = false;
+		ArrayList<String> plotTokens = new ArrayList<>();
+
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
 			StandardCharsets.ISO_8859_1))) {
 			String line;
+
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("MV:")) {
-					parseTitle(StringUtils.substring(line, 4, line.length()).toLowerCase());
+					// was the line before a PL:-line? if yes make some bigrams of the plot
+					if (isPlotLine) {
+						createBiGram(plotTokens);
+						// create a new list for the next plot description
+						plotTokens = new ArrayList<>();
+						isPlotLine = false;
+					}
+					parseTitle(line.substring(4, line.length()).toLowerCase());
 				} else if (line.startsWith("PL:")) {
-					StringTokenizer st = new StringTokenizer(StringUtils.substring(line, 4,
-						line.length()).toLowerCase(), " .,:!?", false);
+					isPlotLine = true;
+
+					StringTokenizer st = new StringTokenizer(line.substring(4, line.length()).
+						toLowerCase(), " .,:!?", false);
+
+					// tokenize the plot
 					while (st.hasMoreTokens()) {
-						String token = st.nextToken();
-						if (!stopWords.contains(token)) {
-							allWords.putIfAbsent(token, new TIntArrayList());
-							wordCount.adjustOrPutValue(token, 1, 1);
-						}
+						plotTokens.add(st.nextToken());
 					}
 				}
 			}
+			// add the last plot of the file
+			createBiGram(plotTokens);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("Tokenized " + allWords.size() + " token.");
+	}
+
+	// create a bigram out of a list of tokens
+	private void createBiGram(ArrayList<String> tokenList) {
+		// count the words in the plot without stop-words
+		for (String token : tokenList) {
+			if (!stopWords.contains(token)) {
+				wordCount.adjustOrPutValue(token, 1, 1);
+			}
+		}
+		// create some bigrams
+		for (int i = 0; i + 1 < tokenList.size(); ++i) {
+			// check for stop words in the bigram
+			if (!stopWords.contains(tokenList.get(i)) && !stopWords.contains(tokenList.get(i + 1))) {
+				allBigrams.adjustOrPutValue(new Bigram<>(tokenList.get(i), tokenList.get(i + 1)), 1, 1);
+			}
+		}
 	}
 
 	// handle the different title formats
@@ -129,36 +156,51 @@ public class CoOccurrences {
 			st = new StringTokenizer(title.substring(0, title.length() - end + 1).intern(), " .,:!?", false);
 		}
 
+		// put all the title words in a list.
+		ArrayList<String> titleTokens = new ArrayList<>();
 		while (st.hasMoreTokens()) {
-			String token = st.nextToken();
-			if (!stopWords.contains(token)) {
-				allWords.putIfAbsent(token, new TIntArrayList());
-				wordCount.adjustOrPutValue(token, 1, 1);
+			titleTokens.add(st.nextToken());
+		}
+
+		// if there is only one word in the title add the word to the overall wordcount
+		if (titleTokens.size() == 1) {
+			// count it only if it is not a stop word
+			if (!stopWords.contains(titleTokens.get(0))) {
+				wordCount.adjustOrPutValue(titleTokens.get(0), 1, 1);
 			}
-			//System.out.println(token);
+		} else if (titleTokens.size() > 1) {
+			createBiGram(titleTokens);
 		}
 	}
 
+	// calculate the collocations and print the 1k highest scored
+	private void calcCollocations() {
+		ArrayList<Bigram<String, Double>> results = new ArrayList<>();
 
-/*	private void sortWordCount() {
-		TObjectIntIterator it = wordCount.iterator();
-
-		for (int i = 0; i < wordCount.size(); ++i) {
+		// iterate through all the bigrams
+		TObjectIntIterator<Bigram<String, String>> it = allBigrams.iterator();
+		for (int i = 0; i < allBigrams.size(); ++i) {
 			it.advance();
-			sortedWords.add(new Tuple<>(it.key().toString(), it.value()));
+			// if both words of the collocation are more than 1k times in the plot, calculate the score
+			if ((wordCount.get(it.key().first) >= 1000) && (wordCount.get(it.key().second) >= 1000)) {
+				// WOAH, what a line! ok, this happens here: we add every matching bigram as one string
+				// to our results list; we also add the score, which was the 2 times the frequency of a
+				// bigram (it.value()) divided through the frequency of the words building the bigram
+				// (it.key.first/second are the two words). we have to cast this into double.
+				results.add(new Bigram<>(it.key().first + " " + it.key().second,
+					(2 * it.value()) / (double) (wordCount.get(it.key().first)
+						+ wordCount.get(it.key().second))));
+			}
 		}
 
-		sortedWords.sort((o1, o2) -> o2.second.compareTo(o1.second));
+		// sort for the score
+		results.sort((o1, o2) -> o2.second.compareTo(o1.second));
 
-*//*		for (int i = 0; i < 10; ++i) {
-			System.out.println("word: \"" + sortedWords.get(i).first + "\", count: " + sortedWords.get(i).second);
-		}*//*
-		int occur = 0;
-		while (sortedWords.get(occur).second > 1000) {
-			++occur;
+		// TODO print 1k
+		for (int i = 0; i < 10; ++i) {
+			System.out.println(results.get(i).first + " " + results.get(i).second);
 		}
-		System.out.println("Number of words with occurrences > 1k: " + occur + ".");
-	}*/
+	}
 
 	public static void main(String[] args) {
 		CoOccurrences co = new CoOccurrences();
@@ -169,15 +211,14 @@ public class CoOccurrences {
 		}
 
 		System.out.println("Parsing stop.words...");
-		co.parseStopWords();
-
-		System.out.println("Parsing plot.list...");
 		long tic = System.nanoTime();
+		co.parseStopWords();
+		System.out.println("Parsing plot.list...");
 		co.parsePlotList(args[0]);
+		System.out.println("Calculating Collocations...");
+		co.calcCollocations();
 		double tac = System.nanoTime() - tic;
 		tac = tac / 1000000000;
 		System.out.println("Time: " + tac + "s");
-
-		//co.sortWordCount();
 	}
 }
