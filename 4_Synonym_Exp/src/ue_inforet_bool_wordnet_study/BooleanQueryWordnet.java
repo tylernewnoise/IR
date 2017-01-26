@@ -67,7 +67,7 @@ public class BooleanQueryWordnet {
 				// read/process the split words
 
 				THashSet<String> tmp =  new THashSet<>();
-				for (int i=0; i <= wordCount;) {
+				for (int i=0; i <= wordCount*2-1;) {
 					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
 						i = i+2;
 						continue; // leave this word alone
@@ -81,8 +81,11 @@ public class BooleanQueryWordnet {
 					tmp.add(justSplit[i].toLowerCase());
 					i = i+2;
 				}
-				if (tmp.size() > 0) {
-					synDex(tmp, type); // run bennys magic :)
+				if (tmp.size() > 1) {
+					if (tmp.contains("well")){
+						System.out.println();
+					}
+					synDex(tmp, type); // run bennis magic :)
 				}
 			}
 		}
@@ -154,16 +157,22 @@ public class BooleanQueryWordnet {
 	 * @param wordnetDir the directory of the wordnet files
 	 */
 	public void buildSynsets(String wordnetDir) {
-		parseData(wordnetDir + "data2.noun", 3);
-		/*parseData(wordnetDir + "data.verb", 4);
+		parseData(wordnetDir + "data.noun", 3);
+		parseData(wordnetDir + "data.verb", 4);
 		parseData(wordnetDir + "data.adj", 1);
 		parseData(wordnetDir + "data.adv", 2);
 		parseExc(wordnetDir + "noun.exc", 7);
 		parseExc(wordnetDir + "verb.exc", 8);
 		parseExc(wordnetDir + "adj.exc", 5);
-		parseExc(wordnetDir + "adv.exc", 6);*/
-
+		parseExc(wordnetDir + "adv.exc", 6);
+		System.out.println("Not merged: " + adjectives.size()+verbs.size()+adverbs.size()+allSynonyms.size());
 		mergeLists();
+		System.out.println("Merged: " + allSynonyms.size());
+		System.out.println();
+		System.out.println("better: "+ allSynonyms.get("better"));
+		System.out.println("good: " + allSynonyms.get("good"));
+		System.out.println("well: " + allSynonyms.get("well"));
+
 	}
 
 	/***Adds a list of token into the fitting Hashmap
@@ -187,6 +196,9 @@ public class BooleanQueryWordnet {
 				break;
 			case 3: //data nouns
 				for (String token : tokenList) {
+					if (tokenList.contains("fountainhead")){
+						System.out.println();
+					}
 					addToHashmap(allSynonyms, token, tokenList);
 				}
 				break;
@@ -275,22 +287,46 @@ public class BooleanQueryWordnet {
 	/***
 	 * Merges all HashMaps into allSynonyms HashMap
 	 */
-	private void mergeLists(){
+	//private void mergeLists(){
+	//	ArrayList<THashMap<String, THashSet<String>>> allLists = new ArrayList<>();
+	//	allLists.add(adjectives);
+	//	allLists.add(adverbs);
+	//	allLists.add(verbs);
+	//
+	//	for (THashMap<String, THashSet<String>> list : allLists){
+	//		for (Map.Entry<String, THashSet<String>> synsetEntry : list.entrySet()) {
+	//			if (!allSynonyms.containsKey(synsetEntry.getKey())) {
+	//				allSynonyms.put(synsetEntry.getKey(), synsetEntry.getValue());
+	//			} else {
+	//				allSynonyms.get(synsetEntry.getKey()).addAll(synsetEntry.getValue());
+	//			}
+	//		}
+	//	}
+	//
+	//}
+
+	/***
+	 * Merges all HashMaps into allSynonyms HashMap
+	 */
+	private void mergeLists() {
 		ArrayList<THashMap<String, THashSet<String>>> allLists = new ArrayList<>();
 		allLists.add(adjectives);
 		allLists.add(adverbs);
 		allLists.add(verbs);
 
-		for (THashMap<String, THashSet<String>> list : allLists){
-			for (Map.Entry<String, THashSet<String>> synsetEntry : list.entrySet()) {
-				if (!allSynonyms.containsKey(synsetEntry.getKey())) {
-					allSynonyms.put(synsetEntry.getKey(), synsetEntry.getValue());
+		for (THashMap<String, THashSet<String>> list : allLists) {
+
+			for (Map.Entry<String, THashSet<String>> entry : list.entrySet()) {
+
+				if (allSynonyms.containsKey(entry.getKey())) {
+					//System.out.println(entry.getKey());
+					allSynonyms.get(entry.getKey()).addAll(entry.getValue());
 				} else {
-					allSynonyms.get(synsetEntry.getKey()).addAll(synsetEntry.getValue());
+					allSynonyms.put(entry.getKey(), entry.getValue());
 				}
+
 			}
 		}
-
 	}
 
 	/**
@@ -498,7 +534,7 @@ public class BooleanQueryWordnet {
 			TopDocs hits = indexSearcher.search(qry, Integer.MAX_VALUE);
 			for(ScoreDoc scoreDoc : hits.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
-				results.add(doc.get("mvline"));
+				results.add(doc.get("movieline"));
 			}
 		}
 		catch (Exception e) {
