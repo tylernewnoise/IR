@@ -38,12 +38,12 @@ public class BooleanQueryWordnet {
 	// set Analyzer
 	Analyzer myAnalyzer = new StandardAnalyzer();
 
- 	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>();
+	private THashMap<String, THashSet<String>> allSynonyms = new THashMap<>();
 	private THashMap<String, THashSet<String>> verbs = new THashMap<>();
- 	private THashMap<String, THashSet<String>> adjectives = new THashMap<>();
- 	private THashMap<String, THashSet<String>> adverbs = new THashMap<>();
+	private THashMap<String, THashSet<String>> adjectives = new THashMap<>();
+	private THashMap<String, THashSet<String>> adverbs = new THashMap<>();
 
- 	// Parse Data Files
+	// Parse Data Files
 	private void parseData(String fileName, int type) {
 		int wordCount;
 		int skipNotice = 29; // 29 lines of copyright notice to skip
@@ -52,44 +52,42 @@ public class BooleanQueryWordnet {
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), StandardCharsets.ISO_8859_1))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (skipNotice > 0){
+				if (skipNotice > 0) {
 					skipNotice--; // count down
 					continue;  // break the current while cycle to skip notice
 				}
 
 				// Get the expected amount of words in the current line
-				wordCount = Integer.parseInt(StringUtils.substring(line,14,16),16);  // 14,16 -> to get the 2 digit Hex val. Last 16 because its Hex
+				wordCount = Integer.parseInt(StringUtils.substring(line, 14, 16), 16);  // 14,16 -> to get the 2 digit Hex val. Last 16 because its Hex
 				if (wordCount == 1) { // only one word...
 					continue;
 				}
 				// split read words
-				String[] justSplit = StringUtils.substring(line, 17).split( Pattern.quote( " " ) );
+				String[] justSplit = StringUtils.substring(line, 17).split(Pattern.quote(" "));
 				// read/process the split words
 
-				THashSet<String> tmp =  new THashSet<>();
-				for (int i=0; i <= wordCount*2-1;) {
+				THashSet<String> tmp = new THashSet<>();
+				for (int i = 0; i <= wordCount * 2 - 1; ) {
 					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
-						i = i+2;
+						i = i + 2;
 						continue; // leave this word alone
 					}
 					// adjective?
 					if (adjective && (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)") || justSplit[i].endsWith("(ip)"))) {
 						if (justSplit[i].endsWith("(p)") || justSplit[i].endsWith("(a)")) {
 							justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 3);
-						} else justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 4);
+						} else {
+							justSplit[i] = StringUtils.substring(justSplit[i], 0, justSplit[i].length() - 4);
+						}
 					}
 					tmp.add(justSplit[i].toLowerCase());
-					i = i+2;
+					i = i + 2;
 				}
 				if (tmp.size() > 1) {
-					if (tmp.contains("well")){
-						System.out.println();
-					}
 					synDex(tmp, type); // run bennis magic :)
 				}
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -103,11 +101,13 @@ public class BooleanQueryWordnet {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// split read words
-				String[] justSplit = StringUtils.substring(line, 0).split( Pattern.quote( " " ) );
+				String[] justSplit = StringUtils.substring(line, 0).split(Pattern.quote(" "));
 
 				// wenn nur ein Wort in der Zeile ist... skippe Zeile
 				wordCount = justSplit.length;
-				if (wordCount < 2) continue;
+				if (wordCount < 2) {
+					continue;
+				}
 
 				// else
 				// read/process the split words
@@ -115,8 +115,8 @@ public class BooleanQueryWordnet {
 					continue; // leave this line alone
 				}
 
-				THashSet<String> tmp =  new THashSet<>();
-				for (int i=0; i < wordCount; i++){
+				THashSet<String> tmp = new THashSet<>();
+				for (int i = 0; i < wordCount; i++) {
 					if (justSplit[i].contains("_")) {   // does this one word is made of >=2 tokens?
 						continue; // leave this word alone
 					}
@@ -126,18 +126,15 @@ public class BooleanQueryWordnet {
 					synDex(tmp, type); // run bennys magic :)
 				}
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
 	}
 
-
 	/**
 	 * DO NOT ADD ADDITIONAL PARAMETERS TO THE SIGNATURE
 	 * OF THE CONSTRUCTOR.
-	 *
 	 */
 	public BooleanQueryWordnet() {
 	}
@@ -147,11 +144,11 @@ public class BooleanQueryWordnet {
 	 * The data.[noun, verb, adj, adv] files contain the synsets.​
 	 * The [noun, verb, adj, adv].exc	files contain the base forms
 	 * of irregular words.
-	 *
+	 * <p>
 	 * Please refer to ​
-	 *  http://wordnet.princeton.edu/man/wndb.5WN.html
+	 * http://wordnet.princeton.edu/man/wndb.5WN.html
 	 * regarding the syntax of these plain files.​
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 *
 	 * @param wordnetDir the directory of the wordnet files
@@ -165,14 +162,7 @@ public class BooleanQueryWordnet {
 		parseExc(wordnetDir + "verb.exc", 8);
 		parseExc(wordnetDir + "adj.exc", 5);
 		parseExc(wordnetDir + "adv.exc", 6);
-		System.out.println("Not merged: " + adjectives.size()+verbs.size()+adverbs.size()+allSynonyms.size());
 		mergeLists();
-		System.out.println("Merged: " + allSynonyms.size());
-		System.out.println();
-		System.out.println("better: "+ allSynonyms.get("better"));
-		System.out.println("good: " + allSynonyms.get("good"));
-		System.out.println("well: " + allSynonyms.get("well"));
-
 	}
 
 	/***Adds a list of token into the fitting Hashmap
@@ -180,12 +170,12 @@ public class BooleanQueryWordnet {
 	 * @param tokenList
 	 * @param type
 	 */
-	private void synDex (THashSet<String> tokenList, int type){
+	private void synDex(THashSet<String> tokenList, int type) {
 		THashSet<String> baseFormSynset = new THashSet<>();
 		switch (type) {
 
 			case 1: //data adjective
-				for (String token : tokenList){
+				for (String token : tokenList) {
 					addToHashmap(adjectives, token, tokenList);
 				}
 				break;
@@ -196,9 +186,6 @@ public class BooleanQueryWordnet {
 				break;
 			case 3: //data nouns
 				for (String token : tokenList) {
-					if (tokenList.contains("fountainhead")){
-						System.out.println();
-					}
 					addToHashmap(allSynonyms, token, tokenList);
 				}
 				break;
@@ -210,12 +197,12 @@ public class BooleanQueryWordnet {
 			case 5: //exc adjectives
 				baseFormSynset.clear();
 				baseFormSynset.addAll(tokenList);
-				for (String token : tokenList){
+				for (String token : tokenList) {
 					baseFormSynset.remove(token);
-					for (String item : baseFormSynset){
+					for (String item : baseFormSynset) {
 						addToHashmap(adjectives, token, baseFormSynset); // add extensions
-						if (adjectives.get(item) != null){
-							addToHashmap(adjectives, token, adjectives.get(item) ); //add synonyms of extentions
+						if (adjectives.get(item) != null) {
+							addToHashmap(adjectives, token, adjectives.get(item)); //add synonyms of extentions
 						}
 					}
 				}
@@ -223,12 +210,12 @@ public class BooleanQueryWordnet {
 			case 6: //exc adverbs
 				baseFormSynset.clear();
 				baseFormSynset.addAll(tokenList);
-				for (String token : tokenList){
+				for (String token : tokenList) {
 					baseFormSynset.remove(token);
-					for (String item : baseFormSynset){
+					for (String item : baseFormSynset) {
 						addToHashmap(adverbs, token, baseFormSynset); // add extensions
-						if (adverbs.get(item) != null){
-							addToHashmap(adverbs, token, adverbs.get(item) ); //add synonyms of extentions
+						if (adverbs.get(item) != null) {
+							addToHashmap(adverbs, token, adverbs.get(item)); //add synonyms of extentions
 						}
 					}
 				}
@@ -236,12 +223,12 @@ public class BooleanQueryWordnet {
 			case 7: //exc nouns
 				baseFormSynset.clear();
 				baseFormSynset.addAll(tokenList);
-				for (String token : tokenList){
+				for (String token : tokenList) {
 					baseFormSynset.remove(token);
-					for (String item : baseFormSynset){
+					for (String item : baseFormSynset) {
 						addToHashmap(allSynonyms, token, baseFormSynset); // add extensions
-						if (allSynonyms.get(item) != null){
-							addToHashmap(allSynonyms, token, allSynonyms.get(item) ); //add synonyms of extentions
+						if (allSynonyms.get(item) != null) {
+							addToHashmap(allSynonyms, token, allSynonyms.get(item)); //add synonyms of extentions
 						}
 					}
 				}
@@ -249,12 +236,12 @@ public class BooleanQueryWordnet {
 			case 8: // exc verbs
 				baseFormSynset.clear();
 				baseFormSynset.addAll(tokenList);
-				for (String token : tokenList){
+				for (String token : tokenList) {
 					baseFormSynset.remove(token);
-					for (String item : baseFormSynset){
+					for (String item : baseFormSynset) {
 						addToHashmap(verbs, token, baseFormSynset); // add extensions
-						if (verbs.get(item) != null){
-							addToHashmap(verbs, token, verbs.get(item) ); //add synonyms of extentions
+						if (verbs.get(item) != null) {
+							addToHashmap(verbs, token, verbs.get(item)); //add synonyms of extentions
 						}
 					}
 				}
@@ -265,7 +252,7 @@ public class BooleanQueryWordnet {
 		}
 	}
 
-	 /***Adds a  List (HashSet) of synonyms of a single token to a HashMap
+	/***Adds a  List (HashSet) of synonyms of a single token to a HashMap
 	 *
 	 * @param hashMap
 	 * @param token
@@ -287,27 +274,6 @@ public class BooleanQueryWordnet {
 	/***
 	 * Merges all HashMaps into allSynonyms HashMap
 	 */
-	//private void mergeLists(){
-	//	ArrayList<THashMap<String, THashSet<String>>> allLists = new ArrayList<>();
-	//	allLists.add(adjectives);
-	//	allLists.add(adverbs);
-	//	allLists.add(verbs);
-	//
-	//	for (THashMap<String, THashSet<String>> list : allLists){
-	//		for (Map.Entry<String, THashSet<String>> synsetEntry : list.entrySet()) {
-	//			if (!allSynonyms.containsKey(synsetEntry.getKey())) {
-	//				allSynonyms.put(synsetEntry.getKey(), synsetEntry.getValue());
-	//			} else {
-	//				allSynonyms.get(synsetEntry.getKey()).addAll(synsetEntry.getValue());
-	//			}
-	//		}
-	//	}
-	//
-	//}
-
-	/***
-	 * Merges all HashMaps into allSynonyms HashMap
-	 */
 	private void mergeLists() {
 		ArrayList<THashMap<String, THashSet<String>>> allLists = new ArrayList<>();
 		allLists.add(adjectives);
@@ -319,7 +285,6 @@ public class BooleanQueryWordnet {
 			for (Map.Entry<String, THashSet<String>> entry : list.entrySet()) {
 
 				if (allSynonyms.containsKey(entry.getKey())) {
-					//System.out.println(entry.getKey());
 					allSynonyms.get(entry.getKey()).addAll(entry.getValue());
 				} else {
 					allSynonyms.put(entry.getKey(), entry.getValue());
@@ -333,16 +298,14 @@ public class BooleanQueryWordnet {
 	 * A method for reading the textual movie plot file and building a Lucene index.
 	 * The purpose of the index is to speed up subsequent boolean searches using
 	 * the {@link #booleanQuery(String) booleanQuery} method.
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 *
-	 * @param plotFile
-	 *          the textual movie plot file 'plot.list', obtainable from <a
-	 *          href="http://www.imdb.com/interfaces"
-	 *          >http://www.imdb.com/interfaces</a> for personal, non-commercial
-	 *          use.
+	 * @param plotFile the textual movie plot file 'plot.list', obtainable from <a
+	 *                 href="http://www.imdb.com/interfaces"
+	 *                 >http://www.imdb.com/interfaces</a> for personal, non-commercial
+	 *                 use.
 	 */
-
 	public void buildIndices(String plotFile) {
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile), StandardCharsets.ISO_8859_1))) {
@@ -359,7 +322,7 @@ public class BooleanQueryWordnet {
 			// Create a document (and add this document to the index, later):
 			Document doc = new Document();
 
-			while ((line = reader.readLine()) != null){
+			while ((line = reader.readLine()) != null) {
 				// recognize MV: lines and handle them
 				// new movie starts --> write old currentMovieString to Index and reset doc and currentMovieString
 				if (line.startsWith("MV:") && (lastLineWasPlot)) {
@@ -481,21 +444,19 @@ public class BooleanQueryWordnet {
 			if (picked.startsWith("t")) {
 				prefix = "title:";
 				suffix = picked.substring(6);
-			}
-			else {
+			} else {
 				prefix = "plot:";
 				suffix = picked.substring(5);
 			}
 			suffix = suffix.toLowerCase();
 			StringBuilder st = new StringBuilder();
-			if (allSynonyms.containsKey(suffix) &&!allSynonyms.get(suffix).isEmpty()) {
+			if (allSynonyms.containsKey(suffix) && !allSynonyms.get(suffix).isEmpty()) {
 				st.append("(").append(picked.toLowerCase());
 				for (String synonym : allSynonyms.get(suffix)) {
 					st.append(" OR ").append(prefix).append(synonym);
 				}
 				st.append(")");
-			}
-			else {
+			} else {
 				st.append(picked);
 			}
 			modString = modString.replaceAll(picked, st.toString());
@@ -512,17 +473,16 @@ public class BooleanQueryWordnet {
 	 * episode, and type. Note that queries are case-insensitive and stop words are
 	 * removed.<br>
 	 * <br>
-	 *
+	 * <p>
 	 * More details on the query syntax can be found at <a
 	 * href="http://www.lucenetutorial.com/lucene-query-syntax.html">
 	 * http://www.lucenetutorial.com/lucene-query-syntax.html</a>.
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 *
-	 * @param queryString
-	 *          the query string, formatted according to the Lucene query syntax.
+	 * @param queryString the query string, formatted according to the Lucene query syntax.
 	 * @return the exact content (in the textual movie plot file) of the title
-	 *         lines (starting with "MV: ") of the documents matching the query
+	 * lines (starting with "MV: ") of the documents matching the query
 	 */
 	public Set<String> booleanQuery(String queryString) {
 		HashSet<String> results = new HashSet<>();
@@ -532,12 +492,11 @@ public class BooleanQueryWordnet {
 			IndexSearcher indexSearcher = new IndexSearcher(indexReader);
 			Query qry = new QueryParser("title", myAnalyzer).parse(parseQueryString(queryString));
 			TopDocs hits = indexSearcher.search(qry, Integer.MAX_VALUE);
-			for(ScoreDoc scoreDoc : hits.scoreDocs) {
+			for (ScoreDoc scoreDoc : hits.scoreDocs) {
 				Document doc = indexSearcher.doc(scoreDoc.doc);
 				results.add(doc.get("movieline"));
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -546,7 +505,7 @@ public class BooleanQueryWordnet {
 
 	/**
 	 * A method for closing any open file handels or a ThreadPool.
-	 *
+	 * <p>
 	 * DO NOT CHANGE THIS METHOD'S INTERFACE.
 	 */
 	public void close() {
