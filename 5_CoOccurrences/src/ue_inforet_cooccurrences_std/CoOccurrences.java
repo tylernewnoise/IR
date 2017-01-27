@@ -71,7 +71,7 @@ public class CoOccurrences {
 		for (String token : tokenList) {
 			if (!stopWords.contains(token)) {
 				if (allWords.containsKey(token)) {
-					allWords.put(token, allWords.get(token + 1));
+					allWords.put(token, allWords.get(token) + 1);
 				} else {
 					allWords.put(token, 1);
 				}
@@ -145,7 +145,7 @@ public class CoOccurrences {
 		if (titleTokens.size() == 1) {
 			// count it only if it is not a stop word
 			if (allWords.containsKey(titleTokens.get(0))) {
-				allWords.put(titleTokens.get(0), allWords.get(titleTokens.get(0) + 1));
+				allWords.put(titleTokens.get(0), allWords.get(titleTokens.get(0)) + 1);
 			} else {
 				allWords.put(titleTokens.get(0), 1);
 			}
