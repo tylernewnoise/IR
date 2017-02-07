@@ -5,16 +5,51 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class CoOccurrences {
 
 	private static HashSet<String> stopWords = new HashSet<>();
 	private static HashMap<String, Integer> allWords = new HashMap<>();
 	private static HashMap<Bigram, Integer> allBigrams = new HashMap<>();
+
+	// geklaut aus IMDBQueries.java, damit ich nicht "unnütz" mit Bigram Objekten rumjongliere :)
+	class Tuple<K, V> {
+		K first;
+		V second;
+
+		public Tuple(K f, V s) {
+			this.first = f;
+			this.second = s;
+		}
+
+
+		private void calcCollocations() {
+		// result arraylist  // first idea: BiGram, but Tuple seems easier
+		ArrayList<Tuple<String, Double>> results = new ArrayList<>(); // BiGram Object: getFirst getSecond getScore setScore
+
+		// iterate through allBigrams HashMap
+		for (Map.Entry<Bigram, Integer> oneBigram : allBigrams.entrySet()) {  // returned ein Objekt mit <Bigram, Integer> (HashMap!) keySet()
+			// extract both words and get their count from allWords count list
+			int appearanceFirstWord = allWords.get(oneBigram.getKey().getFirst());
+			int appearanceSecondWord = allWords.get(oneBigram.getKey().getSecond());
+
+			// wordappearance >= 1000
+			if (appearanceFirstWord >= 1000 && appearanceSecondWord >= 1000) {
+				// calc score
+				results.add(new Tuple<>(oneBigram.getKey().getFirst().toString() + " " + oneBigram.getKey().getSecond().toString(),
+						(2 * oneBigram.getValue().intValue()) / (double)(appearanceFirstWord + appearanceSecondWord)));  // double cast - thanks falko!
+			}
+
+			// sort results
+			results.sort((o1, o2) -> o2.second.compareTo(o1.second));  // vgl. doubles gegeneinander!
+
+			// output first 1000 results
+			for (int i = 0; i < 1000; i++) {
+				System.out.println(results.get(i).first + " " + results.get(i).second);  // Ausgabe Bigram + double result
+			}
+		}
+	}
 
 	// parse and safe the stop-words
 	private static void parseStopWords() {
