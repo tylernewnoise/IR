@@ -43,8 +43,9 @@ public class CoOccurrences {
 
 		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		public boolean equals(Object obj) {
-			return this.first.equals(((BigramTuple<?, ?>) obj).first)
-				&& this.second.equals(((BigramTuple<?, ?>) obj).second);
+			return this == obj || obj != null && getClass() == obj.getClass() &&
+				this.first.equals(((BigramTuple<?, ?>) obj).first) &&
+				this.second.equals(((BigramTuple<?, ?>) obj).second);
 		}
 	}
 
@@ -66,7 +67,6 @@ public class CoOccurrences {
 		boolean isPlotLine = false;
 
 		executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4);
-		System.out.println("Found " + Runtime.getRuntime().availableProcessors() + " cores.");
 
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(plotFile),
 			StandardCharsets.ISO_8859_1))) {
@@ -82,7 +82,7 @@ public class CoOccurrences {
 						plotTokens = new ArrayList<>();
 						isPlotLine = false;
 					}
-					startThreads(line.substring(4, line.length()).toLowerCase());
+					parseTitle(line.substring(4, line.length()).toLowerCase());
 				} else if (line.startsWith("PL:")) {
 					isPlotLine = true;
 
@@ -104,15 +104,10 @@ public class CoOccurrences {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		calcCollocations();
 	}
 
 	private void startThreads(ArrayList<String> tokenList) {
 		executorService.execute(() -> createBiGram(tokenList));
-	}
-
-	private void startThreads(String line) {
-		executorService.execute(() -> parseTitle(line));
 	}
 
 	private void createBiGram(ArrayList<String> tokenList) {
@@ -195,7 +190,7 @@ public class CoOccurrences {
 	}
 
 	private void calcCollocations() {
-		ArrayList<BigramTuple<String, Double>> results = new ArrayList<>();
+		ArrayList<BigramTuple<String, Double>> results = new ArrayList<>(2081000);
 
 		for (Map.Entry<BigramTuple, AtomicInteger> entry : allBigrams.entrySet()) {
 			String firstWordOfBigram = entry.getKey().first.toString();
@@ -225,5 +220,6 @@ public class CoOccurrences {
 
 		co.parseStopWords();
 		co.parsePlotList(args[0]);
+		co.calcCollocations();
 	}
 }
