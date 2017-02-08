@@ -19,8 +19,7 @@
 	- ue_inforet_cooccurrences_variant: uses trove libraries
 	- ue_inforet_cooccurrences_threading: uses multithreading
 
-- 02 - 05 requires the plot.list file: http://www.imdb.com/interfaces
-- 04 requires the wordnet dictionary: http://wordnetcode.princeton.edu/wn3.1.dict.tar.gz
+02 - 05 requires the plot.list file: http://www.imdb.com/interfaces, 04 requires the wordnet dictionary: http://wordnetcode.princeton.edu/wn3.1.dict.tar.gz
 
 Thanks to:
 - https://github.com/Tummetott
