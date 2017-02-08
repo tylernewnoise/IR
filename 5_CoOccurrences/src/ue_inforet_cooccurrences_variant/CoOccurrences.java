@@ -196,8 +196,7 @@ public class CoOccurrences {
 		// sort for the score
 		results.sort((o1, o2) -> o2.second.compareTo(o1.second));
 
-		// TODO print 1k
-		for (int i = 0; i < 10; ++i) {
+		for (int i = 0; i < 1000; ++i) {
 			System.out.println(results.get(i).first + " " + results.get(i).second);
 		}
 	}
