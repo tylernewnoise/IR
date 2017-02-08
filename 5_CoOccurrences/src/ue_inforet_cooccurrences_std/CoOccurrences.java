@@ -1,20 +1,45 @@
 package ue_inforet_cooccurrences_std;
-/* variant without trove libs */
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class CoOccurrences {
 
 	private static HashSet<String> stopWords = new HashSet<>();
 	private static HashMap<String, Integer> allWords = new HashMap<>();
 	private static HashMap<Bigram, Integer> allBigrams = new HashMap<>();
+
+	private static void calcCollocations() {
+		// result arraylist
+		ArrayList<Bigram> results = new ArrayList<>(); // BiGram Object: getFirst getSecond getScore setScore
+
+		// iterate through allBigrams HashMap
+		for (Map.Entry<Bigram, Integer> oneBigram : allBigrams.entrySet()) {  // returned ein Objekt mit <Bigram, Integer> (HashMap!) keySet()
+			// extract both words and get their count from allWords count list
+			int appearanceFirstWord = allWords.get(oneBigram.getKey().getFirst());
+			int appearanceSecondWord = allWords.get(oneBigram.getKey().getSecond());
+
+			// wordappearance >= 1000
+			if (appearanceFirstWord >= 1000 && appearanceSecondWord >= 1000) {
+				double score = (2 * oneBigram.getValue()) / (double) (appearanceFirstWord
+					+ appearanceSecondWord);
+				oneBigram.getKey().setScore(score);
+				results.add(oneBigram.getKey());
+			}
+		}
+
+		// sort results
+		results.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+
+		// output first 1000 results
+		for (int i = 0; i < 1000; i++) {
+			System.out.println(results.get(i).getFirst() + " " + results.get(i).getSecond() + " "
+				+ results.get(i).getScore());
+		}
+	}
 
 	// parse and safe the stop-words
 	private static void parseStopWords() {
@@ -154,19 +179,14 @@ public class CoOccurrences {
 		}
 	}
 
-	// TODO calculate score and print 1k bigrams
-
 	public static void main(String[] args) {
 		if (args.length < 1) {
 			System.err.println("usage: java -jar CoOccurrences.jar <plot list file>");
 			System.exit(-1);
 		}
 
-		System.out.println("Parsing stop.words...");
 		parseStopWords();
-
-		System.out.println("Parsing plot.list...");
 		parsePlotList(args[0]);
-
+		calcCollocations();
 	}
 }
