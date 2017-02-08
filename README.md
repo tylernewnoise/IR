@@ -14,10 +14,16 @@
 	- ue_inforet_bool_wordnet_study: standard java libs, different approach to build the synsets and parse the query
 	- ue_inforet_bool_wordnet_study_variant: uses the trove libraries for the synsets, builds lucene's index with multithreading
 * 05 Finding Frequent Word Co-Occurrences
-	- ue_inforet_cooccurrences:
+	- ue_inforet_cooccurrences: uses trove libraries and an extra class for the bigram data structure
 	- ue_inforet_cooccurrences_std: uses standard java libs and an extra class for the bigram data structure
 	- ue_inforet_cooccurrences_variant: uses trove libraries
 	- ue_inforet_cooccurrences_threading: uses multithreading
 
-02 - 05 requires the plot.list file: http://www.imdb.com/interfaces
-04 requires the wordnet dictionary: http://wordnetcode.princeton.edu/wn3.1.dict.tar.gz
+- 02 - 05 requires the plot.list file: http://www.imdb.com/interfaces
+- 04 requires the wordnet dictionary: http://wordnetcode.princeton.edu/wn3.1.dict.tar.gz
+
+Thanks to:
+- https://github.com/Tummetott
+- https://github.com/belorenz
+- https://github.com/scaszoo
+
