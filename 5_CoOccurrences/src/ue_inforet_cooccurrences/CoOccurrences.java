@@ -1,5 +1,6 @@
 package ue_inforet_cooccurrences;
 
+import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -146,6 +147,30 @@ public class CoOccurrences {
 		}
 	}
 
+	private void calcCollocations() {
+		ArrayList<Bigram> results = new ArrayList<>();
+
+		TObjectIntIterator<Bigram> it = allBigrams.iterator();
+		for (int i = 0; i < allBigrams.size(); ++i) {
+			it.advance();
+			// if both words of the collocation are more than 1k times in the plot, calculate the score
+			if ((allWords.get(it.key().getFirst()) >= 1000)
+				&& (allWords.get(it.key().getSecond()) >= 1000)) {
+				double score = (2 * it.value()) / (double) (allWords.get(it.key().getFirst()) +
+					allWords.get(it.key().getSecond()));
+				it.key().setScore(score);
+				results.add(it.key());
+			}
+		}
+
+		results.sort((o1, o2) -> Double.compare(o2.getScore(), o1.getScore()));
+
+		for (int i = 0; i < 1000; i++) {
+			System.out.println(results.get(i).getFirst() + " " + results.get(i).getSecond() + " "
+				+ results.get(i).getScore());
+		}
+	}
+
 	public static void main(String[] args) {
 		CoOccurrences co = new CoOccurrences();
 
@@ -158,6 +183,7 @@ public class CoOccurrences {
 		co.parseStopWords();
 		System.out.println("Parsing plot.list...");
 		co.parsePlotList(args[0]);
-
+		System.out.println("Calculating Collocations...");
+		co.calcCollocations();
 	}
 }
