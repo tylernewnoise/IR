@@ -13,7 +13,7 @@
 *.class
 
 # Package Files #
-# *.jar
+*.jar
 *.war
 *.ear
 
@@ -23,12 +23,5 @@ hs_err_pid*
 /1_IMDB_Spider/data/movies/
 /1_IMDB_Spider/data/movies2/
 /1_IMDB_Spider/data/movies33k/
-/2_Boolean_IR/data/plot.list
-/2_Boolean_IR/data/plot_small.list
-/3_Boolean_IR_Lucene/data/plot.list
-/1_IMDB_Spider/jars/
-/2_Boolean_IR/jars/
-/3_Boolean_IR_Lucene/jar/
-/4_Synonym_Exp/jar/
 /4_Synonym_Exp/data/dict/
-/4_Synonym_Exp/data/plot.list
+/plot.list
